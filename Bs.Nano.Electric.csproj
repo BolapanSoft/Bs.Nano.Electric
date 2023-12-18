@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<VersionPrefix>1.0.0</VersionPrefix>
+		<TargetFramework>net48</TargetFramework>
+		<RootNamespace>Bs.Nano.Electric_</RootNamespace>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>9.0</LangVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="EntityFramework" version="6.4.4" targetFramework="net48" />
+		<PackageReference Include="EntityFramework.ru" version="6.2.0" targetFramework="net48" />
+		<PackageReference Include="EntityFramework.SqlServerCompact" version="6.4.4" targetFramework="net48" />
+		<PackageReference Include="Microsoft.SqlServer.Compact" version="4.0.8876.1" targetFramework="net48" />
+	</ItemGroup>
+</Project>
