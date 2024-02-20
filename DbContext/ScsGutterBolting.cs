@@ -31,11 +31,12 @@ namespace Nano.Electric
 
         public string SpecDescription { get; set; }
 
-        public int? СanalBoltingType { get; set; }
 
         public double? CountPerBox { get; set; }
 
 #if !InitDbContextEnums
+        public int? СanalBoltingType { get; set; }
+
         public int? MountType { get; set; }
 
         public int? StandType { get; set; }

@@ -1,14 +1,13 @@
-namespace Nano.Electric
-{
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.DataAnnotations;
-    using System.ComponentModel.DataAnnotations.Schema;
-    
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
+namespace Nano.Electric {
 
     [Table("DbElBoardUtilitySet")]
-    public partial class DbElBoardUtilitySet
-    {
+    public partial class DbElBoardUtilitySet {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int id { get; set; }
 

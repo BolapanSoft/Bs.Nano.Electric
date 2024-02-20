@@ -135,6 +135,8 @@ namespace Nano.Electric {
         public virtual DbSet<ScsWorkPlaceDbKit> ScsWorkPlaceDbKits { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder) {
+            InitializeModel(modelBuilder);
         }
+        partial void InitializeModel(DbModelBuilder modelBuilder);
     }
 }

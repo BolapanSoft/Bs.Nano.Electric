@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Nano.Electric.DbScsGutterPartition" Collapsed="true">
+    <Position X="1" Y="1.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAgAABIAAAA0AAAAAAAoAAQAAACAAAAACMAAFACAAgE=</HashCode>
+      <FileName>D:\Projects\Nano.Electric\Nano.Electric.DbContext\DbScsGutterPartition.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nano.Electric.DbScsGcAccessoryUnit" Collapsed="true">
+    <Position X="3.75" Y="1.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>BAgAABIABAAwAAAABAAoAGQAAICAAAAACIAABACAIgE=</HashCode>
+      <FileName>D:\Projects\Nano.Electric\Nano.Electric.DbContext\DbScsGcAccessoryUnit.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nano.Electric.DbScsGcBoltingAccessoryUnit" Collapsed="true">
+    <Position X="6.5" Y="1.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>BAgAABIAAAAwAAAABAAoAAQAAACAAAAACIAABACAAgE=</HashCode>
+      <FileName>D:\Projects\Nano.Electric\Nano.Electric.DbContext\DbScsGcBoltingAccessoryUnit.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nano.Electric.DbScsGcCoverUnit" Collapsed="true">
+    <Position X="1" Y="2.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAgAABIAAAAwAAAAAAAoAQQAAACAAAAACIAAJADAAgE=</HashCode>
+      <FileName>D:\Projects\Nano.Electric\Nano.Electric.DbContext\DbScsGcCoverUnit.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nano.Electric.DbScsGcSeriaConfigiration">
+    <Position X="7.5" Y="3" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAAFAAIAAAAgAAAAAAAAAAAAAAIAAQAAAIAAAAAEAgA=</HashCode>
+      <FileName>D:\Projects\Nano.Electric\Nano.Electric.DbContext\DbScsGcSeriaConfigiration.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nano.Electric.DbScsGutterCover" Collapsed="true">
+    <Position X="4" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAgAABIAAAAwAAAAAAEoAAQAAACAAAAACIAAFADAAgE=</HashCode>
+      <FileName>D:\Projects\Nano.Electric\Nano.Electric.DbContext\DbScsGutterCover.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nano.Electric.DbScsGutterUtilitySet">
+    <Position X="3.75" Y="3.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAAVgEIAAAAgkBAAAAAMABEIQhAAARAEAIAIAAAEAgA=</HashCode>
+      <FileName>D:\Projects\Nano.Electric\Nano.Electric.DbContext\DbScsGutterUtilitySet.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Nano.Electric.DbGcMountSystem" Collapsed="true">
+    <Position X="1" Y="4" Width="2" />
+    <TypeIdentifier>
+      <HashCode>BAAFAAIAABAAAAgAAAAIAIQAAAACARAAAIAAAAAEAgA=</HashCode>
+      <FileName>D:\Projects\Nano.Electric\Nano.Electric.DbContext\DbGcMountSystem.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nano.Electric.ScsGutterCanal" Collapsed="true">
+    <Position X="9.5" Y="0.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>BAgAABMAAAAwQAAABEBoAAQAAACAAAAgCIAAFACBAgE=</HashCode>
+      <FileName>D:\Projects\Nano.Electric\Nano.Electric.DbContext\ScsGutterCanal.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Nano.Electric.ScsGcFitting" Collapsed="true">
+    <Position X="12.75" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>RAkAAhKQBAAwAAAABgBoCAQAAACQogAoKJAABACAAgE=</HashCode>
+      <FileName>D:\Projects\Nano.Electric\Nano.Electric.DbContext\ScsGcFitting.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
