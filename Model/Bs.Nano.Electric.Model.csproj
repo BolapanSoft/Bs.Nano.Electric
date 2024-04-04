@@ -1,176 +1,178 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	  <VersionPrefix>1.0.32</VersionPrefix>
-    <TargetFramework>net48</TargetFramework>
-	  <LangVersion>9.0</LangVersion>
-	  <Nullable>enable</Nullable>
-	  <ImplicitUsings>disable</ImplicitUsings>
-    <RootNamespace>Nano.Electric</RootNamespace>
-    <BaseOutputPath>..\bin\</BaseOutputPath>
-    <!--<Nullable>enable</Nullable>-->
-  </PropertyGroup>
+	<PropertyGroup>
+		<VersionPrefix>1.0.33</VersionPrefix>
+		<TargetFramework>net48</TargetFramework>
+		<LangVersion>9.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<RootNamespace>Nano.Electric</RootNamespace>
+		<BaseOutputPath>..\bin\</BaseOutputPath>
+		<!--<Nullable>enable</Nullable>-->
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>$(DefineConstants);InitDbContextEnums</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>$(DefineConstants);InitDbContextEnums</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>$(DefineConstants);InitDbContextEnums</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DefineConstants>$(DefineConstants);InitDbContextEnums</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Cadwise\Exporter.cs" />
-    <Compile Remove="Cadwise\ReflectionHelper.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Remove="Cadwise\Exporter.cs" />
+		<Compile Remove="Cadwise\ReflectionHelper.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="..\DbContext\AutomatValuesScale.cs" Link="RefPartial\AutomatValuesScale.cs" />
-    <Compile Include="..\DbContext\CaeMaterialUtility.cs" Link="RefPartial\CaeMaterialUtility.cs" />
-    <Compile Include="..\DbContext\ClimateTable.cs" Link="RefPartial\ClimateTable.cs" />
-    <Compile Include="..\DbContext\Context.cs" Link="RefPartial\Context.cs" />
-    <Compile Include="..\DbContext\CurrentReleaseScale.cs" Link="RefPartial\CurrentReleaseScale.cs" />
-    <Compile Include="..\DbContext\CurrentScale.cs" Link="RefPartial\CurrentScale.cs" />
-    <Compile Include="..\DbContext\CurrentScaleUzo.cs" Link="RefPartial\CurrentScaleUzo.cs" />
-    <Compile Include="..\DbContext\DbCableCanalPartition.cs" Link="RefPartial\DbCableCanalPartition.cs" />
-    <Compile Include="..\DbContext\DbCaeMaterialUtilitySet.cs" Link="RefPartial\DbCaeMaterialUtilitySet.cs" />
-    <Compile Include="..\DbContext\DbCcMountSystem.cs" Link="RefPartial\DbCcMountSystem.cs" />
-    <Compile Include="..\DbContext\DbDwgFile.cs" Link="RefPartial\DbDwgFile.cs" />
-    <Compile Include="..\DbContext\DbElBoardUtilitySet.cs" Link="RefPartial\DbElBoardUtilitySet.cs" />
-    <Compile Include="..\DbContext\DbElCSwitch.cs" Link="RefPartial\DbElCSwitch.cs" />
-    <Compile Include="..\DbContext\DbElFiderUtilitySet.cs" Link="RefPartial\DbElFiderUtilitySet.cs" />
-    <Compile Include="..\DbContext\DbElLightUtilitySet.cs" Link="RefPartial\DbElLightUtilitySet.cs" />
-    <Compile Include="..\DbContext\DbElSocket.cs" Link="RefPartial\DbElSocket.cs" />
-    <Compile Include="..\DbContext\DbElSocketUtilitySet.cs" Link="RefPartial\DbElSocketUtilitySet.cs" />
-    <Compile Include="..\DbContext\DbElSwitch.cs" Link="RefPartial\DbElSwitch.cs" />
-    <Compile Include="..\DbContext\DbGcMountSystem.cs" Link="RefPartial\DbGcMountSystem.cs" />
-    <Compile Include="..\DbContext\DbGraphic.cs" Link="RefPartial\DbGraphic.cs" />
-    <Compile Include="..\DbContext\DbImage.cs" Link="RefPartial\DbImage.cs" />
-    <Compile Include="..\DbContext\DbLtKiTable.cs" Link="RefPartial\DbLtKiTable.cs" />
-    <Compile Include="..\DbContext\DbScsGcAccessoryUnit.cs" Link="RefPartial\DbScsGcAccessoryUnit.cs" />
-    <Compile Include="..\DbContext\DbScsGcBoltingAccessoryUnit.cs" Link="RefPartial\DbScsGcBoltingAccessoryUnit.cs" />
-    <Compile Include="..\DbContext\DbScsGcCoverUnit.cs" Link="RefPartial\DbScsGcCoverUnit.cs" />
-    <Compile Include="..\DbContext\DbScsGcSeriaConfigiration.cs" Link="RefPartial\DbScsGcSeriaConfigiration.cs" />
-    <Compile Include="..\DbContext\DbScsGutterCover.cs" Link="RefPartial\DbScsGutterCover.cs" />
-    <Compile Include="..\DbContext\DbScsGutterPartition.cs" Link="RefPartial\DbScsGutterPartition.cs" />
-    <Compile Include="..\DbContext\DbScsGutterUtilitySet.cs" Link="RefPartial\DbScsGutterUtilitySet.cs" />
-    <Compile Include="..\DbContext\DbScsPanelUtilitySet.cs" Link="RefPartial\DbScsPanelUtilitySet.cs" />
-    <Compile Include="..\DbContext\DbScsShellUtilitySet.cs" Link="RefPartial\DbScsShellUtilitySet.cs" />
-    <Compile Include="..\DbContext\DbScsTubeSeriaConfigiration.cs" Link="RefPartial\DbScsTubeSeriaConfigiration.cs" />
-    <Compile Include="..\DbContext\DbTbMountSystem.cs" Link="RefPartial\DbTbMountSystem.cs" />
-    <Compile Include="..\DbContext\DcCableCanalCover.cs" Link="RefPartial\DcCableCanalCover.cs" />
-    <Compile Include="..\DbContext\DSInformation.cs" Link="RefPartial\DSInformation.cs" />
-    <Compile Include="..\DbContext\ElAmperemeter.cs" Link="RefPartial\ElAmperemeter.cs" />
-    <Compile Include="..\DbContext\ElAutomat.cs" Link="RefPartial\ElAutomat.cs" />
-    <Compile Include="..\DbContext\ElBlock.cs" Link="RefPartial\ElBlock.cs" />
-    <Compile Include="..\DbContext\ElBlockBoard.cs" Link="RefPartial\ElBlockBoard.cs" />
-    <Compile Include="..\DbContext\ElBoard.cs" Link="RefPartial\ElBoard.cs" />
-    <Compile Include="..\DbContext\ElBoardUtility.cs" Link="RefPartial\ElBoardUtility.cs" />
-    <Compile Include="..\DbContext\ElBox.cs" Link="RefPartial\ElBox.cs" />
-    <Compile Include="..\DbContext\ElCase.cs" Link="RefPartial\ElCase.cs" />
-    <Compile Include="..\DbContext\ElCasing.cs" Link="RefPartial\ElCasing.cs" />
-    <Compile Include="..\DbContext\ElCompensatorReactivePower.cs" Link="RefPartial\ElCompensatorReactivePower.cs" />
-    <Compile Include="..\DbContext\ElControlCabel.cs" Link="RefPartial\ElControlCabel.cs" />
-    <Compile Include="..\DbContext\ElControlDevice.cs" Link="RefPartial\ElControlDevice.cs" />
-    <Compile Include="..\DbContext\ElControlWireMark.cs" Link="RefPartial\ElControlWireMark.cs" />
-    <Compile Include="..\DbContext\ElCounter.cs" Link="RefPartial\ElCounter.cs" />
-    <Compile Include="..\DbContext\ElCurrentTransformer.cs" Link="RefPartial\ElCurrentTransformer.cs" />
-    <Compile Include="..\DbContext\ElDbCase.cs" Link="RefPartial\ElDbCase.cs" />
-    <Compile Include="..\DbContext\ElDbComplex.cs" Link="RefPartial\ElDbComplex.cs" />
-    <Compile Include="..\DbContext\ElDbEngine.cs" Link="RefPartial\ElDbEngine.cs" />
-    <Compile Include="..\DbContext\ElDbHeater.cs" Link="RefPartial\ElDbHeater.cs" />
-    <Compile Include="..\DbContext\ElDistPanel.cs" Link="RefPartial\ElDistPanel.cs" />
-    <Compile Include="..\DbContext\ElFider.cs" Link="RefPartial\ElFider.cs" />
-    <Compile Include="..\DbContext\ElFiderUtility.cs" Link="RefPartial\ElFiderUtility.cs" />
-    <Compile Include="..\DbContext\ElFrequenceTransformer.cs" Link="RefPartial\ElFrequenceTransformer.cs" />
-    <Compile Include="..\DbContext\ElInputAprBoard.cs" Link="RefPartial\ElInputAprBoard.cs" />
-    <Compile Include="..\DbContext\ElInputBusBoard.cs" Link="RefPartial\ElInputBusBoard.cs" />
-    <Compile Include="..\DbContext\ElInstallBox.cs" Link="RefPartial\ElInstallBox.cs" />
-    <Compile Include="..\DbContext\ElKnifeSwitch.cs" Link="RefPartial\ElKnifeSwitch.cs" />
-    <Compile Include="..\DbContext\ElLamp.cs" Link="RefPartial\ElLamp.cs" />
-    <Compile Include="..\DbContext\ElLighting.cs" Link="RefPartial\ElLighting.cs" />
-    <Compile Include="..\DbContext\ElLightUtility.cs" Link="RefPartial\ElLightUtility.cs" />
-    <Compile Include="..\DbContext\ElModuleBoard.cs" Link="RefPartial\ElModuleBoard.cs" />
-    <Compile Include="..\DbContext\ElOvervoltageSuppressor.cs" Link="RefPartial\ElOvervoltageSuppressor.cs" />
-    <Compile Include="..\DbContext\ElPushButtonStation.cs" Link="RefPartial\ElPushButtonStation.cs" />
-    <Compile Include="..\DbContext\ElRailBoard.cs" Link="RefPartial\ElRailBoard.cs" />
-    <Compile Include="..\DbContext\ElResistReactor.cs" Link="RefPartial\ElResistReactor.cs" />
-    <Compile Include="..\DbContext\ElSafeDevice.cs" Link="RefPartial\ElSafeDevice.cs" />
-    <Compile Include="..\DbContext\ElShieldingUnit.cs" Link="RefPartial\ElShieldingUnit.cs" />
-    <Compile Include="..\DbContext\ElSocketUtility.cs" Link="RefPartial\ElSocketUtility.cs" />
-    <Compile Include="..\DbContext\ElStandartDistrBoard.cs" Link="RefPartial\ElStandartDistrBoard.cs" />
-    <Compile Include="..\DbContext\ElStarter.cs" Link="RefPartial\ElStarter.cs" />
-    <Compile Include="..\DbContext\ElTransformer.cs" Link="RefPartial\ElTransformer.cs" />
-    <Compile Include="..\DbContext\ElUzo.cs" Link="RefPartial\ElUzo.cs" />
-    <Compile Include="..\DbContext\ElVoltmeter.cs" Link="RefPartial\ElVoltmeter.cs" />
-    <Compile Include="..\DbContext\ElWire.cs" Link="RefPartial\ElWire.cs" />
-    <Compile Include="..\DbContext\ElWireConductMaterial.cs" Link="RefPartial\ElWireConductMaterial.cs" />
-    <Compile Include="..\DbContext\ElWireIsolationMaterial.cs" Link="RefPartial\ElWireIsolationMaterial.cs" />
-    <Compile Include="..\DbContext\ElWireMark.cs" Link="RefPartial\ElWireMark.cs" />
-    <Compile Include="..\DbContext\ExplodeSafeLevel.cs" Link="RefPartial\ExplodeSafeLevel.cs" />
-    <Compile Include="..\DbContext\FieldOldValue.cs" Link="RefPartial\FieldOldValue.cs" />
-    <Compile Include="..\DbContext\ImportConflictField.cs" Link="RefPartial\ImportConflictField.cs" />
-    <Compile Include="..\DbContext\ImportObjectStatu.cs" Link="RefPartial\ImportObjectStatu.cs" />
-    <Compile Include="..\DbContext\MultiplicityScale.cs" Link="RefPartial\MultiplicityScale.cs" />
-    <Compile Include="..\DbContext\SafeDegree.cs" Link="RefPartial\SafeDegree.cs" />
-    <Compile Include="..\DbContext\ScsCabelCanal.cs" Link="RefPartial\ScsCabelCanal.cs" />
-    <Compile Include="..\DbContext\ScsCableCanalSupplement.cs" Link="RefPartial\ScsCableCanalSupplement.cs" />
-    <Compile Include="..\DbContext\ScsCableFitting.cs" Link="RefPartial\ScsCableFitting.cs" />
-    <Compile Include="..\DbContext\ScsCableSystemType.cs" Link="RefPartial\ScsCableSystemType.cs" />
-    <Compile Include="..\DbContext\ScsCord.cs" Link="RefPartial\ScsCord.cs" />
-    <Compile Include="..\DbContext\ScsGcFitting.cs" Link="RefPartial\ScsGcFitting.cs" />
-    <Compile Include="..\DbContext\ScsGutterBolting.cs" Link="RefPartial\ScsGutterBolting.cs" />
-    <Compile Include="..\DbContext\ScsGutterCanal.cs" Link="RefPartial\ScsGutterCanal.cs" />
-    <Compile Include="..\DbContext\ScsGutterSupplement.cs" Link="RefPartial\ScsGutterSupplement.cs" />
-    <Compile Include="..\DbContext\ScsOrganaizerPanel.cs" Link="RefPartial\ScsOrganaizerPanel.cs" />
-    <Compile Include="..\DbContext\ScsPanelUtilityUnit.cs" Link="RefPartial\ScsPanelUtilityUnit.cs" />
-    <Compile Include="..\DbContext\ScsPipe.cs" Link="RefPartial\ScsPipe.cs" />
-    <Compile Include="..\DbContext\ScsShellDistr.cs" Link="RefPartial\ScsShellDistr.cs" />
-    <Compile Include="..\DbContext\ScsShellUtility.cs" Link="RefPartial\ScsShellUtility.cs" />
-    <Compile Include="..\DbContext\ScsTubeFitting.cs" Link="RefPartial\ScsTubeFitting.cs" />
-    <Compile Include="..\DbContext\ScsCommutatorPanel.cs" Link="RefPartial\ScsCommutatorPanel.cs" />
-    <Compile Include="..\DbContext\ScsHatch.cs" Link="RefPartial\ScsHatch.cs" />
-    <Compile Include="..\DbContext\ScsHatchUtilityUnit.cs" Link="RefPartial\ScsHatchUtilityUnit.cs" />
-    <Compile Include="..\DbContext\ScsPatchCord.cs" Link="RefPartial\ScsPatchCord.cs" />
-    <Compile Include="..\DbContext\ScsPhoneCross.cs" Link="RefPartial\ScsPhoneCross.cs" />
-    <Compile Include="..\DbContext\ScsPhoneCrossUtilityUnit.cs" Link="RefPartial\ScsPhoneCrossUtilityUnit.cs" />
-    <Compile Include="..\DbContext\ScsPhoneProfile.cs" Link="RefPartial\ScsPhoneProfile.cs" />
-    <Compile Include="..\DbContext\ScsPlintModule.cs" Link="RefPartial\ScsPlintModule.cs" />
-    <Compile Include="..\DbContext\ScsPortType.cs" Link="RefPartial\ScsPortType.cs" />
-    <Compile Include="..\DbContext\ScsServiceColumn.cs" Link="RefPartial\ScsServiceColumn.cs" />
-    <Compile Include="..\DbContext\ScsServiceColumnUtilityUnit.cs" Link="RefPartial\ScsServiceColumnUtilityUnit.cs" />
-    <Compile Include="..\DbContext\ScsSwitchSocketPanel.cs" Link="RefPartial\ScsSwitchSocketPanel.cs" />
-    <Compile Include="..\DbContext\ScsSwitchUtpPanel.cs" Link="RefPartial\ScsSwitchUtpPanel.cs" />
-    <Compile Include="..\DbContext\ScsUtpSocket.cs" Link="RefPartial\ScsUtpSocket.cs" />
-    <Compile Include="..\DbContext\ScsWorkPlaceDbKit.cs" Link="RefPartial\ScsWorkPlaceDbKit.cs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\DbContext\AutomatValuesScale.cs" Link="RefPartial\AutomatValuesScale.cs" />
+		<Compile Include="..\DbContext\CaeMaterialUtility.cs" Link="RefPartial\CaeMaterialUtility.cs" />
+		<Compile Include="..\DbContext\ClimateTable.cs" Link="RefPartial\ClimateTable.cs" />
+		<Compile Include="..\DbContext\Context.cs" Link="RefPartial\Context.cs" />
+		<Compile Include="..\DbContext\CurrentReleaseScale.cs" Link="RefPartial\CurrentReleaseScale.cs" />
+		<Compile Include="..\DbContext\CurrentScale.cs" Link="RefPartial\CurrentScale.cs" />
+		<Compile Include="..\DbContext\CurrentScaleUzo.cs" Link="RefPartial\CurrentScaleUzo.cs" />
+		<Compile Include="..\DbContext\DbCableCanalPartition.cs" Link="RefPartial\DbCableCanalPartition.cs" />
+		<Compile Include="..\DbContext\DbCaeMaterialUtilitySet.cs" Link="RefPartial\DbCaeMaterialUtilitySet.cs" />
+		<Compile Include="..\DbContext\DbCcMountSystem.cs" Link="RefPartial\DbCcMountSystem.cs" />
+		<Compile Include="..\DbContext\DbDwgFile.cs" Link="RefPartial\DbDwgFile.cs" />
+		<Compile Include="..\DbContext\DbElBoardUtilitySet.cs" Link="RefPartial\DbElBoardUtilitySet.cs" />
+		<Compile Include="..\DbContext\DbElCSwitch.cs" Link="RefPartial\DbElCSwitch.cs" />
+		<Compile Include="..\DbContext\DbElFiderUtilitySet.cs" Link="RefPartial\DbElFiderUtilitySet.cs" />
+		<Compile Include="..\DbContext\DbElLightUtilitySet.cs" Link="RefPartial\DbElLightUtilitySet.cs" />
+		<Compile Include="..\DbContext\DbElSocket.cs" Link="RefPartial\DbElSocket.cs" />
+		<Compile Include="..\DbContext\DbElSocketUtilitySet.cs" Link="RefPartial\DbElSocketUtilitySet.cs" />
+		<Compile Include="..\DbContext\DbElSwitch.cs" Link="RefPartial\DbElSwitch.cs" />
+		<Compile Include="..\DbContext\DbGcMountSystem.cs" Link="RefPartial\DbGcMountSystem.cs" />
+		<Compile Include="..\DbContext\DbGraphic.cs" Link="RefPartial\DbGraphic.cs" />
+		<Compile Include="..\DbContext\DbImage.cs" Link="RefPartial\DbImage.cs" />
+		<Compile Include="..\DbContext\DbLtKiTable.cs" Link="RefPartial\DbLtKiTable.cs" />
+		<Compile Include="..\DbContext\DbScsGcAccessoryUnit.cs" Link="RefPartial\DbScsGcAccessoryUnit.cs" />
+		<Compile Include="..\DbContext\DbScsGcBoltingAccessoryUnit.cs" Link="RefPartial\DbScsGcBoltingAccessoryUnit.cs" />
+		<Compile Include="..\DbContext\DbScsGcCoverUnit.cs" Link="RefPartial\DbScsGcCoverUnit.cs" />
+		<Compile Include="..\DbContext\DbScsGcSeriaConfigiration.cs" Link="RefPartial\DbScsGcSeriaConfigiration.cs" />
+		<Compile Include="..\DbContext\DbScsGutterCover.cs" Link="RefPartial\DbScsGutterCover.cs" />
+		<Compile Include="..\DbContext\DbScsGutterPartition.cs" Link="RefPartial\DbScsGutterPartition.cs" />
+		<Compile Include="..\DbContext\DbScsGutterUtilitySet.cs" Link="RefPartial\DbScsGutterUtilitySet.cs" />
+		<Compile Include="..\DbContext\DbScsPanelUtilitySet.cs" Link="RefPartial\DbScsPanelUtilitySet.cs" />
+		<Compile Include="..\DbContext\DbScsShellUtilitySet.cs" Link="RefPartial\DbScsShellUtilitySet.cs" />
+		<Compile Include="..\DbContext\DbScsTubeSeriaConfigiration.cs" Link="RefPartial\DbScsTubeSeriaConfigiration.cs" />
+		<Compile Include="..\DbContext\DbTbMountSystem.cs" Link="RefPartial\DbTbMountSystem.cs" />
+		<Compile Include="..\DbContext\DcCableCanalCover.cs" Link="RefPartial\DcCableCanalCover.cs" />
+		<Compile Include="..\DbContext\DSInformation.cs" Link="RefPartial\DSInformation.cs" />
+		<Compile Include="..\DbContext\ElAmperemeter.cs" Link="RefPartial\ElAmperemeter.cs" />
+		<Compile Include="..\DbContext\ElAutomat.cs" Link="RefPartial\ElAutomat.cs" />
+		<Compile Include="..\DbContext\ElBlock.cs" Link="RefPartial\ElBlock.cs" />
+		<Compile Include="..\DbContext\ElBlockBoard.cs" Link="RefPartial\ElBlockBoard.cs" />
+		<Compile Include="..\DbContext\ElBoard.cs" Link="RefPartial\ElBoard.cs" />
+		<Compile Include="..\DbContext\ElBoardUtility.cs" Link="RefPartial\ElBoardUtility.cs" />
+		<Compile Include="..\DbContext\ElBox.cs" Link="RefPartial\ElBox.cs" />
+		<Compile Include="..\DbContext\ElCase.cs" Link="RefPartial\ElCase.cs" />
+		<Compile Include="..\DbContext\ElCasing.cs" Link="RefPartial\ElCasing.cs" />
+		<Compile Include="..\DbContext\ElCompensatorReactivePower.cs" Link="RefPartial\ElCompensatorReactivePower.cs" />
+		<Compile Include="..\DbContext\ElControlCabel.cs" Link="RefPartial\ElControlCabel.cs" />
+		<Compile Include="..\DbContext\ElControlDevice.cs" Link="RefPartial\ElControlDevice.cs" />
+		<Compile Include="..\DbContext\ElControlWireMark.cs" Link="RefPartial\ElControlWireMark.cs" />
+		<Compile Include="..\DbContext\ElCounter.cs" Link="RefPartial\ElCounter.cs" />
+		<Compile Include="..\DbContext\ElCurrentTransformer.cs" Link="RefPartial\ElCurrentTransformer.cs" />
+		<Compile Include="..\DbContext\ElDbCase.cs" Link="RefPartial\ElDbCase.cs" />
+		<Compile Include="..\DbContext\ElDbComplex.cs" Link="RefPartial\ElDbComplex.cs" />
+		<Compile Include="..\DbContext\ElDbEngine.cs" Link="RefPartial\ElDbEngine.cs" />
+		<Compile Include="..\DbContext\ElDbHeater.cs" Link="RefPartial\ElDbHeater.cs" />
+		<Compile Include="..\DbContext\ElDistPanel.cs" Link="RefPartial\ElDistPanel.cs" />
+		<Compile Include="..\DbContext\ElFider.cs" Link="RefPartial\ElFider.cs" />
+		<Compile Include="..\DbContext\ElFiderUtility.cs" Link="RefPartial\ElFiderUtility.cs" />
+		<Compile Include="..\DbContext\ElFrequenceTransformer.cs" Link="RefPartial\ElFrequenceTransformer.cs" />
+		<Compile Include="..\DbContext\ElInputAprBoard.cs" Link="RefPartial\ElInputAprBoard.cs" />
+		<Compile Include="..\DbContext\ElInputBusBoard.cs" Link="RefPartial\ElInputBusBoard.cs" />
+		<Compile Include="..\DbContext\ElInstallBox.cs" Link="RefPartial\ElInstallBox.cs" />
+		<Compile Include="..\DbContext\ElKnifeSwitch.cs" Link="RefPartial\ElKnifeSwitch.cs" />
+		<Compile Include="..\DbContext\ElLamp.cs" Link="RefPartial\ElLamp.cs" />
+		<Compile Include="..\DbContext\ElLighting.cs" Link="RefPartial\ElLighting.cs" />
+		<Compile Include="..\DbContext\ElLightUtility.cs" Link="RefPartial\ElLightUtility.cs" />
+		<Compile Include="..\DbContext\ElModuleBoard.cs" Link="RefPartial\ElModuleBoard.cs" />
+		<Compile Include="..\DbContext\ElOvervoltageSuppressor.cs" Link="RefPartial\ElOvervoltageSuppressor.cs" />
+		<Compile Include="..\DbContext\ElPushButtonStation.cs" Link="RefPartial\ElPushButtonStation.cs" />
+		<Compile Include="..\DbContext\ElRailBoard.cs" Link="RefPartial\ElRailBoard.cs" />
+		<Compile Include="..\DbContext\ElResistReactor.cs" Link="RefPartial\ElResistReactor.cs" />
+		<Compile Include="..\DbContext\ElSafeDevice.cs" Link="RefPartial\ElSafeDevice.cs" />
+		<Compile Include="..\DbContext\ElShieldingUnit.cs" Link="RefPartial\ElShieldingUnit.cs" />
+		<Compile Include="..\DbContext\ElSocketUtility.cs" Link="RefPartial\ElSocketUtility.cs" />
+		<Compile Include="..\DbContext\ElStandartDistrBoard.cs" Link="RefPartial\ElStandartDistrBoard.cs" />
+		<Compile Include="..\DbContext\ElStarter.cs" Link="RefPartial\ElStarter.cs" />
+		<Compile Include="..\DbContext\ElTransformer.cs" Link="RefPartial\ElTransformer.cs" />
+		<Compile Include="..\DbContext\ElUzo.cs" Link="RefPartial\ElUzo.cs" />
+		<Compile Include="..\DbContext\ElVoltmeter.cs" Link="RefPartial\ElVoltmeter.cs" />
+		<Compile Include="..\DbContext\ElWire.cs" Link="RefPartial\ElWire.cs" />
+		<Compile Include="..\DbContext\ElWireConductMaterial.cs" Link="RefPartial\ElWireConductMaterial.cs" />
+		<Compile Include="..\DbContext\ElWireIsolationMaterial.cs" Link="RefPartial\ElWireIsolationMaterial.cs" />
+		<Compile Include="..\DbContext\ElWireMark.cs" Link="RefPartial\ElWireMark.cs" />
+		<Compile Include="..\DbContext\ExplodeSafeLevel.cs" Link="RefPartial\ExplodeSafeLevel.cs" />
+		<Compile Include="..\DbContext\FieldOldValue.cs" Link="RefPartial\FieldOldValue.cs" />
+		<Compile Include="..\DbContext\ImportConflictField.cs" Link="RefPartial\ImportConflictField.cs" />
+		<Compile Include="..\DbContext\ImportObjectStatu.cs" Link="RefPartial\ImportObjectStatu.cs" />
+		<Compile Include="..\DbContext\MultiplicityScale.cs" Link="RefPartial\MultiplicityScale.cs" />
+		<Compile Include="..\DbContext\SafeDegree.cs" Link="RefPartial\SafeDegree.cs" />
+		<Compile Include="..\DbContext\ScsCabelCanal.cs" Link="RefPartial\ScsCabelCanal.cs" />
+		<Compile Include="..\DbContext\ScsCableCanalSupplement.cs" Link="RefPartial\ScsCableCanalSupplement.cs" />
+		<Compile Include="..\DbContext\ScsCableFitting.cs" Link="RefPartial\ScsCableFitting.cs" />
+		<Compile Include="..\DbContext\ScsCableSystemType.cs" Link="RefPartial\ScsCableSystemType.cs" />
+		<Compile Include="..\DbContext\ScsCord.cs" Link="RefPartial\ScsCord.cs" />
+		<Compile Include="..\DbContext\ScsGcFitting.cs" Link="RefPartial\ScsGcFitting.cs" />
+		<Compile Include="..\DbContext\ScsGutterBolting.cs" Link="RefPartial\ScsGutterBolting.cs" />
+		<Compile Include="..\DbContext\ScsGutterCanal.cs" Link="RefPartial\ScsGutterCanal.cs" />
+		<Compile Include="..\DbContext\ScsGutterSupplement.cs" Link="RefPartial\ScsGutterSupplement.cs" />
+		<Compile Include="..\DbContext\ScsOrganaizerPanel.cs" Link="RefPartial\ScsOrganaizerPanel.cs" />
+		<Compile Include="..\DbContext\ScsPanelUtilityUnit.cs" Link="RefPartial\ScsPanelUtilityUnit.cs" />
+		<Compile Include="..\DbContext\ScsPipe.cs" Link="RefPartial\ScsPipe.cs" />
+		<Compile Include="..\DbContext\ScsShellDistr.cs" Link="RefPartial\ScsShellDistr.cs" />
+		<Compile Include="..\DbContext\ScsShellUtility.cs" Link="RefPartial\ScsShellUtility.cs" />
+		<Compile Include="..\DbContext\ScsTubeFitting.cs" Link="RefPartial\ScsTubeFitting.cs" />
+		<Compile Include="..\DbContext\ScsCommutatorPanel.cs" Link="RefPartial\ScsCommutatorPanel.cs" />
+		<Compile Include="..\DbContext\ScsHatch.cs" Link="RefPartial\ScsHatch.cs" />
+		<Compile Include="..\DbContext\ScsHatchUtilityUnit.cs" Link="RefPartial\ScsHatchUtilityUnit.cs" />
+		<Compile Include="..\DbContext\ScsPatchCord.cs" Link="RefPartial\ScsPatchCord.cs" />
+		<Compile Include="..\DbContext\ScsPhoneCross.cs" Link="RefPartial\ScsPhoneCross.cs" />
+		<Compile Include="..\DbContext\ScsPhoneCrossUtilityUnit.cs" Link="RefPartial\ScsPhoneCrossUtilityUnit.cs" />
+		<Compile Include="..\DbContext\ScsPhoneProfile.cs" Link="RefPartial\ScsPhoneProfile.cs" />
+		<Compile Include="..\DbContext\ScsPlintModule.cs" Link="RefPartial\ScsPlintModule.cs" />
+		<Compile Include="..\DbContext\ScsPortType.cs" Link="RefPartial\ScsPortType.cs" />
+		<Compile Include="..\DbContext\ScsServiceColumn.cs" Link="RefPartial\ScsServiceColumn.cs" />
+		<Compile Include="..\DbContext\ScsServiceColumnUtilityUnit.cs" Link="RefPartial\ScsServiceColumnUtilityUnit.cs" />
+		<Compile Include="..\DbContext\ScsSwitchSocketPanel.cs" Link="RefPartial\ScsSwitchSocketPanel.cs" />
+		<Compile Include="..\DbContext\ScsSwitchUtpPanel.cs" Link="RefPartial\ScsSwitchUtpPanel.cs" />
+		<Compile Include="..\DbContext\ScsUtpSocket.cs" Link="RefPartial\ScsUtpSocket.cs" />
+		<Compile Include="..\DbContext\ScsWorkPlaceDbKit.cs" Link="RefPartial\ScsWorkPlaceDbKit.cs" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="EntityFramework.SqlServerCompact" Version="6.4.4" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="EntityFramework.SqlServerCompact" Version="6.4.4" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Cadwise\" />
-    <Folder Include="RefPartial\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Cadwise\" />
+		<Folder Include="RefPartial\" />
+	</ItemGroup>
 
-  
-  <ItemGroup>
-    <Reference Include="Cadwise.Kit">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Kit.dll</HintPath>
-    </Reference>
-    <Reference Include="Cadwise.ObjectLib.WireCommon.Db">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.ObjectLib.WireCommon.Db.dll</HintPath>
-    </Reference>
-    <Reference Include="Cadwise.Platform">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Platform.dll</HintPath>
-    </Reference>
-    <Reference Include="Cadwise.Studio.DataBase">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Studio.DataBase.dll</HintPath>
-    </Reference>
-    <Reference Include="Cadwise.Studio.DataBase.Model">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Studio.DataBase.Model.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="Cadwise.Kit">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Kit.dll</HintPath>
+		</Reference>
+		<Reference Include="Cadwise.ObjectLib.WireCommon.Db">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.ObjectLib.WireCommon.Db.dll</HintPath>
+		</Reference>
+		<Reference Include="Cadwise.Platform">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Platform.dll</HintPath>
+		</Reference>
+		<Reference Include="Cadwise.Studio.DataBase">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Studio.DataBase.dll</HintPath>
+		</Reference>
+		<Reference Include="Cadwise.Studio.DataBase.Model">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Studio.DataBase.Model.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<Import Project="$(MSBuildProjectName).csproj.local" Condition="Exists('$(MSBuildProjectName).csproj.local')"/>
 
 </Project>
