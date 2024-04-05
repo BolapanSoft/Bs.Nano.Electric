@@ -19,7 +19,7 @@ namespace Nano.Electric
         public double? GutterHeight { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        public int Id { get; set; }
 
         public string Manufacturer { get; set; }
 

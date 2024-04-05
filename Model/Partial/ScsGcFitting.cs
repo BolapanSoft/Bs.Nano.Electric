@@ -7,7 +7,7 @@ namespace Nano.Electric {
     public partial class ScsGcFitting : DbUtilityUnit, IXmlSerializable {
         public override string UtilityTypeId => "ScsGcFitting";
         public override string TableName => "ScsGcFitting";
-        public override int Id => id;
+        
         [Column("FittingType")]
         public ScsGutterFittingTypeEnum FittingType { get; set; } = ScsGutterFittingTypeEnum.OTHER;
         //ScsVerticalUniversalBendTypeEnum

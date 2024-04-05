@@ -9,7 +9,8 @@ namespace Nano.Electric
     public partial class DbScsGcCoverUnit
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("Id")]
+        public override int Id { get; set; }
 
         public double? CountPerBox { get; set; }
 

@@ -1,4 +1,8 @@
+// Ignore Spelling: Amperemeters
+#pragma warning disable VSSpell001 // Spell Check
+
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity;
 using System.Linq;

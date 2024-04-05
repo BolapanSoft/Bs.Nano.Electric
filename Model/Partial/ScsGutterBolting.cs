@@ -7,7 +7,7 @@ namespace Nano.Electric {
     public partial class ScsGutterBolting : DbUtilityUnit, IXmlSerializable {
         public override string UtilityTypeId => "ScsGutterBolting";
         public override string TableName => "ScsGutterBolting";
-        public override int Id => id;
+        
         [Column("СanalBoltingType")] // Achtung! Cirillic!!
         public ScsGutterBoltingTypeEnum CanalBoltingType { get; set; }
         public ScsGcStandMountType? MountType { get; set; }

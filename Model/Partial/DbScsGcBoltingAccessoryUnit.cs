@@ -4,7 +4,7 @@ namespace Nano.Electric {
     public partial class DbScsGcBoltingAccessoryUnit : DbUtilityUnit, IXmlSerializable {
         public override string UtilityTypeId => "DbScsGcBoltingAccessoryUnits";
         public override string TableName => "DbScsGcBoltingAccessoryUnits";
-        public override int Id => id;
+       
     }
 
 }

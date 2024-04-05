@@ -4,6 +4,6 @@ namespace Nano.Electric {
     public partial class DbCaeMaterialUtilitySet : DbUtilityUnit, IXmlSerializable {
         public override string UtilityTypeId => nameof(DbCaeMaterialUtilitySet);
         public override string TableName => nameof(DbCaeMaterialUtilitySet);
-        public override int Id => id;
+        
     }
 }

@@ -7,7 +7,6 @@ namespace Nano.Electric {
     public partial class DbScsGcCoverUnit : DbUtilityUnit, IXmlSerializable {
         public override string UtilityTypeId => "DbScsGcCoverUnit";
         public override string TableName => "DbScsGcCoverUnit";
-        public override int Id => id;
         [Column("CoverType")]
         public ScsGcCoverType CoverType { get; set; } = ScsGcCoverType.STRIGHT;
 

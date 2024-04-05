@@ -38,7 +38,7 @@ namespace Nano.Electric {
             if (!(Bolting is null)) {
                 writer.WriteStartElement("Bolting");
                 writer.WriteAttributeString("TableName", "ScsGutterBolting");
-                writer.WriteAttributeString("Id", Bolting.id.ToString());
+                writer.WriteAttributeString("Id", Bolting.Id.ToString());
                 writer.WriteEndElement();
             }
             writer.WriteElementString("IsEnabled", IsEnabled.ToString());

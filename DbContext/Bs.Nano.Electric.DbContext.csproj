@@ -11,6 +11,10 @@
 		<!--<BaseIntermediateOutputPath>..\obj\</BaseIntermediateOutputPath>-->
 
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="EntityFramework" version="6.4.4" targetFramework="net48" />
 		<PackageReference Include="EntityFramework.SqlServerCompact" version="6.4.4" targetFramework="net48" />

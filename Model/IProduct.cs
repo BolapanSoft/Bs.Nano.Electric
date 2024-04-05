@@ -1,7 +1,9 @@
-﻿namespace Nano.Electric {
+﻿#pragma warning disable VSSpell001 // Spell Check
+
+namespace Nano.Electric {
     public interface IProduct {
         string Code { get; }
-        int id { get; set; }
+        int Id { get; set; }
         int? DbImageRef { get; set; }
         string Name { get; set; }
         string Manufacturer { get; set; }

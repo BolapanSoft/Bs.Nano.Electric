@@ -9,7 +9,8 @@ namespace Nano.Electric
     public partial class DbScsGcBoltingAccessoryUnit
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")]
+        public override int Id { get; set; }
 
         public double? CountPerBox { get; set; }
 

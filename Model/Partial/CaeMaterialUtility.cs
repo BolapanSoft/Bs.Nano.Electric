@@ -12,7 +12,6 @@ namespace Nano.Electric {
         public override string UtilityTypeId => nameof(CaeMaterialUtility);
         [NotMapped]
         public override string TableName => nameof(CaeMaterialUtility);
-        [NotMapped]
-        public override int Id => id;
+        
     }
 }
