@@ -9,12 +9,14 @@ namespace Nano.Electric
     [Table("DSInformation")]
     public partial class DSInformation
     {
+#if DBNE85
         public string Description { get; set; }
 
         public bool? HideEmptyTables { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
         public string Name { get; set; }
 
@@ -27,7 +29,10 @@ namespace Nano.Electric
         public string ModelHash { get; set; }
 
         public int? BranchVersion { get; set; }
+#endif
+#if DBNE201
 
-        public string AppliedConverters { get; set; }
+        public string AppliedConverters { get; set; } 
+#endif
     }
 }

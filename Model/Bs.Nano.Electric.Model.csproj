@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>1.0.34</VersionPrefix>
+		<VersionPrefix>1.1.35</VersionPrefix>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>9.0</LangVersion>
 		<Nullable>enable</Nullable>
@@ -10,6 +10,10 @@
 		<BaseOutputPath>..\bin\</BaseOutputPath>
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>
+	<PropertyGroup >
+		<DefineConstants>$(DefineConstants);DBNE85</DefineConstants>
+	</PropertyGroup>
+
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<DefineConstants>$(DefineConstants);InitDbContextEnums</DefineConstants>
