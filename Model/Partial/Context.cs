@@ -61,11 +61,11 @@ namespace Nano.Electric {
         /// <remarks>Если свойство не удалось заполнить - возвращается имя свойства и возникшее при обработке исключение. 
         /// Процедура обрабатывает только доступные для записи свойства. 
         /// Если свойство является частью ключа сущности, то оно не может быть заполнено.</remarks>
-        public IList<(string, Exception)> FillProperties<Tdest>(Tdest product, IEnumerable<string> propNames, IReadOnlyDictionary<string, string> item) where Tdest : class, IProduct {
+        public IList<(string, Exception)> FillProperties<Tdest>(Tdest product, IEnumerable<string> propNames, IReadOnlyDictionary<string, string> item, bool skipIfEmptyValue = true) where Tdest : class, IProduct {
             var results = new List<(string, Exception)>();
             foreach (var propName in propNames) {
                 var propertyInfo = typeof(Tdest).GetProperty(propName);
-                if (propertyInfo == null || !propertyInfo.CanWrite ) {
+                if (propertyInfo == null || !propertyInfo.CanWrite) {
                     continue;
                 }
                 if (propertyInfo.GetCustomAttribute<KeyAttribute>() != null) {
@@ -78,6 +78,9 @@ namespace Nano.Electric {
                     object value = null;
                     bool success = false;
                     string sourceValue = item[propName];
+                    if (skipIfEmptyValue && string.IsNullOrEmpty(sourceValue)) {
+                        continue;
+                    }
                     if (propertyInfo.PropertyType == typeof(int)) {
                         success = int.TryParse(sourceValue, out int result);
                         value = result;
@@ -98,15 +101,28 @@ namespace Nano.Electric {
                             success = true;
                         }
                     }
-                    //else if (propertyInfo.PropertyType.IsEnum) {
-                    //    value = Enum.Parse(propertyInfo.PropertyType, item[propName]);
-                    //}
+                    else if (propertyInfo.PropertyType == typeof(bool)) {
+                        success = bool.TryParse(sourceValue, out bool result);
+                        value = result;
+                    }
+                    else if (propertyInfo.PropertyType == typeof(bool?)) {
+                        if (bool.TryParse(sourceValue, out bool result)) {
+                            value = result;
+                            success = true;
+                        }
+                    }
+                    else if (propertyInfo.PropertyType.IsEnum) {
+                        if (ReflectionHelper.GetConverter(propertyInfo.PropertyType, out var convert)) {
+                            value = convert(item[propName]);
+                            success = true;
+                        }
+                    }
                     else {
                         value = Convert.ChangeType(sourceValue, propertyInfo.PropertyType);
                         success = true;
                     }
                     if (success) {
-                        propertyInfo.SetValue(product, value); 
+                        propertyInfo.SetValue(product, value);
                     }
                     else {
                         results.Add((propName, new InvalidOperationException($"Операция не выполнена. Значение \"{sourceValue}\" столбца {propName} не удается привести к типу {propertyInfo.PropertyType}.")));

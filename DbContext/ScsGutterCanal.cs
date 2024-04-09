@@ -35,11 +35,10 @@ namespace Nano.Electric
 
         public string SpecDescription { get; set; }
 
-        public int? BoxMeasureUnit { get; set; }
-
         public double? CountPerBox { get; set; }
 
 #if !InitDbContextEnums
+        public int? BoxMeasureUnit { get; set; }
         public int? GutterType { get; set; }
 
 #endif

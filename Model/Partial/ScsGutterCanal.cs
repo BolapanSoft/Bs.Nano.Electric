@@ -6,5 +6,6 @@ namespace Nano.Electric {
         /// Тип лотка
         /// </summary>
         public ScsGutterType GutterType { get; set; } = ScsGutterType.UNKNOWN;
+        public ScsBoxMeasureUnit BoxMeasureUnit { get; set; } = ScsBoxMeasureUnit.IN_SEGMENTS;
     }
 }
