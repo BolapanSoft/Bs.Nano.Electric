@@ -372,15 +372,24 @@ namespace Bs.Nano.Electric.Report {
                         allCodes.Add((p, nameof(context.ScsGutterCanals)));
                     }
                 }
-                var errors = allCodes.GroupBy(item => item.Code)
-                    .Where(group => group.Count() > 1);
-                if (errors.Any()) {
-                    var message = $"В базе имеются дублирующиеся артикулы.";
-                    int n = 0, m = 0;
-                    FailRuleTest(message, errors.SelectMany(group => group));
-                }
+                CheckCodesIsUniqueness(allCodes);
             }
         }
+        /// <summary>
+        /// Осуществляет проверку уникальности поля <paramref name="Code"/> во входных данных.
+        /// </summary>
+        /// <param name="allCodes">Массив входных данных.</param>
+        /// <exception cref="RuleTestException">Правило уникальности кода нарушено.</exception>
+        public static void CheckCodesIsUniqueness(IEnumerable<(string Code, string TableName)> allCodes) {
+            var errors = allCodes.GroupBy(item => item.Code)
+                                .Where(group => group.Count() > 1);
+            if (errors.Any()) {
+                var message = $"В таблице {} имеются дублирующиеся артикулы.";
+                int n = 0, m = 0;
+                FailRuleTest(message, errors.SelectMany(group => group));
+            }
+        }
+
         /**/
         public const string sRule001 = @"В таблице DbImages должен быть внесен файл ""File not found"" под индексом id==0";
         [ReportRule(@"В таблице DbImages должен быть внесен файл ""File not found.png"" под индексом id==0", 4, 1), RuleCategory("Общие рекомендации.")]
