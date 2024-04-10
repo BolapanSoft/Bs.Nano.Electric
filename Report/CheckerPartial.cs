@@ -8,7 +8,7 @@ namespace Bs.Nano.Electric.Report
         private struct Product : IProduct {
             public string Code { get; set; }
 
-            public int id { get; set; }
+            public int Id { get; set; }
             public int? DbImageRef { get; set; }
             public string Name { get; set; }
             public string Manufacturer { get; set; }

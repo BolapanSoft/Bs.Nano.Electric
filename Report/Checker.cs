@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Bs.Nano.Electric.Model;
+using Bs.Nano.Electric;
 using System.Data.Entity;
 
 namespace Bs.Nano.Electric.Report {
@@ -387,7 +388,7 @@ namespace Bs.Nano.Electric.Report {
             // logger.LogInformation($"{GetIndex(nameof(Rule_01_001))}\t{sRule001}");
 
             using (var context = connector.Connect()) {
-                var emptyImage = context.DbImages.FirstOrDefault(img => img.id == 0);
+                var emptyImage = context.DbImages.FirstOrDefault(img => img.Id == 0);
                 if (emptyImage is null || emptyImage.Text != "File not found.png") {
                     RuleTestException ex = new RuleTestException($"Не внесен эскиз \"File not found.png\".");
                 }
