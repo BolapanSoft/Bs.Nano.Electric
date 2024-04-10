@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Model\Bs.Nano.Electric.Model.csproj" />
   </ItemGroup>
 
+    <ProjectReference Include="..\Model\Bs.Nano.Electric.Model.csproj" />
 </Project>

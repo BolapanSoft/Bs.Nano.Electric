@@ -8,9 +8,11 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>Nano.Electric</RootNamespace>
 		<BaseOutputPath>..\bin\</BaseOutputPath>
+		<VersionSuffix>001</VersionSuffix>
+		<Version>$(VersionPrefix).$(VersionSuffix)</Version>
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>
-	<PropertyGroup >
+	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);DBNE85</DefineConstants>
 	</PropertyGroup>
 
@@ -158,25 +160,6 @@
 		<Folder Include="RefPartial\" />
 	</ItemGroup>
 
-
-	<ItemGroup>
-		<Reference Include="Cadwise.Kit">
-			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Kit.dll</HintPath>
-		</Reference>
-		<Reference Include="Cadwise.ObjectLib.WireCommon.Db">
-			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.ObjectLib.WireCommon.Db.dll</HintPath>
-		</Reference>
-		<Reference Include="Cadwise.Platform">
-			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Platform.dll</HintPath>
-		</Reference>
-		<Reference Include="Cadwise.Studio.DataBase">
-			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Studio.DataBase.dll</HintPath>
-		</Reference>
-		<Reference Include="Cadwise.Studio.DataBase.Model">
-			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 22.0\Cadwise.Studio.DataBase.Model.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-
-	<Import Project="$(MSBuildProjectName).csproj.local" Condition="Exists('$(MSBuildProjectName).csproj.local')"/>
+	<Import Project="$(MSBuildProjectName).csproj.local" Condition="Exists('$(MSBuildProjectName).csproj.local')" />
 
 </Project>
