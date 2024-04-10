@@ -12,8 +12,10 @@ namespace Nano.Electric
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
 
-        public int? BoxMeasureUnit { get; set; }
 
+#if !InitDbContextEnums
+        public int? BoxMeasureUnit { get; set; } 
+#endif
         public double? CountPerBox { get; set; }
 
         public double? PartitionHeight { get; set; }

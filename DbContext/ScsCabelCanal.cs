@@ -1,3 +1,5 @@
+// Ignore Spelling: Scs Cabel Etm
+
 namespace Nano.Electric
 {
     using System;
@@ -36,7 +38,9 @@ namespace Nano.Electric
 
         public string SpecDescription { get; set; }
 
-        public int? BoxMeasureUnit { get; set; }
+#if !InitDbContextEnums
+        public int? BoxMeasureUnit { get; set; } 
+#endif
 
         public double? CountPerBox { get; set; }
 

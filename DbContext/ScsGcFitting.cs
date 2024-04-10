@@ -26,9 +26,6 @@ namespace Nano.Electric
 
         public string Description { get; set; }
 
-#if !InitDbContextEnums
-        public int? FittingType { get; set; } 
-#endif
 
         public double? Height { get; set; }
 
@@ -65,14 +62,13 @@ namespace Nano.Electric
         public double? WidthOutBranch { get; set; }
 
         public double? CountPerBox { get; set; }
-
 #if !InitDbContextEnums
+        public int? FittingType { get; set; } 
         public int? VerticalBendType { get; set; }
-
         public int? VerticalUniversalBendType { get; set; } 
+        public int? GutterPassageType { get; set; }
 #endif
 
-        public int? GutterPassageType { get; set; }
 
         public bool? IsCovered { get; set; }
 

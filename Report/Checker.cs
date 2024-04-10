@@ -384,7 +384,7 @@ namespace Bs.Nano.Electric.Report {
             var errors = allCodes.GroupBy(item => item.Code)
                                 .Where(group => group.Count() > 1);
             if (errors.Any()) {
-                var message = $"В таблице {} имеются дублирующиеся артикулы.";
+                var message = $"Имеются дублирующиеся артикулы.";
                 int n = 0, m = 0;
                 FailRuleTest(message, errors.SelectMany(group => group));
             }
@@ -847,10 +847,10 @@ namespace Bs.Nano.Electric.Report {
                 var products = context.ScsGcFittings
                     .Where(p => p.FittingType == ft)
                     .Select(p => new { p.Code, p.GutterPassageType });
-                var errors = new LinkedList<(string Code, int? GutterPassageType)>();
+                var errors = new LinkedList<(string Code, ScsGutterPassageType? GutterPassageType)>();
                 foreach (var p in products) {
                     if (p.GutterPassageType.HasValue) {
-                        var knownEnumValues = typeof(ScsGutterPassageType).GetEnumValues() as int[];
+                        var knownEnumValues = typeof(ScsGutterPassageType).GetEnumValues() as ScsGutterPassageType[];
                         if (knownEnumValues.Contains(p.GutterPassageType.Value))
                             continue;
                     }

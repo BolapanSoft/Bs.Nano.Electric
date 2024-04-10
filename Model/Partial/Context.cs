@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Contexts;
@@ -96,7 +97,7 @@ namespace Nano.Electric {
                         value = result;
                     }
                     else if (propertyInfo.PropertyType == typeof(double?)) {
-                        if (double.TryParse(sourceValue, out double result)) {
+                        if (double.TryParse(sourceValue,NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double result)) {
                             value = result;
                             success = true;
                         }
@@ -113,6 +114,16 @@ namespace Nano.Electric {
                     }
                     else if (propertyInfo.PropertyType.IsEnum) {
                         if (ReflectionHelper.GetConverter(propertyInfo.PropertyType, out var convert)) {
+                            value = convert(item[propName]);
+                            success = true;
+                        }
+                    }
+                    else if (Nullable.GetUnderlyingType(propertyInfo.PropertyType)?.IsEnum == true) {
+                        if (ReflectionHelper.GetConverter(Nullable.GetUnderlyingType(propertyInfo.PropertyType), out var convert)) {
+                            if (string.IsNullOrEmpty(item[propName])) {
+                                propertyInfo.SetValue(product, null);
+                                continue;
+                            }
                             value = convert(item[propName]);
                             success = true;
                         }

@@ -1,3 +1,5 @@
+// Ignore Spelling: Scs
+
 namespace Nano.Electric
 {
     using System;
