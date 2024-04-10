@@ -1,3 +1,5 @@
+// Ignore Spelling: Scs Gc
+
 namespace Nano.Electric
 {
     using System.ComponentModel.DataAnnotations.Schema;
@@ -7,7 +9,8 @@ namespace Nano.Electric
     public partial class DbScsGcAccessoryUnit
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")]
+        public override int Id { get; set; }
 
         public double? CountPerBox { get; set; }
 #if !InitDbContextEnums

@@ -79,7 +79,7 @@ namespace Nano.Electric {
             if (!(DbShelf is null)) {
                 XElement el = new XElement(nameof(DbShelf));
                 el.Add(new XAttribute("TableName", nameof(ScsGutterBolting)));
-                el.Add(new XAttribute("Id", DbShelf.id));
+                el.Add(new XAttribute("Id", DbShelf.Id));
                 el.WriteTo(writer);
             }
             writer.WriteElementString(nameof(IsAutoSelection), IsAutoSelection.ToString());

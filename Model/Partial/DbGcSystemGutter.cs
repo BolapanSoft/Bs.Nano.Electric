@@ -35,7 +35,7 @@ namespace Nano.Electric {
             if (!(Gutter is null)) {
                 XElement el = new XElement(nameof(Gutter));
                 el.Add(new XAttribute("TableName", nameof(ScsGutterCanal)));
-                el.Add(new XAttribute("Id", Gutter.id));
+                el.Add(new XAttribute("Id", Gutter.Id));
                 el.WriteTo(writer);
             }
             writer.WriteElementString(nameof(IsEnabled), IsEnabled.ToString());

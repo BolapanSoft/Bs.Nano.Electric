@@ -47,7 +47,7 @@ namespace Nano.Electric {
 
         string IProduct.Code => DbName;
 
-        int IProduct.id { get => id; set => id = value; }
+        int IProduct.Id { get => id; set => id = value; }
         int? IProduct.DbImageRef { get => DbImageRef; set => DbImageRef = value; }
         string IProduct.Name { get => DbDescription; set => DbDescription = value; }
         string IProduct.Manufacturer { get => string.Empty; set => throw new NotImplementedException(); }

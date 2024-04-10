@@ -36,7 +36,7 @@ namespace Nano.Electric {
             if (!(Profile is null)) {
                 writer.WriteStartElement("Profile");
                 writer.WriteAttributeString("TableName", "ScsGutterBolting");
-                writer.WriteAttributeString("Id", Profile.id.ToString());
+                writer.WriteAttributeString("Id", Profile.Id.ToString());
                 writer.WriteEndElement();
             }
             writer.WriteElementString("ProfileCount", ProfileCount.ToString());

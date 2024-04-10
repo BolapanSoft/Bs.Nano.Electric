@@ -10,7 +10,7 @@ namespace Nano.Electric
     public partial class DbScsGutterCover
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        public int Id { get; set; }
 
         public int? BoxMeasureUnit { get; set; }
 

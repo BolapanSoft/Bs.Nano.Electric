@@ -27,8 +27,7 @@ namespace Nano.Electric {
         public abstract string UtilityTypeId { get; }
         [NotMapped]
         public abstract string TableName { get; }
-        [NotMapped]
-        public abstract int Id { get; }
+        public abstract int Id { get; set; }
         [NotMapped]
         public int SpecCount { get; set; }
         protected override void WriteProperties(XmlWriter writer) {

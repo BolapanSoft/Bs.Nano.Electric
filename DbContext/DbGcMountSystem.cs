@@ -10,7 +10,7 @@ namespace Nano.Electric
     public partial class DbGcMountSystem
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        public int Id { get; set; }
 
         public double? PostDistance { get; set; }
 

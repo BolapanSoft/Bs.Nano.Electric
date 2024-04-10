@@ -12,7 +12,8 @@ namespace Nano.Electric
         public string Climate { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
         public int? OrderNumber { get; set; }
 

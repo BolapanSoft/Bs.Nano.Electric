@@ -9,7 +9,8 @@ namespace Nano.Electric
     public partial class DbImage
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
         public byte[] Image { get; set; }
 

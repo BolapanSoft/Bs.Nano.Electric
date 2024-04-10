@@ -1,3 +1,5 @@
+// Ignore Spelling: Cae
+
 namespace Nano.Electric
 {
     using System;
@@ -10,7 +12,8 @@ namespace Nano.Electric
     public partial class CaeMaterialUtility
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")]
+        public override int Id { get; set; }
 
         public string MaterialGroup { get; set; }
 

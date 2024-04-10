@@ -1,3 +1,5 @@
+// Ignore Spelling: Gc Scs
+
 namespace Nano.Electric
 {
     using System;
@@ -39,7 +41,8 @@ namespace Nano.Electric
         public double? HeightOutBranch { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")]
+        public override int Id { get; set; }
 
         public string Manufacturer { get; set; }
 
