@@ -53,7 +53,7 @@ namespace Nano.Electric {
         string IProduct.Manufacturer { get => string.Empty; set => throw new NotImplementedException(); }
 
         public IEnumerable<DbUtilityUnit> GetChilds() {
-            return base.GetChilds<DbUtilityUnit>().ToArray();
+            return base.GetChildren<DbUtilityUnit>().ToArray();
         }
         //public void Add(DbUtilityUnit child) {
         //    Children.Add(child);

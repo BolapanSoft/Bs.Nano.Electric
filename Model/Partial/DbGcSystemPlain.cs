@@ -1,4 +1,6 @@
-﻿using Nano.Electric.Enums;
+﻿// Ignore Spelling: Gc
+
+using Nano.Electric.Enums;
 
 /* Unmerged change from project 'Iek.MakeModelStudioCS'
 Before:
@@ -64,8 +66,8 @@ namespace Nano.Electric {
                 }
             }
         }
-        public IEnumerable<DbUtilityUnit> GetChilds() {
-            return base.GetChilds<DbUtilityUnit>().ToArray();
+        public IEnumerable<DbUtilityUnit> GetChildren() {
+            return base.GetChildren<DbUtilityUnit>().ToArray();
         }
         public void Add(DbUtilityUnit child) {
             Children.Add(child);

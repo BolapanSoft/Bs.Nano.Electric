@@ -1,4 +1,4 @@
-// Ignore Spelling: Gc Scs
+// Ignore Spelling: Gc Scs Etm
 
 namespace Nano.Electric
 {

@@ -62,7 +62,7 @@ namespace Nano.Electric {
             }
             return null;
         }
-        internal IEnumerable<T> GetChilds<T>() where T : class {
+        internal IEnumerable<T> GetChildren<T>() where T : class {
             foreach (var item in Children) {
                 if (item is T child) {
                     yield return child;

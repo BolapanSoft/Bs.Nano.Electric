@@ -21,7 +21,7 @@ namespace Nano.Electric {
         [NotMapped]
         public IEnumerable<DbGcSystemPlain> SystemPlains {
             get {
-                return GetChilds<DbGcSystemPlain>();
+                return GetChildren<DbGcSystemPlain>();
             }
 
         }

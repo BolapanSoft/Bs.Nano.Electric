@@ -22,7 +22,7 @@ namespace Nano.Electric {
         public string Seria { get; set; }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {

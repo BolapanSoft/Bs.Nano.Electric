@@ -385,7 +385,6 @@ namespace Bs.Nano.Electric.Report {
                                 .Where(group => group.Count() > 1);
             if (errors.Any()) {
                 var message = $"Имеются дублирующиеся артикулы.";
-                int n = 0, m = 0;
                 FailRuleTest(message, errors.SelectMany(group => group));
             }
         }
@@ -473,14 +472,12 @@ namespace Bs.Nano.Electric.Report {
                     //    sb.AppendLine($"... обрезано {sketchNotFound.Count - 50} элементов.");
                     //}
                     var message = $"Не внесены эскизы для {sketchNotFound.Count} элементов";
-                    int n = 0;
                     FailRuleTest(message, sketchNotFound);
                 }
             }
         }
         [ReportRule(@"Для всех элементов должна быть внесена масса.", 4, 3), RuleCategory("Общие рекомендации.")]
         public void Rule_01_003() {
-            int count = 0;
             List<(string Code, string Mass)> codes = new List<(string Code, string Mass)>(128);
             void CheckRule(string code, string sWeight) {
                 bool isMatch = (double.TryParse(sWeight, NumberStyles.Float, CultureInfo.InvariantCulture, out double weight) || double.TryParse(sWeight, NumberStyles.Float, CultureInfo.CurrentCulture, out weight)) && weight > 0.0;
@@ -520,7 +517,6 @@ namespace Bs.Nano.Electric.Report {
             }
             //count = errors.Count;
             if (codes.Count > 0) {
-                int n = 0;
                 FailRuleTest($"Не внесена масса для {codes.Count} артикулов.", codes);
             }
         }
@@ -651,7 +647,6 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.GutterDepth, p.GutterHeight, p.SegLength));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
                     FailRuleTest($"Для {errors.Count} элементов прямых секций лотков не внесена длина, ширина или высота лотка.",
                         errors);
                 }
@@ -672,7 +667,6 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.PartitionHeight, p.PartitionLength));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
                     FailRuleTest($"Для {errors.Count} перегородок не внесена длина или высота лотка.",
                         errors);
                 }
@@ -693,7 +687,6 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.CoverWidth, p.CoverLength));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
                     FailRuleTest($"Для {errors.Count} элементов крышек прямых секций лотков не внесена длина или ширина.",
                         errors);
                 }
@@ -716,7 +709,6 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
                     FailRuleTest($"Для {errors.Count} элементов Секция соединительная переходная вертикальная не полностью внесены геометрические размеры.",
                         errors);
                 }
@@ -761,7 +753,6 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -785,7 +776,6 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -813,8 +803,7 @@ namespace Bs.Nano.Electric.Report {
                 }
                 return (isHaveDuplicateSisez) ? key : null;
             };
-            int count = 0;
-
+         
             var ft = ScsGutterFittingTypeEnum.HORIZONTAL_PASSAGE;
             using (var context = connector.Connect()) {
                 var grours = context.ScsGcFittings
@@ -830,7 +819,6 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -858,7 +846,6 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.GutterPassageType));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -881,7 +868,6 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -894,7 +880,6 @@ namespace Bs.Nano.Electric.Report {
             2, 10)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_030() {
-            int count = 0;
             (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> sizes) {
                 HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>();
                 bool isHaveDuplicateSisez = false;
@@ -926,7 +911,6 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -955,7 +939,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.Height, p.Depth, p.VerticalBendType));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -998,7 +982,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1026,7 +1010,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.Height, p.Depth, p.VerticalBendType));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1071,7 +1055,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1099,7 +1083,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.Height, p.Depth, p.VerticalUniversalBendType));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1144,7 +1128,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1173,7 +1157,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.Height, p.Depth, p.BendType));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1218,7 +1202,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1245,7 +1229,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1290,7 +1274,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1315,7 +1299,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.CoverWidth1, p.CoverWidth2));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1328,7 +1312,6 @@ namespace Bs.Nano.Electric.Report {
         2, 22)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_036() {
-            int count = 0;
             (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? CoverWidth1, double? CoverWidth2)> sizes) {
                 HashSet<(double? CoverWidth1, double? CoverWidth2)> values = new HashSet<(double? CoverWidth1, double? CoverWidth2)>();
                 bool isHaveDuplicateSisez = false;
@@ -1361,7 +1344,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1387,7 +1370,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.CoverWidth));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1400,7 +1383,6 @@ namespace Bs.Nano.Electric.Report {
          2, 24)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_037() {
-            int count = 0;
             (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<double?> sizes) {
                 HashSet<double?> values = new HashSet<double?>();
                 bool isHaveDuplicateSisez = false;
@@ -1433,7 +1415,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1457,7 +1439,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.CoverWidth));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1502,7 +1484,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1526,7 +1508,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.CoverWidth1, p.CoverWidth2));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1571,7 +1553,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1595,7 +1577,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.CoverWidth));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1640,7 +1622,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1662,7 +1644,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.GutterUsefullHeight, p.GutterUsefullDepth));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1684,7 +1666,7 @@ namespace Bs.Nano.Electric.Report {
                         continue;
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1698,7 +1680,6 @@ namespace Bs.Nano.Electric.Report {
         2, 33)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_022() {
-            int count = 0;
             Dictionary<(int, string), (double, double, double)> knownSeries = new Dictionary<(int, string), (double, double, double)>();
 
             string? CheckRule(string code, string name, int? GutterType, string? Series) {
@@ -1716,7 +1697,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1759,7 +1740,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1804,7 +1785,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1849,7 +1830,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1884,7 +1865,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1927,7 +1908,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
@@ -1952,7 +1933,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.Length));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1975,7 +1956,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.ProfileLength));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -1998,7 +1979,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.Length));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -2031,7 +2012,7 @@ namespace Bs.Nano.Electric.Report {
                     errors.AddLast((p.Code, p.MountType, p.StandType, p.Heigth));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -2054,7 +2035,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.Heigth));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -2077,7 +2058,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.Heigth));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
@@ -2100,7 +2081,7 @@ namespace Bs.Nano.Electric.Report {
                         errors.AddLast((p.Code, p.Length));
                 }
                 if (errors.Count > 0) {
-                    int i = 0;
+                    
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }

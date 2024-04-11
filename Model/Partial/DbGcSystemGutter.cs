@@ -18,7 +18,7 @@ namespace Nano.Electric {
         public DbScsGcSeriaConfigiration Configuration { get; set; }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {

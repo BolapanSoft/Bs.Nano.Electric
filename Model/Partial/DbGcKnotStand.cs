@@ -19,12 +19,12 @@ namespace Nano.Electric {
 
         public IEnumerable<DbGcKnotLevel> Levels {
             get {
-                return base.GetChilds<DbGcKnotLevel>();
+                return base.GetChildren<DbGcKnotLevel>();
             }
         }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -79,7 +79,7 @@ namespace Nano.Electric {
 
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -121,7 +121,7 @@ namespace Nano.Electric {
 
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -215,12 +215,12 @@ namespace Nano.Electric {
 
         public IEnumerable<DbGcMsAcceesory> Accessories {
             get {
-                return base.GetChilds<DbGcMsAcceesory>();
+                return base.GetChildren<DbGcMsAcceesory>();
             }
         }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -296,12 +296,12 @@ namespace Nano.Electric {
 
         public IEnumerable<DbGcMsAcceesory> Accessories {
             get {
-                return base.GetChilds<DbGcMsAcceesory>();
+                return base.GetChildren<DbGcMsAcceesory>();
             }
         }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -375,12 +375,12 @@ namespace Nano.Electric {
 
         public IEnumerable<DbGcMsAcceesory> Accessories {
             get {
-                return base.GetChilds<DbGcMsAcceesory>();
+                return base.GetChildren<DbGcMsAcceesory>();
             }
         }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -440,12 +440,12 @@ namespace Nano.Electric {
 
         public IEnumerable<DbGcMsAcceesory> Accessories {
             get {
-                return base.GetChilds<DbGcMsAcceesory>();
+                return base.GetChildren<DbGcMsAcceesory>();
             }
         }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -526,12 +526,12 @@ namespace Nano.Electric {
 
         public IEnumerable<DbGcMsAcceesory> Accessories {
             get {
-                return base.GetChilds<DbGcMsAcceesory>();
+                return base.GetChildren<DbGcMsAcceesory>();
             }
         }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -613,12 +613,12 @@ namespace Nano.Electric {
 
         public IEnumerable<DbGcMsAcceesory> Accessories {
             get {
-                return base.GetChilds<DbGcMsAcceesory>();
+                return base.GetChildren<DbGcMsAcceesory>();
             }
         }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -721,12 +721,12 @@ namespace Nano.Electric {
 
         public IEnumerable<DbGcMsAcceesory> Accessories {
             get {
-                return base.GetChilds<DbGcMsAcceesory>();
+                return base.GetChildren<DbGcMsAcceesory>();
             }
         }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -790,12 +790,12 @@ namespace Nano.Electric {
 
         public IEnumerable<DbGcMsAcceesory> Accessories {
             get {
-                return base.GetChilds<DbGcMsAcceesory>();
+                return base.GetChildren<DbGcMsAcceesory>();
             }
         }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
@@ -850,12 +850,12 @@ namespace Nano.Electric {
 
         public IEnumerable<DbGcMsAcceesory> Accessories {
             get {
-                return base.GetChilds<DbGcMsAcceesory>();
+                return base.GetChildren<DbGcMsAcceesory>();
             }
         }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
-                return base.GetChilds<DbUtilityUnit>();
+                return base.GetChildren<DbUtilityUnit>();
             }
         }
         public void AddChild(DbUtilityUnit unit) {
