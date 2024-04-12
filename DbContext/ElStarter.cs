@@ -30,7 +30,7 @@ namespace Nano.Electric
         public double? HightBoundFaultCurrent { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public double? LowBoundFaultCurrent { get; set; }
 

@@ -36,7 +36,7 @@ namespace Nano.Electric
         public string FullName { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public string Manufacturer { get; set; }
 

@@ -10,7 +10,7 @@ namespace Nano.Electric
     public partial class ScsServiceColumnUtilityUnit
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public string DbOtherName { get; set; }
 

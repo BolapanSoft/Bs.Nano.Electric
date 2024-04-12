@@ -1,23 +1,6 @@
 ﻿using System.ComponentModel;
 
 namespace Nano.Electric.Enums {
-    //[Enum(new object[]
-    //{
-    //    CaeMeasureUnitEnum.UNIT_PCS,
-    //    DataBaseLocalizationDictionary.Шт,
-    //    CaeMeasureUnitEnum.UNIT_MS,
-    //    WireCommonLocalizationDictionary.М,
-    //    CaeMeasureUnitEnum.UNIT_M2,
-    //    WireCommonLocalizationDictionary.М2,
-    //    CaeMeasureUnitEnum.UNIT_M3,
-    //    WireCommonLocalizationDictionary.М3,
-    //    CaeMeasureUnitEnum.UNIT_KMS,
-    //    WireCommonLocalizationDictionary.Км,
-    //    CaeMeasureUnitEnum.UNIT_KGS,
-    //    WireCommonLocalizationDictionary.Кг,
-    //    CaeMeasureUnitEnum.UNIT_TS,
-    //    WireCommonLocalizationDictionary.Т
-    //})]
     public enum CaeMeasureUnitEnum {
         /// <summary>
         /// "шт"

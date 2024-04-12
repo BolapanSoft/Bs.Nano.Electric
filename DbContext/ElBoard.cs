@@ -1,3 +1,5 @@
+// Ignore Spelling: Ik
+
 namespace Nano.Electric
 {
     using System;
@@ -10,7 +12,8 @@ namespace Nano.Electric
     public partial class ElBoard
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")]
+        public int Id { get; set; }
 
         public string Name { get; set; }
 
@@ -27,10 +30,13 @@ namespace Nano.Electric
         public string Manufacturer { get; set; }
 
         public string Code { get; set; }
-
+#if !InitDbContextEnums
         public int? StructureType { get; set; }
-
         public int? BoardType { get; set; }
+        public int? DbInstType { get; set; }
+        public int? IsExplSafe { get; set; }
+#endif
+        public string SafeDegreeIk { get; set; }
 
         public double? DbVoltage { get; set; }
 
@@ -38,11 +44,9 @@ namespace Nano.Electric
 
         public double? ShockIkz { get; set; }
 
-        public int? DbInstType { get; set; }
 
         public int? CableLeadIn { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
         public string Mass { get; set; }
 
@@ -100,6 +104,5 @@ namespace Nano.Electric
 
         public string DbClassificatorCode { get; set; }
 
-        public string SafeDegreeIk { get; set; }
     }
 }

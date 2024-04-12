@@ -7,7 +7,7 @@ namespace Nano.Electric {
     [Table("DbScsGutterUtilitySet")]
     public partial class DbScsGutterUtilitySet {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public string DbName { get; set; }
 

@@ -30,7 +30,7 @@ namespace Nano.Electric
         public int? FittingType { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public string Manufacturer { get; set; }
 

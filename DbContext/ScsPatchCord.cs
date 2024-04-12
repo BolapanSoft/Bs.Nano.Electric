@@ -10,7 +10,7 @@ namespace Nano.Electric
     public partial class ScsPatchCord
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public int? EnvType { get; set; }
 

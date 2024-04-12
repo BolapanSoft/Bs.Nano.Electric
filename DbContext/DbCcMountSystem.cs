@@ -10,7 +10,8 @@ namespace Nano.Electric
     public partial class DbCcMountSystem
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] 
+        public int Id { get; set; }
 
         public double? PartitionCount { get; set; }
 

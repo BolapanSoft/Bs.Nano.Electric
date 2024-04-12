@@ -32,7 +32,7 @@ namespace Nano.Electric
         public string Description { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public double? InductiveResistance { get; set; }
 

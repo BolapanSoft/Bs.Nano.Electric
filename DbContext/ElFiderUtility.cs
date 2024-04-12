@@ -9,7 +9,7 @@ namespace Nano.Electric
     public partial class ElFiderUtility
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public int? FiderUtilityType { get; set; }
 

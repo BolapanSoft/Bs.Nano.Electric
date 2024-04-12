@@ -14,7 +14,7 @@ namespace Nano.Electric
         public double? higherPermTemp { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public int? isolationMaterialId { get; set; }
 

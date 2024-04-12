@@ -1,15 +1,14 @@
-namespace Nano.Electric
-{
+namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
 
-    public partial class DbDwgFile
-    {
+
+    public partial class DbDwgFile {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] 
+        public int Id { get; set; }
 
         public string Text { get; set; }
 

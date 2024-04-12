@@ -28,7 +28,7 @@ namespace Nano.Electric
         public double? Height { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public double? InductiveResistance { get; set; }
 

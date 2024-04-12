@@ -10,7 +10,7 @@ namespace Nano.Electric
     public partial class ScsCommutatorPanel
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public int? InletCountIn { get; set; }
 

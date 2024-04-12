@@ -40,7 +40,7 @@ namespace Nano.Electric
         public double? FullResistance { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public double? KzLoss { get; set; }
 

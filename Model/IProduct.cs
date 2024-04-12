@@ -18,4 +18,5 @@ namespace Nano.Electric {
     public partial class ScsGutterBolting : IProduct { }
     public partial class DbScsGcBoltingAccessoryUnit : IProduct { }
     public partial class CaeMaterialUtility : IProduct { }
+    public partial class ElBoard : IProduct { }
 }

@@ -10,7 +10,7 @@ namespace Nano.Electric
     public partial class ElAmperemeter
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public int? InstallType { get; set; }
 

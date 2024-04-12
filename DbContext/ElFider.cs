@@ -24,7 +24,7 @@ namespace Nano.Electric
         public int? FrequenceTransformer { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public int? InputBusBoardParent { get; set; }
 

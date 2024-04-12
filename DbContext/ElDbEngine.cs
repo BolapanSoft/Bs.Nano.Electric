@@ -20,7 +20,7 @@ namespace Nano.Electric
         public double? Efficiency { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
         public string Manufacturer { get; set; }
 

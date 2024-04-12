@@ -10,7 +10,7 @@ namespace Nano.Electric
     public partial class DcCableCanalCover
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int id { get; set; }
+        [Column("id")] public int Id { get; set; }
 
 #if !InitDbContextEnums
         public int? BoxMeasureUnit { get; set; } 
