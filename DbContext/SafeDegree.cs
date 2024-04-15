@@ -9,7 +9,11 @@ namespace Nano.Electric
     [Table("SafeDegree")]
     public partial class SafeDegree
     {
+#if !InitDbContextEnums
+
         public int? Covered { get; set; }
+
+#endif
 
         public string Degree { get; set; }
 

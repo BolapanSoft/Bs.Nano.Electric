@@ -35,9 +35,13 @@ namespace Nano.Electric
         public int? BoardType { get; set; }
         public int? DbInstType { get; set; }
         public int? IsExplSafe { get; set; }
+        public int? CableLeadIn { get; set; }
 #endif
+#if VER23_1
+        public string DbClassificatorCode { get; set; }
         public string SafeDegreeIk { get; set; }
-
+        public int? DbGraphicRef { get; set; }
+#endif
         public double? DbVoltage { get; set; }
 
         public double? DbInom { get; set; }
@@ -45,7 +49,6 @@ namespace Nano.Electric
         public double? ShockIkz { get; set; }
 
 
-        public int? CableLeadIn { get; set; }
 
 
         public string Mass { get; set; }
@@ -100,9 +103,7 @@ namespace Nano.Electric
 
         public string Url { get; set; }
 
-        public int? DbGraphicRef { get; set; }
 
-        public string DbClassificatorCode { get; set; }
 
     }
 }

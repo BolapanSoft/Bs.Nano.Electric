@@ -62,7 +62,7 @@ namespace Nano.Electric {
         /// <remarks>Если свойство не удалось заполнить - возвращается имя свойства и возникшее при обработке исключение. 
         /// Процедура обрабатывает только доступные для записи свойства. 
         /// Если свойство является частью ключа сущности, то оно не может быть заполнено.</remarks>
-        public IList<(string, Exception)> FillProperties<Tdest>(Tdest product, IEnumerable<string> propNames, IReadOnlyDictionary<string, string> item, bool skipIfEmptyValue = true) where Tdest : class, IProduct {
+        public IList<(string, Exception)> FillProperties<Tdest>(Tdest product, IEnumerable<string> propNames, IReadOnlyDictionary<string, string> item, bool skipIfEmptyValue = true) where Tdest : class {
             var results = new List<(string, Exception)>();
             foreach (var propName in propNames) {
                 var propertyInfo = typeof(Tdest).GetProperty(propName);

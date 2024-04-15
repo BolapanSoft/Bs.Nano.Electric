@@ -29,7 +29,7 @@ namespace Nano.Electric {
             if (!(Configuration is null)) {
                 XElement el = new XElement(nameof(Configuration));
                 el.Add(new XAttribute("TableName", nameof(DbScsGcSeriaConfigiration)));
-                el.Add(new XAttribute("Id", Configuration.id));
+                el.Add(new XAttribute("Id", Configuration.Id));
                 el.WriteTo(writer);
             }
             if (!(Gutter is null)) {

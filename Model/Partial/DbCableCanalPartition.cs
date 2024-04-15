@@ -7,13 +7,4 @@ namespace Nano.Electric {
 
 #endif
     }
-    public partial class ElBoard {
-#if InitDbContextEnums
-        public BoardStructureType StructureType { get; set; }
-        public BoardType BoardType { get; set; }
-        public InstWallEnum DbInstType { get; set; }
-        public EnvExplSafeBoolEnum IsExplSafe { get; set; }
-
-#endif
-    }
 }
