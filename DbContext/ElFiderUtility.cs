@@ -4,8 +4,8 @@ namespace Nano.Electric
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
+    [Table("ElFiderUtilities")]    
     
-
     public partial class ElFiderUtility
     {
 #if !InitDbContextEnums
@@ -16,12 +16,12 @@ namespace Nano.Electric
         public int? InnerDimensionType { get; set; }
         public int? DimensionType { get; set; }
         public int? RailMountTypeFlagged { get; set; }
+        public int? FiderUtilityType { get; set; }
+
 
 #endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
-
-        public int? FiderUtilityType { get; set; }
 
         public string OtherType { get; set; }
 
