@@ -1,14 +1,21 @@
-namespace Nano.Electric
-{
+namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     [Table("ElFrequenceTransformer")]
-    public partial class ElFrequenceTransformer
-    {
+    public partial class ElFrequenceTransformer {
+
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }
+        public int? MountType { get; set; }
+        public int? PhaseCount { get; set; }
+        public int? RailMountTypeFlagged { get; set; }
+
+
+#endif
         public double? ActiveResistance { get; set; }
 
         public string Code { get; set; }
@@ -52,10 +59,6 @@ namespace Nano.Electric
 
         public string SpecDescription { get; set; }
 
-        public int? PhaseCount { get; set; }
-
-        public int? IsExplSafe { get; set; }
-
         public int? CwPCode { get; set; }
 
         public int? DbImageRef { get; set; }
@@ -64,9 +67,6 @@ namespace Nano.Electric
 
         public string EtmCode { get; set; }
 
-        public int? MountType { get; set; }
-
-        public int? RailMountTypeFlagged { get; set; }
 
         public bool? InImport { get; set; }
 

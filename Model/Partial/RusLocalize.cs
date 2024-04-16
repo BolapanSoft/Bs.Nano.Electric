@@ -104,6 +104,18 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Распределительные устройства\\Шкафы")]
     public partial class ElBoard { }
 
+    [DefaultLocalizeValue("Распределительные устройства\\Блоки")]
+    public partial class ElBlock { }
+
+    [DefaultLocalizeValue("Распределительные устройства\\Ящики")]
+    public partial class ElBox { }
+
+    [DefaultLocalizeValue("Распределительные устройства\\Ящики с трансформатором")]
+    public partial class ElShieldingUnit { }
+
+    [DefaultLocalizeValue("Распределительные устройства\\Доп. оборудование РУ")]
+    public partial class ElBoardUtility { }
+
     [DefaultLocalizeValue("Электроприемники\\Светильники\\Таблица КИ")]
     public partial class DbLtKiTable { }
 
@@ -113,26 +125,14 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Вольтметры")]
     public partial class ElVoltmeter { }
 
-    [DefaultLocalizeValue("УЗО")]
-    public partial class ElUzo { }
-
-    [DefaultLocalizeValue("Пускатели, контакторы и реле")]
-    public partial class ElStarter { }
 
     //[DefaultLocalizeValue("Доп. оборудование ЭУИ")]
     //public partial class ElSocketUtility { }
 
-    [DefaultLocalizeValue("Ящики с трансформатором")]
-    public partial class ElShieldingUnit { }
 
-    [DefaultLocalizeValue("Предохранители")]
-    public partial class ElSafeDevice { }
 
-    [DefaultLocalizeValue("Кнопочние посты управления")]
+    [DefaultLocalizeValue("Кнопочные посты управления")]
     public partial class ElPushButtonStation { }
-
-    [DefaultLocalizeValue("Ограничители перенапряжения")]
-    public partial class ElOvervoltageSuppressor { }
 
     [DefaultLocalizeValue("Доп. оборудование светильников")]
     public partial class ElLightUtility { }
@@ -142,15 +142,6 @@ namespace Nano.Electric {
 
     [DefaultLocalizeValue("Лампы")]
     public partial class ElLamp { }
-
-    [DefaultLocalizeValue("Рубильники")]
-    public partial class ElKnifeSwitch { }
-
-    [DefaultLocalizeValue("Частотные преобразователи")]
-    public partial class ElFrequenceTransformer { }
-
-    [DefaultLocalizeValue("Доп. оборудование КА")]
-    public partial class ElFiderUtilities { }
 
     [DefaultLocalizeValue("Нагреватели")]
     public partial class ElDbHeater { }
@@ -170,20 +161,32 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Приборы управления")]
     public partial class ElControlDevice { }
 
-    [DefaultLocalizeValue("Оболочки")]
+    [DefaultLocalizeValue("Коммутационные аппараты\\Автоматические выключатели")]
+    public partial class ElAutomat { }
+
+    [DefaultLocalizeValue("Коммутационные аппараты\\Предохранители")]
+    public partial class ElSafeDevice { }
+
+    [DefaultLocalizeValue("Коммутационные аппараты\\Рубильники")]
+    public partial class ElKnifeSwitch { }
+
+    [DefaultLocalizeValue("Коммутационные аппараты\\УЗО")]
+    public partial class ElUzo { }
+
+    [DefaultLocalizeValue("Коммутационные аппараты\\Пускатели, контакторы и реле")]
+    public partial class ElStarter { }
+
+    [DefaultLocalizeValue("Коммутационные аппараты\\Ограничители перенапряжения")]
+    public partial class ElOvervoltageSuppressor { }
+
+    [DefaultLocalizeValue("Коммутационные аппараты\\Частотные преобразователи")]
+    public partial class ElFrequenceTransformer { }
+
+    [DefaultLocalizeValue("Коммутационные аппараты\\Оболочки")]
     public partial class ElCasing { }
 
-    [DefaultLocalizeValue("Ящики")]
-    public partial class ElBox { }
-
-    [DefaultLocalizeValue("Доп. оборудование РУ")]
-    public partial class ElBoardUtility { }
-
-    [DefaultLocalizeValue("Блоки")]
-    public partial class ElBlock { }
-
-    [DefaultLocalizeValue("Автоматические выключатели")]
-    public partial class ElAutomat { }
+    [DefaultLocalizeValue("Коммутационные аппараты\\Доп. оборудование КА")]
+    public partial class ElFiderUtility { }
 
     [DefaultLocalizeValue("Амперметры")]
     public partial class ElAmperemeter { }
@@ -215,7 +218,7 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Комплектации РУ")]
     public partial class DbElBoardUtilitySet { }
 
-   
+
     /* 
     [DefaultLocalizeValue("")]
     public partial class ___ { }

@@ -1,14 +1,22 @@
-namespace Nano.Electric
-{
+namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     [Table("ElStarter")]
-    public partial class ElStarter
-    {
+    public partial class ElStarter {
+#if !InitDbContextEnums
+        public int? DbPoleCountEnum { get; set; }
+        public int? IsExplSafe { get; set; }
+        public int? MountType { get; set; }
+        public int? DbDeviceType { get; set; }
+        public int? DbStarterType { get; set; }
+        public int? RailMountTypeFlagged { get; set; }
+
+
+#endif
         public double? ActiveResistance { get; set; }
 
         public string Code { get; set; }
@@ -58,7 +66,6 @@ namespace Nano.Electric
 
         public double? DbModuleCount { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
         public int? CwPCode { get; set; }
 
@@ -66,15 +73,9 @@ namespace Nano.Electric
 
         public int? ExplodeLevel { get; set; }
 
-        public int? MountType { get; set; }
 
-        public int? DbPoleCountEnum { get; set; }
 
         public double? CoilControlVoltage { get; set; }
-
-        public int? DbDeviceType { get; set; }
-
-        public int? DbStarterType { get; set; }
 
         public string CurrentRelayType { get; set; }
 
@@ -84,7 +85,6 @@ namespace Nano.Electric
 
         public string EtmCode { get; set; }
 
-        public int? RailMountTypeFlagged { get; set; }
 
         public bool? InImport { get; set; }
 

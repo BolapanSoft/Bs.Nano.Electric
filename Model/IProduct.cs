@@ -1,5 +1,7 @@
 ﻿#pragma warning disable VSSpell001 // Spell Check
 
+using Nano.Electric.Enums;
+
 namespace Nano.Electric {
     public interface IHaveId {
         int Id { get; set; }
@@ -23,5 +25,16 @@ namespace Nano.Electric {
     public partial class ScsGutterBolting : IProduct { }
     public partial class DbScsGcBoltingAccessoryUnit : IProduct { }
     public partial class CaeMaterialUtility : IProduct { }
-    public partial class ElBoard : IProduct { }
+    public partial class ElBoard : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
+    public partial class ElBox : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
+    public partial class ElShieldingUnit : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
+    public partial class ElAutomat : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
+    public partial class ElSafeDevice : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    public partial class ElKnifeSwitch : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    public partial class ElUzo : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    public partial class ElStarter : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    public partial class ElOvervoltageSuppressor : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    public partial class ElFrequenceTransformer : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    public partial class ElCasing : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    public partial class ElFiderUtility : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
 }

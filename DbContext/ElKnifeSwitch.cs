@@ -9,6 +9,14 @@ namespace Nano.Electric
     [Table("ElKnifeSwitch")]
     public partial class ElKnifeSwitch
     {
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }
+        public int? MountType { get; set; }
+        public int? Poles { get; set; }
+      public int? RailMountTypeFlagged { get; set; }
+
+
+#endif
         public double? ActiveResistance { get; set; }
 
         public string Code { get; set; }
@@ -50,7 +58,6 @@ namespace Nano.Electric
 
         public double? Voltage { get; set; }
 
-        public int? Poles { get; set; }
 
         public bool? DbIsModule { get; set; }
 
@@ -58,7 +65,6 @@ namespace Nano.Electric
 
         public double? MaxDynCurrent { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
         public int? CwPCode { get; set; }
 
@@ -66,13 +72,10 @@ namespace Nano.Electric
 
         public int? ExplodeLevel { get; set; }
 
-        public int? MountType { get; set; }
 
         public string EtmCode { get; set; }
 
-        public int? RailMountTypeFlagged { get; set; }
-
-        public bool? InImport { get; set; }
+          public bool? InImport { get; set; }
 
         public string Purpose { get; set; }
 

@@ -9,21 +9,35 @@ namespace Nano.Electric
     [Table("ElAutomat")]
     public partial class ElAutomat
     {
+#if !InitDbContextEnums
+        public int? DbPoleCountEnum { get; set; }
+        public int? CurrentChoice { get; set; }
+        public int? IsExplSafe { get; set; }
+        public int? ContactType { get; set; }
+        public int? MountType { get; set; }
+        public int? KzInstantCurrentChoice { get; set; }
+        public int? VoltageType { get; set; }
+
+#endif  
+        public bool? IsHeatR { get; set; }
+
+        public bool? IsElMagR { get; set; }
+
+        public bool? IsElectronicR { get; set; }
+
+        public bool? HasUzo { get; set; }
         public double? ActiveResistance { get; set; }
 
         public int? Climate { get; set; }
 
         public string Code { get; set; }
 
-        public int? CurrentChoice { get; set; }
 
         public string DbDocument { get; set; }
 
         public double? Depth { get; set; }
 
         public string Description { get; set; }
-
-        public bool? HasUzo { get; set; }
 
         public double? Height { get; set; }
 
@@ -60,7 +74,6 @@ namespace Nano.Electric
 
         public double? Width { get; set; }
 
-        public int? DbPoleCountEnum { get; set; }
 
         public bool? DbIsModule { get; set; }
 
@@ -68,9 +81,7 @@ namespace Nano.Electric
 
         public double? DynResistance { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
-        public int? ContactType { get; set; }
 
         public int? CwPCode { get; set; }
 
@@ -80,11 +91,7 @@ namespace Nano.Electric
 
         public string UserCategory { get; set; }
 
-        public bool? IsHeatR { get; set; }
 
-        public bool? IsElMagR { get; set; }
-
-        public bool? IsElectronicR { get; set; }
 
         public string CurrentScale { get; set; }
 
@@ -102,7 +109,6 @@ namespace Nano.Electric
 
         public double? MultiplicityOfCurrentForTmTime { get; set; }
 
-        public int? KzInstantCurrentChoice { get; set; }
 
         public string KzKiScale { get; set; }
 
@@ -110,7 +116,6 @@ namespace Nano.Electric
 
         public string CurrentScaleUzo { get; set; }
 
-        public int? MountType { get; set; }
 
         public string EtmCode { get; set; }
 
@@ -120,7 +125,6 @@ namespace Nano.Electric
 
         public string Purpose { get; set; }
 
-        public int? VoltageType { get; set; }
 
         public double? MaxCommutation660 { get; set; }
 

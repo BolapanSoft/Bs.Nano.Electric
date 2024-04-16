@@ -1,14 +1,19 @@
-namespace Nano.Electric
-{
+namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     [Table("ElOvervoltageSuppressor")]
-    public partial class ElOvervoltageSuppressor
-    {
+    public partial class ElOvervoltageSuppressor {
+#if !InitDbContextEnums
+        public int? PoleCount { get; set; }
+        public int? IsExplSafe { get; set; }
+        public int? MountType { get; set; }
+        public int? RailMountTypeFlagged { get; set; }
+
+#endif      
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
@@ -36,15 +41,9 @@ namespace Nano.Electric
 
         public double? MaxDischargeCurrent { get; set; }
 
-        public int? PoleCount { get; set; }
-
-        public int? IsExplSafe { get; set; }
-
         public double? MaxCordS { get; set; }
 
         public string Mass { get; set; }
-
-        public int? MountType { get; set; }
 
         public bool? IsModular { get; set; }
 
@@ -70,7 +69,6 @@ namespace Nano.Electric
 
         public string EtmCode { get; set; }
 
-        public int? RailMountTypeFlagged { get; set; }
 
         public bool? InImport { get; set; }
 

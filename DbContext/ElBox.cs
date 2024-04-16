@@ -9,9 +9,12 @@ namespace Nano.Electric
     [Table("ElBox")]
     public partial class ElBox
     {
-        public int? BoxAppointment { get; set; }
+#if !InitDbContextEnums
+        public int? BoxAppointment { get; set; } 
 
         public int? CableLeadIn { get; set; }
+        public int? IsExplSafe { get; set; }
+#endif
 
         public string Code { get; set; }
 
@@ -50,7 +53,6 @@ namespace Nano.Electric
 
         public string SpecDescription { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
         public string KitStructure { get; set; }
 

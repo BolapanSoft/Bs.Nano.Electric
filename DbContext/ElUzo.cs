@@ -7,8 +7,15 @@ namespace Nano.Electric
     
 
     [Table("ElUzo")]
-    public partial class ElUzo
-    {
+    public partial class ElUzo {
+#if !InitDbContextEnums
+        public int? DbPoleCountEnum { get; set; }
+        public int? IsExplSafe { get; set; }
+        public int? MountType { get; set; }
+        public int? RailMountTypeFlagged { get; set; }
+
+
+#endif
         public string Code { get; set; }
 
         public int? DbClimate { get; set; }
@@ -45,15 +52,11 @@ namespace Nano.Electric
         public string Series { get; set; }
 
         public string SpecDescription { get; set; }
-
-        public int? DbPoleCountEnum { get; set; }
-
+    
         public bool? DbIsModule { get; set; }
 
         public double? DbModuleCount { get; set; }
-
-        public int? IsExplSafe { get; set; }
-
+    
         public double? ActiveResistance { get; set; }
 
         public int? CwPCode { get; set; }
@@ -64,13 +67,9 @@ namespace Nano.Electric
 
         public string CurrentScaleUzo { get; set; }
 
-        public int? MountType { get; set; }
-
         public double? DbVoltage { get; set; }
 
         public string EtmCode { get; set; }
-
-        public int? RailMountTypeFlagged { get; set; }
 
         public bool? InImport { get; set; }
 

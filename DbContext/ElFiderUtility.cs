@@ -8,6 +8,16 @@ namespace Nano.Electric
 
     public partial class ElFiderUtility
     {
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }
+        public int? MountType { get; set; }
+        public int? InstallationType { get; set; }
+        public int? FacadeDimensionType { get; set; }
+        public int? InnerDimensionType { get; set; }
+        public int? DimensionType { get; set; }
+        public int? RailMountTypeFlagged { get; set; }
+
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
@@ -45,14 +55,6 @@ namespace Nano.Electric
 
         public int? DbImageRef { get; set; }
 
-        public int? IsExplSafe { get; set; }
-
-        public int? InstallationType { get; set; }
-
-        public int? MountType { get; set; }
-
-        public int? DimensionType { get; set; }
-
         public double? Height { get; set; }
 
         public double? Width { get; set; }
@@ -60,8 +62,6 @@ namespace Nano.Electric
         public double? Diameter { get; set; }
 
         public double? Depth { get; set; }
-
-        public int? FacadeDimensionType { get; set; }
 
         public double? FacadeHeight { get; set; }
 
@@ -71,8 +71,6 @@ namespace Nano.Electric
 
         public double? FacadeDepth { get; set; }
 
-        public int? InnerDimensionType { get; set; }
-
         public double? InnerHeight { get; set; }
 
         public double? InnerWidth { get; set; }
@@ -81,7 +79,6 @@ namespace Nano.Electric
 
         public double? InnerDepth { get; set; }
 
-        public int? RailMountTypeFlagged { get; set; }
 
         public string EtmCode { get; set; }
 

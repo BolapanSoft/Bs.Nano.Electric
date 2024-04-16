@@ -47,7 +47,8 @@ namespace Nano.Electric
         public bool? InImport { get; set; }
 
         public string Url { get; set; }
-
+#if false
         public string DbClassificatorCode { get; set; }
+#endif
     }
 }

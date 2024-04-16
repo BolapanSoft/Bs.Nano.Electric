@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿// Ignore Spelling: Automat
+
+using System.ComponentModel;
 
 namespace Nano.Electric.Enums {
     public enum SafeDegreeIk {

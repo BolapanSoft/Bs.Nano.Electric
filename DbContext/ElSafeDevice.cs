@@ -1,14 +1,19 @@
-namespace Nano.Electric
-{
+namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     [Table("ElSafeDevice")]
-    public partial class ElSafeDevice
-    {
+    public partial class ElSafeDevice {
+#if !InitDbContextEnums
+        public int? DbPoleCountEnum { get; set; }
+        public int? IsExplSafe { get; set; }
+        public int? MountType { get; set; }
+        public int? RailMountTypeFlagged { get; set; }
+
+#endif
         public double? ActiveResistance { get; set; }
 
         public int? Climate { get; set; }
@@ -52,7 +57,6 @@ namespace Nano.Electric
 
         public double? Width { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
         public int? CwPCode { get; set; }
 
@@ -62,13 +66,10 @@ namespace Nano.Electric
 
         public string CurrentScale { get; set; }
 
-        public int? MountType { get; set; }
 
-        public int? DbPoleCountEnum { get; set; }
 
         public string EtmCode { get; set; }
 
-        public int? RailMountTypeFlagged { get; set; }
 
         public bool? InImport { get; set; }
 

@@ -9,7 +9,12 @@ namespace Nano.Electric
     [Table("ElShieldingUnit")]
     public partial class ElShieldingUnit
     {
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }
+
         public int? CableLeadIn { get; set; }
+        public int? PhaseCount { get; set; }
+#endif     
 
         public string Code { get; set; }
 
@@ -40,7 +45,6 @@ namespace Nano.Electric
 
         public int? OrderNumber { get; set; }
 
-        public int? PhaseCount { get; set; }
 
         public string Series { get; set; }
 
@@ -48,7 +52,6 @@ namespace Nano.Electric
 
         public double? VoltageUp { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
         public string KitStructure { get; set; }
 

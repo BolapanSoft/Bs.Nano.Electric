@@ -34,7 +34,9 @@ namespace Nano.Electric
 
         public string SpecDescription { get; set; }
 
-        public int? ContactType { get; set; }
+#if !InitDbContextEnums
+        public int? ContactType { get; set; } 
+#endif
 
         public string KitStructure { get; set; }
 

@@ -8,4 +8,5 @@ namespace Nano.Electric {
         public ScsBoxMeasureUnit? BoxMeasureUnit { get; set; } = ScsBoxMeasureUnit.IN_SEGMENTS; 
 #endif
     }
+
 }
