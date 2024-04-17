@@ -74,77 +74,37 @@ namespace Nano.Electric {
 
                     continue;
                 }
+                string sourceValue = item[propName];
 
                 try {
-                    object? value = null;
-                    bool success = false;
-                    string sourceValue = item[propName];
-                    if (skipIfEmptyValue && string.IsNullOrEmpty(sourceValue)) {
-                        continue;
-                    }
-                    if (propertyInfo.PropertyType == typeof(int)) {
-                        success = int.TryParse(sourceValue, out int result);
-                        value = result;
-                    }
-                    else if (propertyInfo.PropertyType == typeof(int?)) {
-                        if (int.TryParse(sourceValue, out int result)) {
-                            value = result;
-                            success = true;
-                        }
-                    }
-                    else if (propertyInfo.PropertyType == typeof(double)) {
-                        success = double.TryParse(sourceValue, out double result);
-                        value = result;
-                    }
-                    else if (propertyInfo.PropertyType == typeof(double?)) {
-                        if (double.TryParse(sourceValue,NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double result)) {
-                            value = result;
-                            success = true;
-                        }
-                    }
-                    else if (propertyInfo.PropertyType == typeof(bool)) {
-                        success = bool.TryParse(sourceValue, out bool result);
-                        value = result;
-                    }
-                    else if (propertyInfo.PropertyType == typeof(bool?)) {
-                        if (bool.TryParse(sourceValue, out bool result)) {
-                            value = result;
-                            success = true;
-                        }
-                    }
-                    else if (propertyInfo.PropertyType.IsEnum) {
-                        if (ReflectionHelper.GetConverter(propertyInfo.PropertyType, out var convert)) {
-                            value = convert(item[propName]);
-                            success = true;
-                        }
-                    }
-                    else if (Nullable.GetUnderlyingType(propertyInfo.PropertyType)?.IsEnum == true) {
-                        if (ReflectionHelper.GetConverter(Nullable.GetUnderlyingType(propertyInfo.PropertyType), out var convert)) {
-                            if (string.IsNullOrEmpty(item[propName])) {
-                                propertyInfo.SetValue(product, null);
-                                continue;
-                            }
-                            value = convert(item[propName]);
-                            success = true;
-                        }
-                    }
-                    else {
-                        value = Convert.ChangeType(sourceValue, propertyInfo.PropertyType);
-                        success = true;
-                    }
-                    if (success) {
-                        propertyInfo.SetValue(product, value);
-                    }
-                    else {
-                        results.Add((propName, new InvalidOperationException($"Операция не выполнена. Значение \"{sourceValue}\" столбца {propName} не удается привести к типу {propertyInfo.PropertyType}.")));
-                    }
+                    propertyInfo.SetValue(product, sourceValue, BindingFlags.Public, FieldBinder.Instance, null, CultureInfo.GetCultureInfo("Ru-ru"));
                 }
-                catch (Exception ex) {
-                    results.Add((propName, new InvalidOperationException($"Не удалось заполнить свойство {propName}. Тип свойства назначения \"{propertyInfo.PropertyType}\"", ex)));
+                catch(Exception ex) {
+                    results.Add((propName, new InvalidOperationException($"Операция не выполнена. Значение \"{sourceValue}\" столбца {propName} не удается привести к типу {propertyInfo.PropertyType}.",ex)));
                 }
             }
             return results;
         }
+
+        private static bool TryConvertToBool(string sourceValue, out bool? result) {
+            if (string.Compare(sourceValue, "True", ignoreCase: true, CultureInfo.InvariantCulture) == 0 ||
+                string.Compare(sourceValue, "Да", ignoreCase: true, CultureInfo.GetCultureInfo("Ru-ru")) == 0
+                ) {
+                result = true;
+                return true;
+            }
+            else if (string.Compare(sourceValue, "False", ignoreCase: true, CultureInfo.InvariantCulture) == 0 ||
+                string.Compare(sourceValue, "Нет", ignoreCase: true, CultureInfo.GetCultureInfo("Ru-ru")) == 0
+                ) {
+                result = false;
+                return true;
+            }
+            else {
+                result = null;
+                return false;
+            }
+        }
+        
         /// <summary>
         /// 
         /// </summary>

@@ -82,6 +82,8 @@ namespace Nano.Electric
 
         public string Url { get; set; }
 
-       // public string DbClassificatorCode { get; set; }
+#if DBNE23
+        public string DbClassificatorCode { get; set; }
+#endif
     }
 }

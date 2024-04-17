@@ -70,9 +70,12 @@ namespace Nano.Electric
         public double? VoltageDownValue { get; set; }
 
         public int? DbGraphicRef { get; set; }
-
+#if DBNE23
         public string DbClassificatorCode { get; set; }
+#endif
 
+#if DBNE23
         public string SafeDegreeIk { get; set; }
+#endif
     }
 }

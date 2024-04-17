@@ -22,4 +22,7 @@ namespace Nano.Electric {
     public interface IHaveDbClimate {
         public int? DbClimate { get; set; }
     }
+    public interface IHaveDbGraphicRef {
+        public int? DbGraphicRef { get; set; }
+    }
 }

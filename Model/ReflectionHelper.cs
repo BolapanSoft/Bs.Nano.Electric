@@ -2,12 +2,14 @@
 
 using Nano.Electric;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Web;
 
 namespace Nano.Electric {
     internal static class ReflectionHelper {
@@ -68,14 +70,11 @@ namespace Nano.Electric {
         }
 
 
-        public static string GetDescription<MyEnum>(this MyEnum value) where MyEnum : Enum {
-            FieldInfo field = value.GetType().GetField(value.ToString());
-            if (field is null) {
-                throw new InvalidOperationException($"For value = \"{value}\" of type {typeof(MyEnum)} not defined DescriptionAttribute.");
-            }
-            DescriptionAttribute? attribute = Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) as DescriptionAttribute;
-
-            return attribute?.Description ?? value.ToString();
+        public static string GetDescription<TEnum>(this TEnum enumValue) where TEnum : Enum {
+            string strValue = enumValue.ToString();
+            var memberInfo = typeof(TEnum).GetMember(strValue);
+            var descriptionAttribute = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
+            return descriptionAttribute?.Description ?? strValue;
         }
         /// <summary>
         /// Возвращает список геттеров экземпляра класса для свойств простого типа (string, double, int, bool).
@@ -94,10 +93,11 @@ namespace Nano.Electric {
        );
             columnGetters.AddRange(ReflectionHelper.GetPropertiesWithGetters<Tsource, double?>()
                 .Select<(string PropertyName, Func<Tsource, double?> Getter), (string PropertyName, Func<Tsource, string> Getter)>(
-                selector: vp => (PropertyName: vp.PropertyName, Getter: (sgc) => { 
+                selector: vp => (PropertyName: vp.PropertyName, Getter: (sgc) => {
                     double? value = vp.Getter(sgc);
                     return value.HasValue ? value.Value.ToString(CultureInfo.InvariantCulture) : string.Empty;
-                }))
+                }
+                ))
                 );
             columnGetters.AddRange(ReflectionHelper.GetPropertiesWithGetters<Tsource, int>()
                  .Select<(string PropertyName, Func<Tsource, int> Getter), (string PropertyName, Func<Tsource, string> Getter)>(
@@ -119,7 +119,7 @@ namespace Nano.Electric {
 
             return columnGetters;
         }
-        
+
         public static List<(string PropertyName, Action<Tsource, string> Setter)> GenerateColumnSetters<Tsource>() where Tsource : class {
             var columnSetters = new List<(string PropertyName, Action<Tsource, string> Setter)>();
             columnSetters.AddRange(ReflectionHelper.GetPropertiesWithSetters<Tsource, string>()
@@ -191,81 +191,9 @@ namespace Nano.Electric {
                 && (type.GenericTypeArguments[0].IsPrimitive || type.GenericTypeArguments[0] == typeof(string) || type.GenericTypeArguments[0].IsEnum);
         }
 
-        //internal static bool GetConverter<Tenum>(Type targetType, string errMessage, out Func<object, object?> convert)
-        //    where Tenum : Enum {
-        //    if (targetType ==typeof(int?)) {
-        //        convert = (o) => {
-        //            if (o is null)
-        //                return null;
-        //            IConvertible convertible = (IConvertible)o;
-        //            int value = convertible.ToInt32(CultureInfo.InvariantCulture);
-        //            return value;
-        //        };
-        //        return true;
-        //    }
-        //    else if (targetType.IsAssignableFrom(typeof(int))) {
-        //        convert = (o) => {
-        //            if (o is null)
-        //                return 0;
-        //            IConvertible convertible = (IConvertible)o;
-        //            int value = convertible.ToInt32(CultureInfo.InvariantCulture);
-        //            return value;
-        //        };
-        //        return true;
-        //    }
-        //    else {
-        //        convert = (o) => throw new InvalidCastException(errMessage);
-        //        return false;
-        //    }
-        //}
-        private static Dictionary<Type, Func<string, object>> enumConverters = new();
-        internal static bool GetConverter(Type type, out Func<string, object> convert) {
-            if (enumConverters.ContainsKey(type)) {
-                convert= enumConverters[type];
-                return true;
-            }
-            if (type.IsEnum) {
-                MethodInfo method = typeof(ReflectionHelper).GetMethod(nameof(Convert), BindingFlags.Public | BindingFlags.Static);
-               var generic = method.MakeGenericMethod(type);
-                convert = (s) => {
-                    var obj = generic.Invoke(null, new object[] { s });
-                    return System.Convert.ChangeType(obj, type);
-                };
-                enumConverters[type] = convert;
-                return true;
-            }
-            // если type является Nullable<Enum>
-            else if (Nullable.GetUnderlyingType(type)?.IsEnum == true) {
-                MethodInfo method = typeof(ReflectionHelper).GetMethod(nameof(Convert), BindingFlags.Public | BindingFlags.Static);
-                var generic = method.MakeGenericMethod(Nullable.GetUnderlyingType(type));
-                convert = (s) => {
-                    if (string.IsNullOrEmpty(s)) {
-                        return null;
-                    }
-                    var obj = generic.Invoke(null, new object[] { s });
-                    return System.Convert.ChangeType(obj, type);
-                };
-                enumConverters[type] = convert;
-                return true;
-            }
-            else {
-                throw new InvalidOperationException($"Can't make converter for {type}.");
-            }
-        }
-        public static TEnum Convert<TEnum>(string description) where TEnum : Enum {
-            var enumValues = typeof(TEnum).GetEnumValues();
-
-            foreach (var enumValue in enumValues) {
-                var memberInfo = typeof(TEnum).GetMember(enumValue.ToString());
-                var descriptionAttribute = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
-
-                if (descriptionAttribute != null && descriptionAttribute.Description == description) {
-                    return (TEnum)enumValue;
-                }
-            }
-
-            throw new ArgumentException($"No enum value found with the description '{description}' for type '{typeof(TEnum).Name}'.");
-        }
+        
+        
+        
         
     }
 }

@@ -50,6 +50,8 @@ namespace Nano.Electric
 
         public int? DbGraphicRef { get; set; }
 
+#if DBNE23
         public string DbClassificatorCode { get; set; }
+#endif
     }
 }

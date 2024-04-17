@@ -84,6 +84,8 @@ namespace Nano.Electric
 
         public double? SectionalDiameter { get; set; }
 
+#if DBNE23
         public string DbClassificatorCode { get; set; }
+#endif
     }
 }

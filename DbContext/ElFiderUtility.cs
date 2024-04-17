@@ -90,6 +90,8 @@ namespace Nano.Electric
 
         public string SafeDegreeIk { get; set; }
 
+#if DBNE23
         public string DbClassificatorCode { get; set; }
+#endif
     }
 }

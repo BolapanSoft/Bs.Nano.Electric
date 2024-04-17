@@ -50,6 +50,8 @@ namespace Nano.Electric
 
         public string LampsType { get; set; }
 
+#if DBNE23
         public string DbClassificatorCode { get; set; }
+#endif
     }
 }

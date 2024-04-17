@@ -49,6 +49,8 @@ namespace Nano.Electric
 
         public string MeashureUnits { get; set; }
 
-        //public string DbClassificatorCode { get; set; }
+#if DBNE23
+        public string DbClassificatorCode { get; set; }
+#endif
     }
 }
