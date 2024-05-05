@@ -20,16 +20,16 @@ namespace Nano.Electric
         public double? ActiveResistance { get; set; }
 
         public string Code { get; set; }
-
-        public int? DbClimate { get; set; }
+        [Column("DbClimate")]
+        public int? Climate { get; set; }
 
         public double? DbDepth { get; set; }
 
         public string DbDocument { get; set; }
 
         public double? DbHeight { get; set; }
-
-        public int? DbSafeDegree { get; set; }
+        [Column("DbSafeDegree")]
+        public int? SafeDegree { get; set; }
 
         public double? DbWidth { get; set; }
 

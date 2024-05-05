@@ -17,10 +17,10 @@ namespace Nano.Electric {
         public int? ExplodeLevel { get; set; }
     }
     public interface IHaveSafeDegree {
-        public int? DbSafeDegree { get; set; }
+        public int? SafeDegree { get; set; }
     }
     public interface IHaveDbClimate {
-        public int? DbClimate { get; set; }
+        public int? Climate { get; set; }
     }
     public interface IHaveDbGraphicRef {
         public int? DbGraphicRef { get; set; }

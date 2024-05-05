@@ -48,10 +48,10 @@ namespace Nano.Electric
         public int? OrderNumber { get; set; }
 
         public int? CwPCode { get; set; }
-
-        public int? DbSafeDegree { get; set; }
-
-        public int? DbClimate { get; set; }
+        [Column("DbSafeDegree")]
+        public int? SafeDegree { get; set; }
+        [Column("DbClimate")]
+        public int? Climate { get; set; }
 
         public int? DbImageRef { get; set; }
 
@@ -88,9 +88,9 @@ namespace Nano.Electric
 
         public string Url { get; set; }
 
-        public string SafeDegreeIk { get; set; }
 
 #if DBNE23
+        public string SafeDegreeIk { get; set; }
         public string DbClassificatorCode { get; set; }
 #endif
     }

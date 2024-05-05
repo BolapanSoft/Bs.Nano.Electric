@@ -19,7 +19,7 @@ namespace Nano.Electric.Enums {
         ANGLE_45 = 1,
         [Description("0-90")]
         ANGLE_0_90 = 2,
-        [Description("90")]
+        [Description("")]
         OTHER = 3
     }
 }

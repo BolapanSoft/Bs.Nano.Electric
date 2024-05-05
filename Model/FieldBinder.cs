@@ -100,14 +100,16 @@ namespace Nano.Electric {
             if (typeCode1 == typeCode2)
                 return value;
             if (typeCode1 == TypeCode.String) {
-                if (Nullable.GetUnderlyingType(type2) is not null) { // type2 is Nullable
+                var underlylingType2 = Nullable.GetUnderlyingType(type2);
+                if (underlylingType2 is not null) { // type2 is Nullable
                     if (value is null) {
                         return value!;
                     }
-                    if ((string)value == "null") {
+                    var strValue = (string)value;
+                    if (string.IsNullOrEmpty(strValue) || string.Compare("null", strValue, ignoreCase: true, culture: culture) == 0) {
                         return null!;
                     }
-                    type2 = Nullable.GetUnderlyingType(type2);
+                    type2 = underlylingType2;
                     typeCode2 = Type.GetTypeCode(type2);
                 }
                 if (type2.IsEnum) {

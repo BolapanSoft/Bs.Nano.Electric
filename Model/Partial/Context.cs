@@ -69,13 +69,16 @@ namespace Nano.Electric {
                 if (propertyInfo == null || !propertyInfo.CanWrite) {
                     continue;
                 }
+             
                 if (propertyInfo.GetCustomAttribute<KeyAttribute>() != null) {
                     results.Add((propName, new InvalidOperationException($"Операция не разрешена. Свойство {propName} является частью ключа.")));
 
                     continue;
                 }
                 string sourceValue = item[propName];
-
+                if (skipIfEmptyValue && (sourceValue == null || sourceValue == "")) {
+                    continue;
+                }
                 try {
                     propertyInfo.SetValue(product, sourceValue, BindingFlags.Public, FieldBinder.Instance, null, CultureInfo.GetCultureInfo("Ru-ru"));
                 }

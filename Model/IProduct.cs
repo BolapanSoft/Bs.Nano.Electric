@@ -37,4 +37,10 @@ namespace Nano.Electric {
     public partial class ElFrequenceTransformer : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
     public partial class ElCasing : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
     public partial class ElFiderUtility : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    public partial class ElBoardUtility : IProduct {  }
+    public partial class ElBlock : IProduct {  }
+    //public partial class ElAutomat : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    //public partial class ElOvervoltageSuppressor : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    //public partial class ElStarter : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    //public partial class ElCasing : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
 }

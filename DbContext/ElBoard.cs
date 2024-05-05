@@ -90,12 +90,12 @@ namespace Nano.Electric
         public int? CwPCode { get; set; }
 
         public int? DbImageRef { get; set; }
-
-        public int? DbClimate { get; set; }
+        [Column("DbClimate")]
+        public int? Climate { get; set; }
 
         public int? ExplodeLevel { get; set; }
-
-        public int? DbSafeDegree { get; set; }
+        [Column("DbSafeDegree")]
+        public int? SafeDegree { get; set; }
 
         public string EtmCode { get; set; }
 

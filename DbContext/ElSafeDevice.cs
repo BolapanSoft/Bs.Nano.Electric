@@ -15,7 +15,6 @@ namespace Nano.Electric {
 
 #endif
         public double? ActiveResistance { get; set; }
-
         public int? Climate { get; set; }
 
         public string Code { get; set; }
@@ -46,7 +45,6 @@ namespace Nano.Electric {
         public double? NominalCurrent { get; set; }
 
         public int? OrderNumber { get; set; }
-
         public int? SafeDegree { get; set; }
 
         public string Series { get; set; }
