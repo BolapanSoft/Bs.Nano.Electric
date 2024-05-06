@@ -13,7 +13,7 @@ namespace Nano.Electric {
         public AutomatContactType? ContactType { get; set; }
         public ElControlRegisterDeviceMountType? MountType { get; set; }
         public ElInstantKzCurrentChoiseEnum? KzInstantCurrentChoice { get; set; }
-        // TODO: Реализовать импорт [Flags] Enum
+        public ElMountRailType? RailMountTypeFlagged { get; set; }
         public RatedNetVoltageType? VoltageType { get; set; }
 
 #endif

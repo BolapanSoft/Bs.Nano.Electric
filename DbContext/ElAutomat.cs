@@ -1,14 +1,12 @@
-namespace Nano.Electric
-{
+namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     [Table("ElAutomat")]
-    public partial class ElAutomat
-    {
+    public partial class ElAutomat {
 #if !InitDbContextEnums
         public int? DbPoleCountEnum { get; set; }
         public int? CurrentChoice { get; set; }
@@ -17,6 +15,7 @@ namespace Nano.Electric
         public int? MountType { get; set; }
         public int? KzInstantCurrentChoice { get; set; }
         public int? VoltageType { get; set; }
+       public int? RailMountTypeFlagged { get; set; }
 
 #endif  
         public bool? IsHeatR { get; set; }
@@ -117,7 +116,6 @@ namespace Nano.Electric
 
         public string EtmCode { get; set; }
 
-        public int? RailMountTypeFlagged { get; set; }
 
         public bool? InImport { get; set; }
 
