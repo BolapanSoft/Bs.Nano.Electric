@@ -126,7 +126,7 @@ namespace Nano.Electric {
             }
             var attr = typeof(Tdest).GetCustomAttribute<System.ComponentModel.DataAnnotations.Schema.TableAttribute>();
             if (attr is null) {
-                throw new InvalidOperationException($"Тип {typeName} не имеет аттрибута TableAttribute.");
+                throw new InvalidOperationException($"Тип {typeName} не имеет атрибута TableAttribute.");
             }
             // out public propertis, exept properties width attribute [NotMapped]
             properties = type.GetProperties()

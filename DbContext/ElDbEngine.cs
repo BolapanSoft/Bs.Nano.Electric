@@ -9,6 +9,10 @@ namespace Nano.Electric
     [Table("ElDbEngine")]
     public partial class ElDbEngine
     {
+#if !InitDbContextEnums
+        public int? PhaseCount { get; set; }
+        public int? IsExplSafe { get; set; }
+#endif
         public int? Climate { get; set; }
 
         public string Code { get; set; }
@@ -34,7 +38,6 @@ namespace Nano.Electric
 
         public int? OrderNumber { get; set; }
 
-        public int? PhaseCount { get; set; }
 
         public double? PowerCoef { get; set; }
 
@@ -52,7 +55,6 @@ namespace Nano.Electric
 
         public string NominalRotationFrequencyStr { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
         public int? CwPCode { get; set; }
 

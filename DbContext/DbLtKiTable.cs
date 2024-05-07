@@ -9,6 +9,9 @@ namespace Nano.Electric
     [Table("DbLtKiTable")]
     public partial class DbLtKiTable
     {
+#if !InitDbContextEnums
+        public int? CurveType { get; set; }
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
@@ -26,6 +29,5 @@ namespace Nano.Electric
 
         public bool? InImport { get; set; }
 
-        public int? CurveType { get; set; }
     }
 }

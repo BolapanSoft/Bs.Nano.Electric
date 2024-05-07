@@ -9,6 +9,10 @@ namespace Nano.Electric
     [Table("ElDbHeater")]
     public partial class ElDbHeater
     {
+#if !InitDbContextEnums
+        public int? PhaseCount { get; set; }
+        public int? IsExplSafe { get; set; }
+#endif
         public int? Climate { get; set; }
 
         public string Code { get; set; }
@@ -31,9 +35,7 @@ namespace Nano.Electric
         public double? NominalPower { get; set; }
 
         public int? OrderNumber { get; set; }
-
-        public int? PhaseCount { get; set; }
-
+        
         public int? SafeDegree { get; set; }
 
         public string Siries { get; set; }
@@ -41,8 +43,6 @@ namespace Nano.Electric
         public string SpecDescription { get; set; }
 
         public double? Voltage { get; set; }
-
-        public int? IsExplSafe { get; set; }
 
         public int? CwPCode { get; set; }
 

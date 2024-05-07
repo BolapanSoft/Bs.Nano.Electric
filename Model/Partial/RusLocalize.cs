@@ -122,23 +122,23 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Параметры исполнения\\Климатическое исполнение")]
     public partial class ClimateTable { }
 
-    
+
     //[DefaultLocalizeValue("Доп. оборудование ЭУИ")]
     //public partial class ElSocketUtility { }
 
-    [DefaultLocalizeValue("Доп. оборудование светильников")]
+    [DefaultLocalizeValue("Электроприемники\\Светильники\\Доп. оборудование светильников")]
     public partial class ElLightUtility { }
 
-    [DefaultLocalizeValue("Светильники")]
+    [DefaultLocalizeValue("Электроприемники\\Светильники")]
     public partial class ElLighting { }
 
-    [DefaultLocalizeValue("Лампы")]
+    [DefaultLocalizeValue("Электроприемники\\Светильники\\Лампы")]
     public partial class ElLamp { }
 
-    [DefaultLocalizeValue("Нагреватели")]
+    [DefaultLocalizeValue("Электроприемники\\Нагреватели")]
     public partial class ElDbHeater { }
 
-    [DefaultLocalizeValue("Асинхронные двигатели")]
+    [DefaultLocalizeValue("Электроприемники\\Асинхронные двигатели")]
     public partial class ElDbEngine { }
 
     [DefaultLocalizeValue("Комплексные ЭП")]

@@ -9,11 +9,7 @@ namespace Nano.Electric
     [Table("ExplodeSafeLevel")]
     public partial class ExplodeSafeLevel
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        [Column("id")] public int Id { get; set; }
-
-        public string SafeLevelName { get; set; }
-
+#if !InitDbContextEnums
         public int? ExplLevel { get; set; }
 
         public int? ExplMixCategory { get; set; }
@@ -21,6 +17,11 @@ namespace Nano.Electric
         public int? ExplGroup { get; set; }
 
         public int? ExplType { get; set; }
+#endif
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Column("id")] public int Id { get; set; }
+
+        public string SafeLevelName { get; set; }
 
         public int? OrderNumber { get; set; }
 

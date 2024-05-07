@@ -9,13 +9,24 @@ namespace Nano.Electric
     [Table("ElLighting")]
     public partial class ElLighting
     {
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }       
+        public int? DbInstType { get; set; }
+        public int? Lamp { get; set; }
+        public int? Socle { get; set; }
+        public int? LampExistance { get; set; }
+        public int? KccPmType { get; set; }
+        public int? DimensionType { get; set; }
+        public int? LightingPurpouse { get; set; }
+#endif
+
         public int? Climate { get; set; }
 
         public string Code { get; set; }
 
         public string DbDocument { get; set; }
 
-        public int? DbInstType { get; set; }
+        public int? ExplodeLevel { get; set; }
 
         public string DbName { get; set; }
 
@@ -28,7 +39,6 @@ namespace Nano.Electric
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public int? Lamp { get; set; }
 
         public int? LampCount { get; set; }
 
@@ -50,7 +60,6 @@ namespace Nano.Electric
 
         public string Series { get; set; }
 
-        public int? Socle { get; set; }
 
         public string SpecDescription { get; set; }
 
@@ -61,32 +70,26 @@ namespace Nano.Electric
         public string UserCategory { get; set; }
 
         public double? PraPower { get; set; }
-
-        public int? LampExistance { get; set; }
-
-        public double? DbNominalPower { get; set; }
+ 
+     public double? DbNominalPower { get; set; }
 
         public double? LightFlux { get; set; }
-
+        //[MaxLength(1024*4)]
         public string CurvePmContent { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
         public int? CwPCode { get; set; }
 
         public int? DbImageRef { get; set; }
 
-        public int? ExplodeLevel { get; set; }
 
         public int? KiTable { get; set; }
 
-        public int? KccPmType { get; set; }
 
         public string KccFileName { get; set; }
 
         public string EtmCode { get; set; }
 
-        public int? DimensionType { get; set; }
 
         public double? Diameter { get; set; }
 
@@ -94,7 +97,6 @@ namespace Nano.Electric
 
         public string Url { get; set; }
 
-        public int? LightingPurpouse { get; set; }
 
         public double? EmergancyWorkTime { get; set; }
 

@@ -1,14 +1,16 @@
-namespace Nano.Electric
-{
+namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     [Table("ElLamp")]
-    public partial class ElLamp
-    {
+    public partial class ElLamp {
+#if !InitDbContextEnums
+     public int? Socle { get; set; }
+       
+#endif
         public string Code { get; set; }
 
         public string DbDocument { get; set; }
@@ -32,7 +34,6 @@ namespace Nano.Electric
 
         public string Series { get; set; }
 
-        public int? Socle { get; set; }
 
         public string SpecDescription { get; set; }
 
