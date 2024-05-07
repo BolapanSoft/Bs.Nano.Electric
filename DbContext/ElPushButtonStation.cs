@@ -9,6 +9,10 @@ namespace Nano.Electric
     [Table("ElPushButtonStation")]
     public partial class ElPushButtonStation
     {
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }
+
+#endif
         public int? ButtonCount { get; set; }
 
         public string Code { get; set; }
@@ -32,7 +36,6 @@ namespace Nano.Electric
 
         public string SpecDescription { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
         public int? CwPCode { get; set; }
 

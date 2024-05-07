@@ -9,6 +9,22 @@ namespace Nano.Electric
     [Table("ElVoltmeter")]
     public partial class ElVoltmeter
     {
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }
+       public int? MountType { get; set; }
+       public int? InstallationType { get; set; }
+
+        public int? RailMountTypeFlagged { get; set; }
+
+        public int? DimensionType { get; set; }
+
+        public double? Diameter { get; set; }
+
+        public int? FacadeDimensionType { get; set; }
+
+        public int? InnerDimensionType { get; set; }
+
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
@@ -34,8 +50,6 @@ namespace Nano.Electric
 
         public string accuracyClass { get; set; }
 
-        public int? IsExplSafe { get; set; }
-
         public string Mass { get; set; }
 
         public double? Height { get; set; }
@@ -48,7 +62,6 @@ namespace Nano.Electric
 
         public double? DbModuleCount { get; set; }
 
-        public int? MountType { get; set; }
 
         public int? OrderNumber { get; set; }
 
@@ -64,17 +77,7 @@ namespace Nano.Electric
 
         public string EtmCode { get; set; }
 
-        public int? InstallationType { get; set; }
-
-        public int? RailMountTypeFlagged { get; set; }
-
-        public int? DimensionType { get; set; }
-
-        public double? Diameter { get; set; }
-
-        public int? FacadeDimensionType { get; set; }
-
-        public double? FacadeHeight { get; set; }
+          public double? FacadeHeight { get; set; }
 
         public double? FacadeWidth { get; set; }
 
@@ -82,7 +85,6 @@ namespace Nano.Electric
 
         public double? FacadeDepth { get; set; }
 
-        public int? InnerDimensionType { get; set; }
 
         public double? InnerHeight { get; set; }
 

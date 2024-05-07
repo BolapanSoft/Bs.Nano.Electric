@@ -122,17 +122,9 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Параметры исполнения\\Климатическое исполнение")]
     public partial class ClimateTable { }
 
-    [DefaultLocalizeValue("Вольтметры")]
-    public partial class ElVoltmeter { }
-
-
+    
     //[DefaultLocalizeValue("Доп. оборудование ЭУИ")]
     //public partial class ElSocketUtility { }
-
-
-
-    [DefaultLocalizeValue("Кнопочные посты управления")]
-    public partial class ElPushButtonStation { }
 
     [DefaultLocalizeValue("Доп. оборудование светильников")]
     public partial class ElLightUtility { }
@@ -151,15 +143,6 @@ namespace Nano.Electric {
 
     [DefaultLocalizeValue("Комплексные ЭП")]
     public partial class ElDbComplex { }
-
-    [DefaultLocalizeValue("Трансформаторы тока")]
-    public partial class ElCurrentTransformer { }
-
-    [DefaultLocalizeValue("Счетчики")]
-    public partial class ElCounter { }
-
-    [DefaultLocalizeValue("Приборы управления")]
-    public partial class ElControlDevice { }
 
     [DefaultLocalizeValue("Коммутационные аппараты\\Автоматические выключатели")]
     public partial class ElAutomat { }
@@ -188,9 +171,6 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Коммутационные аппараты\\Доп. оборудование КА")]
     public partial class ElFiderUtility { }
 
-    [DefaultLocalizeValue("Амперметры")]
-    public partial class ElAmperemeter { }
-
     [DefaultLocalizeValue("Общая информация")]
     public partial class DSInformation { }
 
@@ -218,10 +198,20 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Комплектации РУ")]
     public partial class DbElBoardUtilitySet { }
 
-
+    [DefaultLocalizeValue("Приборы контроля и учета\\Кнопочные посты управления")]
+    public partial class ElPushButtonStation { }
+    [DefaultLocalizeValue("Приборы контроля и учета\\Амперметры")]
+    public partial class ElAmperemeter { }
+    [DefaultLocalizeValue("Приборы контроля и учета\\Приборы управления")]
+    public partial class ElControlDevice { }
+    [DefaultLocalizeValue("Приборы контроля и учета\\Счетчики")]
+    public partial class ElCounter { }
+    [DefaultLocalizeValue("Приборы контроля и учета\\Трансформаторы тока")]
+    public partial class ElCurrentTransformer { }
+    [DefaultLocalizeValue("Приборы контроля и учета\\Вольтметры")]
+    public partial class ElVoltmeter { }
+    
     /* 
-    [DefaultLocalizeValue("")]
-    public partial class ___ { }
 
     [DefaultLocalizeValue("")]
     public partial class ___ { }

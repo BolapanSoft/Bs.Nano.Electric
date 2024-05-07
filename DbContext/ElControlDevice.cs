@@ -1,14 +1,22 @@
-namespace Nano.Electric
-{
+namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     [Table("ElControlDevice")]
-    public partial class ElControlDevice
-    {
+    public partial class ElControlDevice {
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }
+        public int? MountType { get; set; }
+        public int? RailMountTypeFlagged { get; set; }
+        public int? DimensionType { get; set; }
+        public int? InstallationType { get; set; }
+        public int? FacadeDimensionType { get; set; }
+        public int? InnerDimensionType { get; set; }
+
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
@@ -36,19 +44,12 @@ namespace Nano.Electric
 
         public string UserCategory { get; set; }
 
-        public int? IsExplSafe { get; set; }
-
         public string Mass { get; set; }
 
-        public int? InstallationType { get; set; }
-
-        public int? MountType { get; set; }
 
         public bool? DbIsModule { get; set; }
 
         public double? DbModuleCount { get; set; }
-
-        public int? DimensionType { get; set; }
 
         public double? Height { get; set; }
 
@@ -58,7 +59,6 @@ namespace Nano.Electric
 
         public double? Depth { get; set; }
 
-        public int? FacadeDimensionType { get; set; }
 
         public double? FacadeHeight { get; set; }
 
@@ -68,8 +68,7 @@ namespace Nano.Electric
 
         public double? FacadeDepth { get; set; }
 
-        public int? InnerDimensionType { get; set; }
-
+        
         public double? InnerHeight { get; set; }
 
         public double? InnerWidth { get; set; }
@@ -94,7 +93,6 @@ namespace Nano.Electric
 
         public string EtmCode { get; set; }
 
-        public int? RailMountTypeFlagged { get; set; }
 
         public bool? InImport { get; set; }
 
