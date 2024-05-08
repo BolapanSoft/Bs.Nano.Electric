@@ -20,7 +20,8 @@ namespace Nano.Electric {
         }
 
         partial void InitializeModel(DbModelBuilder modelBuilder) {
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Conventions.Add(new StringPropertiesConvention());
+            
             modelBuilder.Entity<CaeMaterialUtility>()
                 .Property(t => t.MeashureUnits)
                 .HasColumnName("MeashureUnits");
@@ -35,6 +36,9 @@ namespace Nano.Electric {
             modelBuilder.Ignore<DbGcKnotLevel>();
             modelBuilder.Ignore<DbGcSystemPlain>();
 #endif
+            //modelBuilder.Entity<DbLtKiTable>()
+            //    .Property(p => p.CurveDb)
+            //    .HasColumnType("ntext");
             //modelBuilder.Entity<DbScsGutterUtilitySet>()
             //    .Property(p=>p.LevelType)
             //    .HasColumnName("LevelType")
@@ -50,6 +54,7 @@ namespace Nano.Electric {
             //    .HasColumnName("StructureType")
             //    .HasColumnType("int")
             //    .IsOptional();
+            
         }
         /// <summary>
         /// Выполняет заполнение свойств сущности из сериализованного в строку источника.
@@ -130,7 +135,7 @@ namespace Nano.Electric {
             }
             // out public propertis, exept properties width attribute [NotMapped]
             properties = type.GetProperties()
-                .Where(p => p.GetCustomAttribute<System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute>() == null && p.CanWrite)
+                .Where(p => /*p.GetCustomAttribute<System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute>() == null &&*/ p.CanWrite)
                 .Select(p => p.Name)
                 .ToArray();
             propertiesCache[typeName] = properties;

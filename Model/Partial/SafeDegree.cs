@@ -8,7 +8,5 @@ namespace Nano.Electric {
 
 #endif
     }
-    public partial class DbLtKiTable {
 
-    }
 }

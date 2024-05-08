@@ -4,10 +4,13 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Nano.Electric {
     internal class FieldBinder : Binder {
@@ -90,7 +93,6 @@ namespace Nano.Electric {
             else
                 throw new NotImplementedException();
         }
-
         private static object ChangeTypeRelease(object value, Type myChangeType, CultureInfo culture) {
             var type1 = value.GetType();
             var type2 = myChangeType;
@@ -99,131 +101,146 @@ namespace Nano.Electric {
             // If both type1 and type2 have the same type, return true.
             if (typeCode1 == typeCode2)
                 return value;
+            switch (value) {
+                default:
+                    break;
+            }
             if (typeCode1 == TypeCode.String) {
-                var underlylingType2 = Nullable.GetUnderlyingType(type2);
-                if (underlylingType2 is not null) { // type2 is Nullable
-                    if (value is null) {
-                        return value!;
-                    }
-                    var strValue = (string)value;
-                    if (string.IsNullOrEmpty(strValue) || string.Compare("null", strValue, ignoreCase: true, culture: culture) == 0) {
-                        return null!;
-                    }
-                    type2 = underlylingType2;
-                    typeCode2 = Type.GetTypeCode(type2);
-                }
-                if (type2.IsEnum) {
-                    if (IsFlagsEnum(type2)) {
-                        var flagValues= ((string)value).Split(';').Select(s=>s.TrimStart());
-                        ulong val = flagValues.Aggregate(0ul, (current, item) => current | Convert.ToUInt64(ParseEnum(type2, item)));
-                        return Enum.ToObject(type2, val);
-                    }
-                    else {
-                        object enumValue = ParseEnum(type2, (string)value);
-                        return enumValue;
-                    }
-                }
-                else {
-                    switch (typeCode2) {
-                        case TypeCode.Boolean: {
-                                var strValue = (string)value;
-                                if (culture == CultureInfo.GetCultureInfo("Ru-ru")) {
-                                    if (string.Compare("Да", strValue, ignoreCase: true, culture: culture) == 0) {
-                                        strValue = "True";
-                                    }
-                                    else if (string.Compare("Нет", strValue, ignoreCase: true, culture: culture) == 0) {
-                                        strValue = "False";
-                                    }
-                                    else if (string.Compare("1", strValue, ignoreCase: true, culture: culture) == 0) {
-                                        strValue = "True";
-                                    }
-                                    else if (string.Compare("0", strValue, ignoreCase: true, culture: culture) == 0) {
-                                        strValue = "False";
-                                    }
-                                    else if (string.Compare("Истина", strValue, ignoreCase: true, culture: culture) == 0) {
-                                        strValue = "True";
-                                    }
-                                    else if (string.Compare("Ложь", strValue, ignoreCase: true, culture: culture) == 0) {
-                                        strValue = "False";
-                                    }
-                                }
-                                return Convert.ToBoolean(strValue);
-                            }
-                        case TypeCode.SByte:
-                            return Convert.ToSByte(value);
-                        case TypeCode.Byte:
-                            return Convert.ToByte(value);
-                        case TypeCode.Int16:
-                            return Convert.ToInt16(value);
-                        case TypeCode.UInt16:
-                            return Convert.ToUInt16(value);
-                        case TypeCode.Int32:
-                            return Convert.ToInt32(value);
-                        case TypeCode.UInt32:
-                            return Convert.ToUInt32(value);
-                        case TypeCode.Int64:
-                            return Convert.ToInt64(value);
-                        case TypeCode.UInt64:
-                            return Convert.ToUInt64(value);
-                        case TypeCode.Double: {
-                                var strValue = (string)value;
-                                if (double.TryParse(strValue, NumberStyles.Float, culture, out double result)) {
-                                    return result;
-                                }
-                                else if (double.TryParse(strValue, NumberStyles.Float, CultureInfo.InvariantCulture, out result)) {
-                                    return result;
-                                }
-                                throw new FormatException($"Значение {strValue} не удается преобразовать в double.");
-                            }
-                        case TypeCode.Single: {
-                                var strValue = (string)value;
-                                if (Single.TryParse(strValue, NumberStyles.Float, culture, out Single result)) {
-                                    return result;
-                                }
-                                else if (Single.TryParse(strValue, NumberStyles.Float, CultureInfo.InvariantCulture, out result)) {
-                                    return result;
-                                }
-                                throw new FormatException($"Значение {strValue} не удается преобразовать в System.Single.");
-                            }
-                        case TypeCode.Decimal: {
-                                var strValue = (string)value;
-                                if (decimal.TryParse(strValue, NumberStyles.Number, culture, out decimal result)) {
-                                    return result;
-                                }
-                                else if (decimal.TryParse(strValue, NumberStyles.Number, CultureInfo.InvariantCulture, out result)) {
-                                    return result;
-                                }
-                                throw new FormatException($"Значение {strValue} не удается преобразовать в decimal.");
-                            }
-                        case TypeCode.Empty:
-                        case TypeCode.Object:
-                        case TypeCode.DBNull:
-                        case TypeCode.Char:
-                        case TypeCode.DateTime: {
-                                var strValue = (string)value;
-                                if (DateTime.TryParse(strValue, culture, DateTimeStyles.AssumeUniversal, out DateTime result)) {
-                                    return result;
-                                }
-                                else if (DateTime.TryParse(strValue, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out result)) {
-                                    return result;
-                                }
-                                throw new FormatException($"Значение {strValue} не удается преобразовать в DateTime.");
-                            }
-                        case TypeCode.String:
-                            return value;
-                        default:
-                            throw new NotImplementedException($"Преобразование из System.String к {typeCode2} не реализовано.");
-                    }
-                }
+                return ChangeTypeRelease((string)value, myChangeType, culture);
             }
             else {
                 try {
-                    return Convert.ChangeType(typeCode1, typeCode2, culture);
+                    return Convert.ChangeType(value, typeCode2, culture);
                 }
-                catch (Exception) {
-                    return Convert.ChangeType(typeCode1, typeCode2, CultureInfo.InvariantCulture);
+                catch {
+                    return Convert.ChangeType(value, typeCode2, CultureInfo.InvariantCulture);
                 }
             }
+        }
+
+        private static object ChangeTypeRelease(string value, Type myChangeType, CultureInfo culture) {
+            TypeCode typeCode2 = Type.GetTypeCode(myChangeType);
+            var underlylingType2 = Nullable.GetUnderlyingType(myChangeType);
+            if (underlylingType2 is not null) { // type2 is Nullable
+                if (value is null) {
+                    return value!;
+                }
+                var strValue = (string)value;
+                if (string.IsNullOrEmpty(strValue) || string.Compare("null", strValue, ignoreCase: true, culture: culture) == 0) {
+                    return null!;
+                }
+                myChangeType = underlylingType2;
+                typeCode2 = Type.GetTypeCode(myChangeType);
+            }
+            if (myChangeType.IsEnum) {
+                if (IsFlagsEnum(myChangeType)) {
+                    var flagValues = ((string)value).Split(';').Select(s => s.TrimStart());
+                    ulong val = flagValues.Aggregate(0ul, (current, item) => current | Convert.ToUInt64(ParseEnum(myChangeType, item)));
+                    return Enum.ToObject(myChangeType, val);
+                }
+                else {
+                    object enumValue = ParseEnum(myChangeType, (string)value);
+                    return enumValue;
+                }
+            }
+            else {
+                switch (typeCode2) {
+                    case TypeCode.Boolean: {
+                            var strValue = (string)value;
+                            if (culture == CultureInfo.GetCultureInfo("Ru-ru")) {
+                                if (string.Compare("Да", strValue, ignoreCase: true, culture: culture) == 0) {
+                                    strValue = "True";
+                                }
+                                else if (string.Compare("Нет", strValue, ignoreCase: true, culture: culture) == 0) {
+                                    strValue = "False";
+                                }
+                                else if (string.Compare("1", strValue, ignoreCase: true, culture: culture) == 0) {
+                                    strValue = "True";
+                                }
+                                else if (string.Compare("0", strValue, ignoreCase: true, culture: culture) == 0) {
+                                    strValue = "False";
+                                }
+                                else if (string.Compare("Истина", strValue, ignoreCase: true, culture: culture) == 0) {
+                                    strValue = "True";
+                                }
+                                else if (string.Compare("Ложь", strValue, ignoreCase: true, culture: culture) == 0) {
+                                    strValue = "False";
+                                }
+                            }
+                            return Convert.ToBoolean(strValue);
+                        }
+                    case TypeCode.SByte:
+                        return Convert.ToSByte(value);
+                    case TypeCode.Byte:
+                        return Convert.ToByte(value);
+                    case TypeCode.Int16:
+                        return Convert.ToInt16(value);
+                    case TypeCode.UInt16:
+                        return Convert.ToUInt16(value);
+                    case TypeCode.Int32:
+                        return Convert.ToInt32(value);
+                    case TypeCode.UInt32:
+                        return Convert.ToUInt32(value);
+                    case TypeCode.Int64:
+                        return Convert.ToInt64(value);
+                    case TypeCode.UInt64:
+                        return Convert.ToUInt64(value);
+                    case TypeCode.Double: {
+                            var strValue = (string)value;
+                            if (double.TryParse(strValue, NumberStyles.Float, culture, out double result)) {
+                                return result;
+                            }
+                            else if (double.TryParse(strValue, NumberStyles.Float, CultureInfo.InvariantCulture, out result)) {
+                                return result;
+                            }
+                            throw new FormatException($"Значение {strValue} не удается преобразовать в double.");
+                        }
+                    case TypeCode.Single: {
+                            var strValue = (string)value;
+                            if (Single.TryParse(strValue, NumberStyles.Float, culture, out Single result)) {
+                                return result;
+                            }
+                            else if (Single.TryParse(strValue, NumberStyles.Float, CultureInfo.InvariantCulture, out result)) {
+                                return result;
+                            }
+                            throw new FormatException($"Значение {strValue} не удается преобразовать в System.Single.");
+                        }
+                    case TypeCode.Decimal: {
+                            var strValue = (string)value;
+                            if (decimal.TryParse(strValue, NumberStyles.Number, culture, out decimal result)) {
+                                return result;
+                            }
+                            else if (decimal.TryParse(strValue, NumberStyles.Number, CultureInfo.InvariantCulture, out result)) {
+                                return result;
+                            }
+                            throw new FormatException($"Значение {strValue} не удается преобразовать в decimal.");
+                        }
+                    case TypeCode.DateTime: {
+                            var strValue = (string)value;
+                            if (DateTime.TryParse(strValue, culture, DateTimeStyles.AssumeUniversal, out DateTime result)) {
+                                return result;
+                            }
+                            else if (DateTime.TryParse(strValue, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal, out result)) {
+                                return result;
+                            }
+                            throw new FormatException($"Значение {strValue} не удается преобразовать в DateTime.");
+                        }
+                    case TypeCode.String:
+                        return value;
+                    case TypeCode.Object:
+                        if (myChangeType == typeof(XDocument)) {
+                            var xdoc= XDocument.Parse(value);
+                            return xdoc;
+                        }
+                        break;
+                    case TypeCode.Empty:
+                    case TypeCode.DBNull:
+                    case TypeCode.Char:
+                    default:
+                        break;
+                }
+            }
+            throw new NotImplementedException($"Преобразование из System.String к {myChangeType.FullName} не реализовано.");
         }
 
         public override void ReorderArgumentArray(ref object[] args, object state) {
@@ -312,8 +329,6 @@ namespace Nano.Electric {
                 switch (typeCode2) {
                     case TypeCode.Empty:
                         return false;
-                    case TypeCode.Object:
-                        return false;
                     case TypeCode.DBNull:
                         return false;
                     case TypeCode.Boolean:
@@ -346,6 +361,13 @@ namespace Nano.Electric {
                         return true;
                     case TypeCode.String:
                         return false;
+                    case TypeCode.Object:
+                        switch (type2.FullName) {
+                            case "System.Xml.Linq.XDocument":
+                                return true;
+                            default:
+                                return false;
+                        }
                     default:
                         return false;
                 }
