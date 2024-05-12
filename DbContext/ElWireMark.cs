@@ -9,22 +9,23 @@ namespace Nano.Electric
     [Table("ElWireMark")]
     public partial class ElWireMark
     {
+#if !InitDbContextEnums
+        public string MarkNameMain { get; set; }
+        public int? WireCategory { get; set; }
+        public int? WireShellFire { get; set; }
+        public int? WireArmor { get; set; }
+        public int? isolationMaterialId { get; set; }
+        public int? materialId { get; set; }
+
+#endif
         public string DbDocument { get; set; }
+        public string markName { get; set; }
 
         public double? higherPermTemp { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
-
-        public int? isolationMaterialId { get; set; }
-
         public double? lowerPermTemp { get; set; }
-
-        public string markName { get; set; }
-
-        public string MarkNameMain { get; set; }
-
-        public int? materialId { get; set; }
 
         public double? minBendRadius { get; set; }
 
@@ -34,15 +35,12 @@ namespace Nano.Electric
 
         public double? voltage { get; set; }
 
-        public int? WireArmor { get; set; }
 
-        public int? WireShellFire { get; set; }
 
         public string сomment { get; set; }
 
         public int? CwPCode { get; set; }
 
-        public int? WireCategory { get; set; }
 
         public bool? InImport { get; set; }
     }

@@ -9,17 +9,21 @@ namespace Nano.Electric
     [Table("ElDbCase")]
     public partial class ElDbCase
     {
-        public string Code { get; set; }
-
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }
+        public int? DbInstType { get; set; }
+        public int? DbSafeDegree { get; set; }
         public int? DbClimate { get; set; }
+  
+
+#endif
+        public string Code { get; set; }
 
         public double? DbDepth { get; set; }
 
         public string DbDocument { get; set; }
 
         public double? DbHeight { get; set; }
-
-        public int? DbInstType { get; set; }
 
         public double? DbWidth { get; set; }
 
@@ -40,15 +44,11 @@ namespace Nano.Electric
 
         public string SpecDescription { get; set; }
 
-        public int? IsExplSafe { get; set; }
-
         public int? CwPCode { get; set; }
 
         public int? DbImageRef { get; set; }
 
         public int? ExplodeLevel { get; set; }
-
-        public int? DbSafeDegree { get; set; }
 
         public string EtmCode { get; set; }
 

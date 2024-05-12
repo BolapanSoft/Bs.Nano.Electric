@@ -77,14 +77,7 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Dwg Файлы")]
     public partial class DbDwgFiles { }
 
-    [DefaultLocalizeValue("Электроустановочные изделия\\Доп. оборудование ЭУИ")]
-    public partial class ElSocketUtility { }
 
-    [DefaultLocalizeValue("Электроустановочные изделия\\Разветвительные коробки")]
-    public partial class ElDbCase { }
-
-    [DefaultLocalizeValue("Кабельно-проводниковая продукция\\Марки кабелей и проводов")]
-    public partial class ElWireMark { }
 
     [DefaultLocalizeValue("Параметры исполнения\\Степень защиты IP")]
     public partial class SafeDegree { }
@@ -98,6 +91,8 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Кабельно-проводниковая продукция\\Материалы жил")]
     public partial class ElWireConductMaterial { }
 
+    [DefaultLocalizeValue("Кабельно-проводниковая продукция\\Марки кабелей и проводов")]
+    public partial class ElWireMark { }
     [DefaultLocalizeValue("Кабельно-проводниковая продукция\\Кабели и провода")]
     public partial class ElWire { }
 
@@ -141,7 +136,7 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Электроприемники\\Асинхронные двигатели")]
     public partial class ElDbEngine { }
 
-    [DefaultLocalizeValue("Комплексные ЭП")]
+    [DefaultLocalizeValue("Электроприемники\\Комплексные ЭП")]
     public partial class ElDbComplex { }
 
     [DefaultLocalizeValue("Коммутационные аппараты\\Автоматические выключатели")]
@@ -177,13 +172,20 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Короба\\Крышки")]
     public partial class DcCableCanalCover { }
 
-    [DefaultLocalizeValue("Выключатели")]
+    [DefaultLocalizeValue("Электроустановочные изделия\\Выключатели")]
     public partial class DbElSwitch { }
 
+    [DefaultLocalizeValue("Электроустановочные изделия\\Переключатели на два направления")]
+    public partial class DbElCSwitch { }
+    [DefaultLocalizeValue("Электроустановочные изделия\\Доп. оборудование ЭУИ")]
+    public partial class ElSocketUtility { }
+
+    [DefaultLocalizeValue("Электроустановочные изделия\\Разветвительные коробки")]
+    public partial class ElDbCase { }
     [DefaultLocalizeValue("Комплектации ЭУИ")]
     public partial class DbElSocketUtilitySet { }
 
-    [DefaultLocalizeValue("Розетки")]
+    [DefaultLocalizeValue("Электроустановочные изделия\\Розетки")]
     public partial class DbElSocket { }
 
     [DefaultLocalizeValue("Комплектации светильников")]
@@ -192,9 +194,7 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Комплектации КА")]
     public partial class DbElFiderUtilitySet { }
 
-    [DefaultLocalizeValue("Переключатели на два направления")]
-    public partial class DbElCSwitch { }
-
+ 
     [DefaultLocalizeValue("Комплектации РУ")]
     public partial class DbElBoardUtilitySet { }
 

@@ -9,14 +9,17 @@ namespace Nano.Electric
     [Table("ElSocketUtility")]
     public partial class ElSocketUtility
     {
+#if !InitDbContextEnums
+        public int? DbInstType { get; set; }
+        public int? DbSafeDegree { get; set; }
+        public int? DbClimate { get; set; }
+        public int? SocketUtilityType { get; set; }
+
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public int? SocketUtilityType { get; set; }
-
         public string OtherType { get; set; }
-
-        public int? DbInstType { get; set; }
 
         public int? PostCount { get; set; }
 
@@ -39,10 +42,6 @@ namespace Nano.Electric
         public int? OrderNumber { get; set; }
 
         public int? CwPCode { get; set; }
-
-        public int? DbSafeDegree { get; set; }
-
-        public int? DbClimate { get; set; }
 
         public int? DbImageRef { get; set; }
 

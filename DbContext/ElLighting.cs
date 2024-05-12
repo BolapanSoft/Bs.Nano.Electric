@@ -18,6 +18,8 @@ namespace Nano.Electric
         public int? KccPmType { get; set; }
         public int? DimensionType { get; set; }
         public int? LightingPurpouse { get; set; }
+
+        public int? KiTable { get; set; }
 #endif
 
         public int? Climate { get; set; }
@@ -74,7 +76,7 @@ namespace Nano.Electric
      public double? DbNominalPower { get; set; }
 
         public double? LightFlux { get; set; }
-        //[MaxLength(1024*4)]
+        [MaxLength(-1)]
         public string CurvePmContent { get; set; }
 
 
@@ -82,8 +84,6 @@ namespace Nano.Electric
 
         public int? DbImageRef { get; set; }
 
-
-        public int? KiTable { get; set; }
 
 
         public string KccFileName { get; set; }

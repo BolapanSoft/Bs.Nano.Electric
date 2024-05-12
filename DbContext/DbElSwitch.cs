@@ -9,9 +9,16 @@ namespace Nano.Electric
     [Table("DbElSwitch")]
     public partial class DbElSwitch
     {
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }
+        public int? DbInstType { get; set; }
+        public int? DbSafeDegree { get; set; }
+        public int? DbClimate { get; set; }
+  
+
+#endif
         public string Code { get; set; }
 
-        public int? DbClimate { get; set; }
 
         public double? DbDepth { get; set; }
 
@@ -21,11 +28,9 @@ namespace Nano.Electric
 
         public double? DbInom { get; set; }
 
-        public int? DbInstType { get; set; }
 
         public double? DbMaxThreadSection { get; set; }
 
-        public int? DbSafeDegree { get; set; }
 
         public double? DbVoltage { get; set; }
 
@@ -51,8 +56,6 @@ namespace Nano.Electric
         public string Series { get; set; }
 
         public string SpecDescription { get; set; }
-
-        public int? IsExplSafe { get; set; }
 
         public int? CwPCode { get; set; }
 

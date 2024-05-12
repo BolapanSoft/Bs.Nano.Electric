@@ -9,6 +9,11 @@ namespace Nano.Electric
     [Table("ElDbComplex")]
     public partial class ElDbComplex
     {
+#if !InitDbContextEnums
+        public int? IsExplSafe { get; set; }
+     public int? PhaseCount { get; set; }
+
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
@@ -30,15 +35,13 @@ namespace Nano.Electric
 
         public double? Voltage { get; set; }
 
-        public int? PhaseCount { get; set; }
-
+   
         public double? NominalPower { get; set; }
 
         public double? PowerCoef { get; set; }
 
         public double? StarterAndNominalCurrentRatio { get; set; }
 
-        public int? IsExplSafe { get; set; }
 
         public double? MaxSectionConductor { get; set; }
 

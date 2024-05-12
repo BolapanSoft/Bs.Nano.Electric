@@ -13,7 +13,7 @@ namespace Nano.Electric {
         private XDocument _curveDb;
 
         [Column(nameof(CurveDb), TypeName = "ntext")]
-        [MaxLength(-1)]
+        [MaxLength(-1)] // Недокументированное значение. Однако, отключает проверку на длину строки.
         public string CurveDbString {
             get { return _curveDb?.ToString()??string.Empty; }
             set {

@@ -36,6 +36,23 @@ namespace Nano.Electric {
             modelBuilder.Ignore<DbGcKnotLevel>();
             modelBuilder.Ignore<DbGcSystemPlain>();
 #endif
+#if InitDbContextEnums
+            modelBuilder.Entity<DbLtKiTable>()
+               .HasKey(e => e.Id);
+            modelBuilder.Entity<ElLighting>()
+                .HasOptional(p => p.DbLtKiTable)
+                .WithMany()
+                .Map(m=>m.MapKey("KiTable"));
+            modelBuilder.Entity<ElWireMark>()
+                .HasOptional(p => p.IsolationMaterial)
+                .WithMany()
+                .Map(m=>m.MapKey("isolationMaterialId"));
+            modelBuilder.Entity<ElWireMark>()
+                .HasOptional(p => p.Material)
+                .WithMany()
+                .Map(m=>m.MapKey("materialId"));
+
+#endif
             //modelBuilder.Entity<DbLtKiTable>()
             //    .Property(p => p.CurveDb)
             //    .HasColumnType("ntext");
@@ -54,7 +71,7 @@ namespace Nano.Electric {
             //    .HasColumnName("StructureType")
             //    .HasColumnType("int")
             //    .IsOptional();
-            
+
         }
         /// <summary>
         /// Выполняет заполнение свойств сущности из сериализованного в строку источника.

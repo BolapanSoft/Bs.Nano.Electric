@@ -2,6 +2,7 @@
 
 using Nano.Electric.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
 
 namespace Nano.Electric {
     public partial class ElLighting : IProduct, IHaveExplodeLevel {
@@ -19,6 +20,8 @@ namespace Nano.Electric {
         //public ExplodeSafeLevel ExplodeLevel { get; set; }
         //public ClimateTable Climate { get; set; }
         public ElLightingDimensionType DimensionType { get; set; }
+        // Id store to public int? KiTable
+        public DbLtKiTable? DbLtKiTable { get; set; }
 #endif
     }
 }

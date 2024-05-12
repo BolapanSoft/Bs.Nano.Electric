@@ -10,6 +10,8 @@ namespace Nano.Electric {
     public partial class ClimateTable : IHaveId { }
     public partial class DbLtKiTable : IHaveId { }
     public partial class ExplodeSafeLevel : IHaveId { }
+    public partial class ElWireConductMaterial : IHaveId { }
+    public partial class ElWireIsolationMaterial : IHaveId { }
     public interface IProduct : IHaveId {
         string Code { get; }
         //int Id { get; set; }
@@ -47,10 +49,16 @@ namespace Nano.Electric {
     public partial class ElCounter : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
     public partial class ElVoltmeter : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
     public partial class ElAmperemeter : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElLighting : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
+    public partial class ElLighting : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElLamp : IProduct {  }
     public partial class ElLightUtility : IProduct { }
     public partial class ElDbEngine : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
     public partial class ElDbHeater : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    //public partial class ElStarter : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate {  }
+    public partial class ElDbComplex : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
+    public partial class DbElSwitch : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef  {  }
+    public partial class DbElCSwitch : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef {  }
+    public partial class DbElSocket : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef {  }
+    public partial class ElDbCase : IProduct, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef  {  }
+    public partial class ElSocketUtility : IProduct, IHaveSafeDegree, IHaveDbClimate  {  }
+    public partial class ElWireMark : IHaveId  {  }
 }
