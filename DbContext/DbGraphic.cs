@@ -4,11 +4,10 @@ namespace Nano.Electric
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     [Table("DbGraphic")]
-    public partial class DbGraphic
-    {
+    public partial class DbGraphic : IDbGraphic {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 

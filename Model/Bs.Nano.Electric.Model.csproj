@@ -115,6 +115,7 @@
 		<Compile Include="..\DbContext\ElWireMark.cs" Link="RefPartial\ElWireMark.cs" />
 		<Compile Include="..\DbContext\ExplodeSafeLevel.cs" Link="RefPartial\ExplodeSafeLevel.cs" />
 		<Compile Include="..\DbContext\FieldOldValue.cs" Link="RefPartial\FieldOldValue.cs" />
+		<Compile Include="..\DbContext\IDbGraphic.cs" Link="RefPartial\IDbGraphic.cs" />
 		<Compile Include="..\DbContext\ImportConflictField.cs" Link="RefPartial\ImportConflictField.cs" />
 		<Compile Include="..\DbContext\ImportObjectStatu.cs" Link="RefPartial\ImportObjectStatu.cs" />
 		<Compile Include="..\DbContext\MultiplicityScale.cs" Link="RefPartial\MultiplicityScale.cs" />

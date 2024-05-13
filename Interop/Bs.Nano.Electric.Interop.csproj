@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net48</TargetFramework>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <LangVersion>9.0</LangVersion>
+	  <BaseOutputPath>..\bin\</BaseOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Model\Bs.Nano.Electric.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Cadwise.Graphic">
+      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD Электро. Редактор БД 8.5\Cadwise.Graphic.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cadwise.Graphic.Db">
+      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD Электро. Редактор БД 8.5\Cadwise.Graphic.Db.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cadwise.Kit">
+      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD Электро. Редактор БД 8.5\Cadwise.Kit.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cadwise.OpenCascade.Interop">
+      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD Электро. Редактор БД 8.5\Cadwise.OpenCascade.Interop.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cadwise.Studio.DataBase">
+      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD Электро. Редактор БД 8.5\Cadwise.Studio.DataBase.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Cadwise.Studio.DataBase.Model">
+      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD Электро. Редактор БД 8.5\Cadwise.Studio.DataBase.Model.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
