@@ -1,5 +1,5 @@
 ﻿namespace Nano.Electric {
-    public interface IDbGraphic {
+    public interface IDbGraphic : IHaveId {
         bool? AutoSelectSize { get; set; }
         string Category { get; set; }
         byte[] GraphicInBytes { get; set; }

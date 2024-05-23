@@ -8,12 +8,13 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Caching;
 using System.Runtime.CompilerServices;
 using System.Web;
 
 namespace Nano.Electric {
     internal static class ReflectionHelper {
-
+        private static MemoryCache memoryCache = new MemoryCache("ReflectionHelper");
         /// <summary>
         /// Для типа <typeparamref name="Type"/> формирует перечень публичных свойств типа <typeparamref name="Tret"/>
         /// </summary>
@@ -21,6 +22,10 @@ namespace Nano.Electric {
         /// <param name="type"></param>
         /// <returns></returns>
         public static List<(string PropertyName, Func<T, Tret> Getter)> GetPropertiesWithGetters<T, Tret>() {
+            var cacheKey = $"GetPropertiesWithGetters_{typeof(T).Name}_{typeof(Tret).Name}";
+            if (memoryCache.Contains(cacheKey)) {
+                return (memoryCache[cacheKey] as List<(string PropertyName, Func<T, Tret> Getter)>) ?? throw new Exception($"Invalid cache key {cacheKey}");
+            }
             var properties = new List<(string PropertyName, Func<T, Tret> Getter)>();
             var type = typeof(T);
             // Get all properties declared in the given type and its base types
@@ -39,6 +44,7 @@ namespace Nano.Electric {
                     properties.Add((property.Name, getter));
                 }
             }
+            memoryCache.Add(cacheKey, properties, DateTimeOffset.Now.AddDays(5));
             return properties;
         }
         /// <summary>
@@ -48,6 +54,10 @@ namespace Nano.Electric {
         /// <param name="type"></param>
         /// <returns></returns>
         public static List<(string PropertyName, Action<T, Tprop> Setter)> GetPropertiesWithSetters<T, Tprop>() {
+            var cacheKey = $"GetPropertiesWithSetters_{typeof(T).Name}_{typeof(Tprop).Name}";
+            if (memoryCache.Contains(cacheKey)) {
+                return (memoryCache[cacheKey] as List<(string PropertyName, Action<T, Tprop> Setter)>) ?? throw new Exception($"Invalid cache key {cacheKey}");
+            }
             var properties = new List<(string PropertyName, Action<T, Tprop> Setter)>();
             var type = typeof(T);
             // Get all properties declared in the given type and its base types
@@ -66,6 +76,7 @@ namespace Nano.Electric {
                     properties.Add((property.Name, setter));
                 }
             }
+            memoryCache.Add(cacheKey, properties, DateTimeOffset.Now.AddDays(5));
             return properties;
         }
 
@@ -88,9 +99,9 @@ namespace Nano.Electric {
                 vp => (PropertyName: vp.PropertyName, Getter: (sgc) => { return vp.Getter(sgc); }))
                 );
             columnGetters.AddRange(ReflectionHelper.GetPropertiesWithGetters<Tsource, double>()
-       .Select<(string PropertyName, Func<Tsource, double> Getter), (string PropertyName, Func<Tsource, string> Getter)>(
-       vp => (PropertyName: vp.PropertyName, Getter: (sgc) => { return vp.Getter(sgc).ToString(CultureInfo.InvariantCulture); }))
-       );
+                .Select<(string PropertyName, Func<Tsource, double> Getter), (string PropertyName, Func<Tsource, string> Getter)>(
+                vp => (PropertyName: vp.PropertyName, Getter: (sgc) => { return vp.Getter(sgc).ToString(CultureInfo.InvariantCulture); }))
+                );
             columnGetters.AddRange(ReflectionHelper.GetPropertiesWithGetters<Tsource, double?>()
                 .Select<(string PropertyName, Func<Tsource, double?> Getter), (string PropertyName, Func<Tsource, string> Getter)>(
                 selector: vp => (PropertyName: vp.PropertyName, Getter: (sgc) => {
@@ -191,9 +202,9 @@ namespace Nano.Electric {
                 && (type.GenericTypeArguments[0].IsPrimitive || type.GenericTypeArguments[0] == typeof(string) || type.GenericTypeArguments[0].IsEnum);
         }
 
-        
-        
-        
-        
+
+
+
+
     }
 }

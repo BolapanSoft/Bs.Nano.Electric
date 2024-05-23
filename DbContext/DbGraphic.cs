@@ -22,7 +22,7 @@ namespace Nano.Electric
         public int? CwPCode { get; set; }
 
         public bool? InImport { get; set; }
-
+        [MaxLength(-1)]
         public byte[] GraphicInBytes { get; set; }
     }
 }

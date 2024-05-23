@@ -110,7 +110,22 @@ namespace Nano.Electric {
             }
             return results;
         }
-
+        public bool TrySetProperty<Tdest,Tprop>(Tdest product, string propName, Tprop sourceValue) where Tdest : class {
+            var propertyInfo = product.GetType().GetProperty(propName);
+            if (propertyInfo == null || !propertyInfo.CanWrite) {
+                return false;
+            }
+            if (propertyInfo.GetCustomAttribute<KeyAttribute>() != null) {
+                throw new InvalidOperationException($"Операция не разрешена. Свойство {propName} является частью ключа.");
+            }
+            try {
+                propertyInfo.SetValue(product, sourceValue, BindingFlags.Public, FieldBinder.Instance, null, CultureInfo.GetCultureInfo("Ru-ru"));
+                return true;
+            }
+            catch (Exception ex) {
+                throw new InvalidOperationException($"Операция не выполнена. Значение \"{sourceValue}\" свойства {propName} не удается привести к типу {propertyInfo.PropertyType}.", ex);
+            }
+        }
         private static bool TryConvertToBool(string sourceValue, out bool? result) {
             if (string.Compare(sourceValue, "True", ignoreCase: true, CultureInfo.InvariantCulture) == 0 ||
                 string.Compare(sourceValue, "Да", ignoreCase: true, CultureInfo.GetCultureInfo("Ru-ru")) == 0

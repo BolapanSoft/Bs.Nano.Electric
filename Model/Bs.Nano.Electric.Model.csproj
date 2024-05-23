@@ -8,7 +8,7 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>Nano.Electric</RootNamespace>
 		<BaseOutputPath>..\bin\</BaseOutputPath>
-		<VersionSuffix>007</VersionSuffix>
+		<VersionSuffix>008</VersionSuffix>
 		<Version>$(VersionPrefix).$(VersionSuffix)</Version>
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>
@@ -159,6 +159,10 @@
 	<ItemGroup>
 		<Folder Include="Cadwise\" />
 		<Folder Include="RefPartial\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="System.Runtime.Caching" />
 	</ItemGroup>
 
 	<Import Project="$(MSBuildProjectName).csproj.local" Condition="Exists('$(MSBuildProjectName).csproj.local')" />
