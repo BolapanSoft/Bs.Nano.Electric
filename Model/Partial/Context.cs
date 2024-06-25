@@ -98,7 +98,7 @@ namespace Nano.Electric {
                     continue;
                 }
                 string sourceValue = item[propName];
-                if (skipIfEmptyValue && (sourceValue == null || sourceValue == "")) {
+                if (skipIfEmptyValue && string.IsNullOrEmpty(sourceValue)) {
                     continue;
                 }
                 try {
