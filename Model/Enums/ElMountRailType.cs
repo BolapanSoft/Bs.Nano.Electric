@@ -17,4 +17,10 @@ namespace Nano.Electric.Enums {
         [Description("27x15")]
         SIZE_27X15 = 0x20
     }
+    public enum TbTypeEnum {
+        [Description("Жесткая")]
+        Rigid = 0,
+        [Description("Гибкая")]
+        Flexible = 1
+    }
 }

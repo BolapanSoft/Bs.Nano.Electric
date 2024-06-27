@@ -27,7 +27,9 @@ namespace Nano.Electric
 
         public double? DiameterOutBranch { get; set; }
 
-        public int? FittingType { get; set; }
+#if !InitDbContextEnums
+        public int? FittingType { get; set; } 
+#endif
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }

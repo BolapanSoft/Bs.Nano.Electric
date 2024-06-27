@@ -21,6 +21,10 @@ namespace Nano.Electric {
     }
 
     public partial class ScsGutterCanal : IProduct { }
+    public partial class ScsCabelCanal : IProduct { }
+    public partial class ScsCableFitting : IProduct { }
+    public partial class ScsPipe : IProduct { }
+    public partial class ScsTubeFitting : IProduct { }
     public partial class DbScsGutterCover : IProduct { }
     public partial class DbScsGutterPartition : IProduct { }
     public partial class ScsGcFitting : IProduct { }

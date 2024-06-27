@@ -19,7 +19,9 @@ namespace Nano.Electric
 
         public string Description { get; set; }
 
-        public int? FittingType { get; set; }
+#if !InitDbContextEnums
+        public int? FittingType { get; set; } 
+#endif
 
         public double? Height { get; set; }
 
