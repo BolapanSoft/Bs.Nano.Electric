@@ -20,7 +20,7 @@ namespace Nano.Electric {
         }
 
         partial void InitializeModel(DbModelBuilder modelBuilder) {
-            modelBuilder.Conventions.Add(new StringPropertiesConvention());
+            modelBuilder.Conventions.Add(new NanoCadPropertiesConvention());
             
             modelBuilder.Entity<CaeMaterialUtility>()
                 .Property(t => t.MeashureUnits)
@@ -118,7 +118,7 @@ namespace Nano.Electric {
             if (propertyInfo.GetCustomAttribute<KeyAttribute>() != null) {
                 throw new InvalidOperationException($"Операция не разрешена. Свойство {propName} является частью ключа.");
             }
-            try {
+            try {  
                 propertyInfo.SetValue(product, sourceValue, BindingFlags.Public, FieldBinder.Instance, null, CultureInfo.GetCultureInfo("Ru-ru"));
                 return true;
             }

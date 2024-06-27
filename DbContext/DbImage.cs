@@ -11,7 +11,7 @@ namespace Nano.Electric
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")]
         public int Id { get; set; }
-
+        [MaxLength(-1)]
         public byte[] Image { get; set; }
 
         public string Text { get; set; }
