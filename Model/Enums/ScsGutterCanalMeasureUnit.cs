@@ -1,15 +1,12 @@
 ﻿using System.ComponentModel;
 namespace Nano.Electric.Enums {
-    /// <summary>
-    /// Единица Измерения В Упаковке
-    /// </summary>
-    public enum ScsBoxMeasureUnit {
-        [Description("м.")]
+    public enum ScsGutterCanalMeasureUnit {
+        [Description("В метрах")]
         /// <summary>
         /// В метрах
         /// </summary>
         IN_METERS = 0,
-        [Description("шт.")]
+        [Description("В сегментах")]
         /// <summary>
         /// шт.
         /// </summary>

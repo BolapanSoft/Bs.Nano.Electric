@@ -5,7 +5,7 @@ namespace Nano.Electric {
 
     public partial class DbScsGutterPartition {
 #if InitDbContextEnums
-        public ScsBoxMeasureUnit? BoxMeasureUnit { get; set; } = ScsBoxMeasureUnit.IN_SEGMENTS; 
+        public ScsGutterCanalMeasureUnit? BoxMeasureUnit { get; set; } = ScsGutterCanalMeasureUnit.IN_SEGMENTS; 
 #endif
 
     }

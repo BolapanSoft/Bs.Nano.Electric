@@ -2092,6 +2092,29 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
+        [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" с типом элемента ""Другой"" должно быть внесено значение DbOtherName (Тип элемента).",
+         2, 46)]
+        [RuleCategory("Полнота заполнения технических данных.")]
+        public void Rule_03_008() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.ScsTubeFittings
+                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.OTHER)
+                    .Select(p => new { p.Code, p.DbOtherName });
+                var errors = new LinkedList<(string Code, string?)>();
+                foreach (var p in products) {
+                    if (!string.IsNullOrEmpty(p.DbOtherName))
+                        continue;
+                    else
+                        errors.AddLast((p.Code, p.DbOtherName));
+                }
+                if (errors.Count > 0) {
+
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
 
         // TODO: Реализовать правила проверки значений Enum полей на допустимость.
         // TODO: Для элементов "Приборы контроля и учета. Приборы управления" в свойстве "Монтаж" допускаются только значения "Внутрь шкафа", "На фасад"

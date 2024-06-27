@@ -44,7 +44,9 @@ namespace Nano.Electric
 
         public bool? InImport { get; set; }
 
-        public int? TubeType { get; set; }
+#if !InitDbContextEnums
+        public int? TubeType { get; set; } 
+#endif
 
         public string Url { get; set; }
 
