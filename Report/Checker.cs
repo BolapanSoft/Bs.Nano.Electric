@@ -643,14 +643,19 @@ namespace Bs.Nano.Electric.Report {
         public void Rule_02_001() {
             using (var context = connector.Connect()) {
                 var scsGutterCanals = context.ScsGutterCanals
-                    .Select(p => new { p.Code, p.GutterDepth, p.GutterHeight, p.SegLength });
-                var errors = new LinkedList<(string Code, double? GutterDepth, double? GutterHeight, double? SegLength)>();
-                foreach (var p in scsGutterCanals) {
-                    if (p.SegLength > 1 & p.GutterDepth > 1 & p.GutterHeight > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.GutterDepth, p.GutterHeight, p.SegLength));
-                }
+                    .Select(p => new { p.Code,p.Series, p.GutterDepth, p.GutterHeight, p.SegLength })
+                    .ToList();
+                //var errors = new LinkedList<(string Code, double? GutterDepth, double? GutterHeight, double? SegLength)>();
+                //foreach (var p in scsGutterCanals) {
+                //    if (p.SegLength > 1 & p.GutterDepth > 1 & p.GutterHeight > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.GutterDepth, p.GutterHeight, p.SegLength));
+                //}
+                var errors = scsGutterCanals
+                    .Where(p => !(p.SegLength > 1 & p.GutterDepth > 1 & p.GutterHeight > 1))
+                    .Select(p => $"({p.Series}\\{p.Code} {nameof( p.GutterDepth)}:{p.GutterDepth},{nameof(p.GutterHeight)}:{p.GutterDepth},{nameof(p.SegLength)}:{p.SegLength}")
+                    .ToList();
                 if (errors.Count > 0) {
                     FailRuleTest($"Для {errors.Count} элементов прямых секций лотков не внесена длина, ширина или высота лотка.",
                         errors);
@@ -662,15 +667,18 @@ namespace Bs.Nano.Electric.Report {
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_002() {
             using (var context = connector.Connect()) {
-                var products = context.DbScsGutterPartitions
-                    .Select(p => new { p.Code, p.PartitionHeight, p.PartitionLength });
-                var errors = new LinkedList<(string Code, double? PartitionHeight, double? PartitionLength)>();
-                foreach (var p in products) {
-                    if (p.PartitionHeight > 1 & p.PartitionLength > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.PartitionHeight, p.PartitionLength));
-                }
+                var products = context.DbScsGutterPartitions.ToList();
+                //    .Select(p => new { p.Code, p.PartitionHeight, p.PartitionLength });
+                //var errors = new LinkedList<(string Code, double? PartitionHeight, double? PartitionLength)>();
+                //foreach (var p in products) {
+                //    if (p.PartitionHeight > 1 & p.PartitionLength > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.PartitionHeight, p.PartitionLength));
+                //}
+                var errors = products.Where(p => !(p.PartitionHeight > 1 & p.PartitionLength > 1))
+                    .Select(p => $"({p.Series}\\{p.Code} {nameof(p.PartitionHeight)}:{p.PartitionHeight}, {nameof(p.PartitionLength)}:{p.PartitionLength}")
+                    .ToList();
                 if (errors.Count > 0) {
                     FailRuleTest($"Для {errors.Count} перегородок не внесена длина или высота лотка.",
                         errors);
@@ -683,14 +691,18 @@ namespace Bs.Nano.Electric.Report {
         public void Rule_02_003() {
             using (var context = connector.Connect()) {
                 var products = context.DbScsGutterCovers
-                    .Select(p => new { p.Code, p.CoverWidth, p.CoverLength });
-                var errors = new LinkedList<(string Code, double? CoverWidth, double? CoverLength)>();
-                foreach (var p in products) {
-                    if (p.CoverWidth > 1 & p.CoverLength > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.CoverWidth, p.CoverLength));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.CoverWidth, p.CoverLength });
+                //var errors = new LinkedList<(string Code, double? CoverWidth, double? CoverLength)>();
+                //foreach (var p in products) {
+                //    if (p.CoverWidth > 1 & p.CoverLength > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.CoverWidth, p.CoverLength));
+                //}
+                var errors = products.Where(p => !(p.CoverWidth > 1 & p.CoverLength > 1))
+                    .Select(p => $"({p.Series}\\{p.Code} {nameof(p.CoverWidth)}:{p.CoverWidth}, {nameof(p.CoverLength)}:{p.CoverLength}")
+                    .ToList();
                 if (errors.Count > 0) {
                     FailRuleTest($"Для {errors.Count} элементов крышек прямых секций лотков не внесена длина или ширина.",
                         errors);
@@ -705,14 +717,18 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                     .Where(p => p.FittingType == ft)
-                    .Select(p => new { p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch });
-                var errors = new LinkedList<(string Code, double?, double?, double?, double?)>();
-                foreach (var p in products) {
-                    if (p.WidthMainBranch > 1 & p.HeightMainBranch > 1 & p.WidthOutBranch > 1 & p.HeightOutBranch > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch });
+                //var errors = new LinkedList<(string Code, double?, double?, double?, double?)>();
+                //foreach (var p in products) {
+                //    if (p.WidthMainBranch > 1 & p.HeightMainBranch > 1 & p.WidthOutBranch > 1 & p.HeightOutBranch > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
+                //}
+                var errors = products.Where(p => !(p.WidthMainBranch > 1 & p.HeightMainBranch > 1 & p.WidthOutBranch > 1 & p.HeightOutBranch > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.WidthMainBranch)}:{p.WidthMainBranch}, {nameof(p.HeightMainBranch)}:{p.HeightMainBranch}, {nameof(p.WidthOutBranch)}:{p.WidthOutBranch}, {nameof(p.HeightOutBranch)}:{p.HeightOutBranch}")
+                    .ToList();
                 if (errors.Count > 0) {
                     FailRuleTest($"Для {errors.Count} элементов Секция соединительная переходная вертикальная не полностью внесены геометрические размеры.",
                         errors);
@@ -722,7 +738,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Секция соединительная переходная вертикальная\" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента, ширина основного и отходящего элемента]
         /// </summary>
-        [ReportRule(@"Внутри серии элементов \""Секция соединительная переходная вертикальная\"" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента, ширина основного и отходящего элемента].",
+        [ReportRule(@"Внутри серии элементов \""Секция соединительная переходная вертикальная\"" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента (HeightMainBranch, HeightOutBranch), ширина основного и отходящего элемента (WidthMainBranch, WidthOutBranch)].",
             2, 5)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_028() {
@@ -750,11 +766,11 @@ namespace Bs.Nano.Electric.Report {
                         .Select(p => new { p.Code, p.Series, p.FittingType, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch })
                         .ToArray()
                         .GroupBy(p => (p.FittingType, p.Series), p => (p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
+                LinkedList<string> errors = new();
                 foreach (var p in grours) {
                     var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), (IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>)p);
                     if (key != null) {
-                        errors.Add(key.Value);
+                        errors.AddLast($"{p.Key.FittingType}, {p.Key.Series}");
                     }
                 }
                 if (errors.Count > 0) {
@@ -771,15 +787,19 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                     .Where(p => p.FittingType == ft)
-                    .Select(p => new { p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch, p.GutterPassageType });
-                var errors = new LinkedList<(string Code, double?, double?, double?, double?)>();
-                foreach (var p in products) {
-                    if (p.WidthMainBranch > 1 & p.HeightMainBranch > 1 & p.WidthOutBranch > 1 & p.HeightOutBranch > 1) {
-                        continue;
-                    }
-                    else
-                        errors.AddLast((p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch, p.GutterPassageType });
+                //var errors = new LinkedList<(string Code, double?, double?, double?, double?)>();
+                //foreach (var p in products) {
+                //    if (p.WidthMainBranch > 1 & p.HeightMainBranch > 1 & p.WidthOutBranch > 1 & p.HeightOutBranch > 1) {
+                //        continue;
+                //    }
+                //    else
+                //        errors.AddLast((p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
+                //}
+                var errors = products.Where(p => !(p.WidthMainBranch > 1 & p.HeightMainBranch > 1 & p.WidthOutBranch > 1 & p.HeightOutBranch > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.WidthMainBranch)}:{p.WidthMainBranch}, {nameof(p.HeightMainBranch)}:{p.HeightMainBranch}, {nameof(p.WidthOutBranch)}:{p.WidthOutBranch}, {nameof(p.HeightOutBranch)}:{p.HeightOutBranch}")
+                    .ToList();
                 if (errors.Count > 0) {
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
@@ -789,7 +809,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Секция соединительная переходная горизонтальная\" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента, ширина основного и отходящего элемента]
         /// </summary>
-        [ReportRule(@"Внутри серии элементов \""Секция соединительная переходная горизонтальная\"" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента, ширина основного и отходящего элемента].",
+        [ReportRule(@"Внутри серии элементов \""Секция соединительная переходная горизонтальная\"" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента (HeightMainBranch, HeightOutBranch), ширина основного и отходящего элемента (WidthMainBranch, WidthOutBranch)].",
             2, 7)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_029() {
@@ -816,11 +836,11 @@ namespace Bs.Nano.Electric.Report {
                         .Select(p => new { p.Code, p.Series, p.FittingType, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch })
                         .ToArray()
                         .GroupBy(p => (p.FittingType, p.Series), p => (p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
+                LinkedList<string> errors = new();
                 foreach (var p in grours) {
                     var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), (IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>)p);
                     if (key != null) {
-                        errors.Add(key.Value);
+                        errors.AddLast($"{p.Key.FittingType}, {p.Key.Series}");
                     }
                 }
                 if (errors.Count > 0) {
@@ -830,7 +850,7 @@ namespace Bs.Nano.Electric.Report {
 
             }
         }
-        [ReportRule(@"Для элементов ""Секция соединительная переходная горизонтальная"" должен быть установлен тип перехода",
+        [ReportRule(@"Для элементов ""Секция соединительная переходная горизонтальная"" должен быть установлен тип перехода GutterPassageType",
             2, 8)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_007() {
@@ -839,8 +859,8 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                     .Where(p => p.FittingType == ft)
-                    .Select(p => new { p.Code, p.GutterPassageType });
-                var errors = new LinkedList<(string Code, ScsGutterPassageType? GutterPassageType)>();
+                    .Select(p => new { p.Code,p.Series, p.GutterPassageType });
+                LinkedList<string> errors = new();
                 foreach (var p in products) {
                     if (p.GutterPassageType.HasValue) {
                         var knownEnumValues = typeof(ScsGutterPassageType).GetEnumValues() as ScsGutterPassageType[];
@@ -848,7 +868,7 @@ namespace Bs.Nano.Electric.Report {
                             continue;
                     }
                     else
-                        errors.AddLast((p.Code, p.GutterPassageType));
+                        errors.AddLast($"({p.Series}\\{p.Code} {nameof(p.GutterPassageType)}:{p.GutterPassageType})");
                 }
                 if (errors.Count > 0) {
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -856,7 +876,7 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        [ReportRule(@"Для элементов ""Секция Т-образная горизонтальная"" должны быть внесены высота борта основного и отходящего элемента, ширина основного и отходящего элемента.",
+        [ReportRule(@"Для элементов ""Секция Т-образная горизонтальная"" должны быть внесены [высота борта основного и отходящего элемента (HeightMainBranch, HeightOutBranch), ширина основного и отходящего элемента (WidthMainBranch, WidthOutBranch)].",
             2, 9)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_008() {
@@ -864,14 +884,18 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                     .Where(p => p.FittingType == ft)
-                    .Select(p => new { p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch });
-                var errors = new LinkedList<(string Code, double?, double?, double?, double?)>();
-                foreach (var p in products) {
-                    if (p.WidthMainBranch > 1 & p.HeightMainBranch > 1 & p.WidthOutBranch > 1 & p.HeightOutBranch > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
-                }
+                    .ToList();
+                //.Select(p => new { p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch });
+                //var errors = new LinkedList<(string Code, double?, double?, double?, double?)>();
+                //foreach (var p in products) {
+                //    if (p.WidthMainBranch > 1 & p.HeightMainBranch > 1 & p.WidthOutBranch > 1 & p.HeightOutBranch > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
+                //}
+                var errors = products.Where(p => !(p.WidthMainBranch > 1 & p.HeightMainBranch > 1 & p.WidthOutBranch > 1 & p.HeightOutBranch > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.WidthMainBranch)}:{p.WidthMainBranch}, {nameof(p.HeightMainBranch)}:{p.HeightMainBranch}, {nameof(p.WidthOutBranch)}:{p.WidthOutBranch}, {nameof(p.HeightOutBranch)}:{p.HeightOutBranch}")
+                    .ToList();
                 if (errors.Count > 0) {
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
@@ -881,7 +905,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Секция Т-образная горизонтальная\" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента, ширина основного и отходящего элемента]
         /// </summary>
-        [ReportRule(@"Внутри серии элементов ""Секция Т-образная горизонтальная"" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента, ширина основного и отходящего элемента].",
+        [ReportRule(@"Внутри серии элементов ""Секция Т-образная горизонтальная"" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента (HeightMainBranch, HeightOutBranch), ширина основного и отходящего элемента (WidthMainBranch, WidthOutBranch)].",
             2, 10)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_030() {
@@ -930,19 +954,26 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                     .Where(p => p.FittingType == ft)
-                    .Select(p => new { p.Code, p.Height, p.Depth, p.VerticalBendType });
-                var errors = new LinkedList<(string Code, double?, double?, ScsVerticalBendTypeEnum?)>();
-                foreach (var p in products) {
-                    if (p.Height > 1 & p.Depth > 1) {
-                        if (p.VerticalBendType.HasValue) {
-                            var knownEnumValues = typeof(ScsVerticalBendTypeEnum).GetEnumValues() as ScsVerticalBendTypeEnum[];
-                            if (knownEnumValues.Contains(p.VerticalBendType.Value))
-                                continue;
-                        }
-                    }
-                    else
-                        errors.AddLast((p.Code, p.Height, p.Depth, p.VerticalBendType));
-                }
+                    .ToList();
+                //.Select(p => new { p.Code, p.Height, p.Depth, p.VerticalBendType });
+                //var errors = new LinkedList<(string Code, double?, double?, ScsVerticalBendTypeEnum?)>();
+                //foreach (var p in products) {
+                //    if (p.Height > 1 & p.Depth > 1) {
+                //        if (p.VerticalBendType.HasValue) {
+                //            var knownEnumValues = typeof(ScsVerticalBendTypeEnum).GetEnumValues() as ScsVerticalBendTypeEnum[];
+                //            if (knownEnumValues.Contains(p.VerticalBendType.Value))
+                //                continue;
+                //        }
+                //    }
+                //    else
+                //        errors.AddLast((p.Code, p.Height, p.Depth, p.VerticalBendType));
+                //}
+                var knownEnumValues = typeof(ScsVerticalBendTypeEnum).GetEnumValues() as ScsVerticalBendTypeEnum[];
+                var errors = products.Where(p => !( (p.Height > 1 & p.Depth > 1) &&
+                        p.VerticalBendType.HasValue &&
+                        knownEnumValues.Contains(p.VerticalBendType.Value) ))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Height)}:{p.Height}, {nameof(p.Depth)}:{p.Depth}, {nameof(p.VerticalBendType)}:{p.VerticalBendType}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -953,7 +984,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Секция угловая вертикальная внешняя\" должно быть не более одного сочетания параметров [высота борта, ширина элемента и угол поворота]
         /// </summary>
-        [ReportRule(@"Внутри серии элементов ""Секция угловая вертикальная внешняя"" должно быть не более одного сочетания параметров [высота борта, ширина элемента и угол поворота].",
+        [ReportRule(@"Внутри серии элементов ""Секция угловая вертикальная внешняя"" должно быть не более одного сочетания параметров [высота борта Height, ширина элемента Depth и угол поворота VerticalBendType].",
          2, 12)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_031() {
@@ -993,7 +1024,7 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        [ReportRule(@"Для элементов ""Секция угловая вертикальная внутренняя"" должны быть внесены высота борта, ширина элемента и угол поворота.",
+        [ReportRule(@"Для элементов ""Секция угловая вертикальная внутренняя"" должны быть внесены высота борта Height, ширина элемента Depth и угол поворота VerticalBendType.",
             2, 13)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_010() {
@@ -1001,19 +1032,26 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                     .Where(p => p.FittingType == ft)
-                    .Select(p => new { p.Code, p.Height, p.Depth, p.VerticalBendType });
-                var errors = new LinkedList<(string Code, double?, double?, ScsVerticalBendTypeEnum?)>();
-                foreach (var p in products) {
-                    if (p.Height > 1 & p.Depth > 1) {
-                        if (p.VerticalBendType.HasValue) {
-                            var knownEnumValues = typeof(ScsVerticalBendTypeEnum).GetEnumValues() as ScsVerticalBendTypeEnum[];
-                            if (knownEnumValues.Contains(p.VerticalBendType.Value))
-                                continue;
-                        }
-                    }
-                    else
-                        errors.AddLast((p.Code, p.Height, p.Depth, p.VerticalBendType));
-                }
+                    .ToList();
+                //.Select(p => new { p.Code, p.Height, p.Depth, p.VerticalBendType });
+                //var errors = new LinkedList<(string Code, double?, double?, ScsVerticalBendTypeEnum?)>();
+                //foreach (var p in products) {
+                //    if (p.Height > 1 & p.Depth > 1) {
+                //        if (p.VerticalBendType.HasValue) {
+                //            var knownEnumValues = typeof(ScsVerticalBendTypeEnum).GetEnumValues() as ScsVerticalBendTypeEnum[];
+                //            if (knownEnumValues.Contains(p.VerticalBendType.Value))
+                //                continue;
+                //        }
+                //    }
+                //    else
+                //        errors.AddLast((p.Code, p.Height, p.Depth, p.VerticalBendType));
+                //}
+                var knownEnumValues = typeof(ScsVerticalBendTypeEnum).GetEnumValues() as ScsVerticalBendTypeEnum[];
+                var errors = products.Where(p => !((p.Height > 1 & p.Depth > 1) &&
+                        p.VerticalBendType.HasValue &&
+                        knownEnumValues.Contains(p.VerticalBendType.Value)))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Height)}:{p.Height}, {nameof(p.Depth)}:{p.Depth}, {nameof(p.VerticalBendType)}:{p.VerticalBendType}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1024,7 +1062,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Секция угловая вертикальная внутренняя\" должно быть не более одного сочетания параметров [высота борта, ширина элемента и угол поворота]
         /// </summary>
-        [ReportRule(@"Внутри серии элементов ""Секция угловая вертикальная внутренняя"" должно быть не более одного сочетания параметров [высота борта, ширина элемента и угол поворота].",
+        [ReportRule(@"Внутри серии элементов ""Секция угловая вертикальная внутренняя"" должно быть не более одного сочетания параметров [высота борта Height, ширина элемента Depth и угол поворота VerticalBendType].",
          2, 14)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_032() {
@@ -1066,7 +1104,7 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        [ReportRule(@"Для элементов ""Секция угловая вертикальная универсальная"" должны быть внесены высота борта, ширина элемента и угол поворота.",
+        [ReportRule(@"Для элементов ""Секция угловая вертикальная универсальная"" должны быть внесены высота борта Height, ширина элемента Depth и угол поворота VerticalUniversalBendType.",
          2, 15)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_011() {
@@ -1074,19 +1112,26 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                     .Where(p => p.FittingType == ft)
-                    .Select(p => new { p.Code, p.Height, p.Depth, p.VerticalUniversalBendType });
-                var errors = new LinkedList<(string Code, double?, double?, ScsVerticalUniversalBendTypeEnum?)>();
-                foreach (var p in products) {
-                    if (p.Height > 1 & p.Depth > 1) {
-                        if (p.VerticalUniversalBendType.HasValue) {
-                            var knownEnumValues = typeof(ScsVerticalUniversalBendTypeEnum).GetEnumValues() as ScsVerticalUniversalBendTypeEnum[];
-                            if (knownEnumValues.Contains(p.VerticalUniversalBendType.Value))
-                                continue;
-                        }
-                    }
-                    else
-                        errors.AddLast((p.Code, p.Height, p.Depth, p.VerticalUniversalBendType));
-                }
+                    .ToList();
+                //.Select(p => new { p.Code, p.Height, p.Depth, p.VerticalUniversalBendType });
+                //var errors = new LinkedList<(string Code, double?, double?, ScsVerticalUniversalBendTypeEnum?)>();
+                //foreach (var p in products) {
+                //    if (p.Height > 1 & p.Depth > 1) {
+                //        if (p.VerticalUniversalBendType.HasValue) {
+                //            var knownEnumValues = typeof(ScsVerticalUniversalBendTypeEnum).GetEnumValues() as ScsVerticalUniversalBendTypeEnum[];
+                //            if (knownEnumValues.Contains(p.VerticalUniversalBendType.Value))
+                //                continue;
+                //        }
+                //    }
+                //    else
+                //        errors.AddLast((p.Code, p.Height, p.Depth, p.VerticalUniversalBendType));
+                //}
+                var knownEnumValues = typeof(ScsVerticalUniversalBendTypeEnum).GetEnumValues() as ScsVerticalUniversalBendTypeEnum[];
+                var errors = products.Where(p => !((p.Height > 1 & p.Depth > 1) &&
+                        p.VerticalUniversalBendType.HasValue &&
+                        knownEnumValues.Contains(p.VerticalUniversalBendType.Value)))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Height)}:{p.Height}, {nameof(p.Depth)}:{p.Depth}, {nameof(p.VerticalUniversalBendType)}:{p.VerticalUniversalBendType}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1097,7 +1142,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Секция угловая вертикальная универсальная\" должно быть не более одного сочетания параметров [высота борта, ширина элемента и угол поворота]
         /// </summary>
-        [ReportRule(@"Внутри серии элементов ""Секция угловая вертикальная универсальная"" должно быть не более одного сочетания параметров [высота борта, ширина элемента и угол поворота].",
+        [ReportRule(@"Внутри серии элементов ""Секция угловая вертикальная универсальная"" должно быть не более одного сочетания параметров [высота борта Height, ширина элемента Depth и угол поворота VerticalUniversalBendType].",
          2, 16)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_033() {
@@ -1140,7 +1185,7 @@ namespace Bs.Nano.Electric.Report {
 
             }
         }
-        [ReportRule(@"Для элементов ""Секция угловая горизонтальная"" должны быть внесены высота борта, ширина элемента и угол поворота.",
+        [ReportRule(@"Для элементов ""Секция угловая горизонтальная"" должны быть внесены высота борта Height, ширина элемента Depth и угол поворота BendType.",
             2, 17)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_012() {
@@ -1148,19 +1193,26 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                     .Where(p => p.FittingType == ft)
-                    .Select(p => new { p.Code, p.Height, p.Depth, p.BendType });
-                var errors = new LinkedList<(string Code, double?, double?, ScsBendTypeEnum?)>();
-                foreach (var p in products) {
-                    if (p.Height > 1 & p.Depth > 1) {
-                        if (p.BendType.HasValue) {
-                            var knownEnumValues = typeof(ScsBendTypeEnum).GetEnumValues() as ScsBendTypeEnum[];
-                            if (knownEnumValues.Contains(p.BendType.Value))
-                                continue;
-                        }
-                    }
-                    else
-                        errors.AddLast((p.Code, p.Height, p.Depth, p.BendType));
-                }
+                    .ToList();
+                //.Select(p => new { p.Code, p.Height, p.Depth, p.BendType });
+                //var errors = new LinkedList<(string Code, double?, double?, ScsBendTypeEnum?)>();
+                //foreach (var p in products) {
+                //    if (p.Height > 1 & p.Depth > 1) {
+                //        if (p.BendType.HasValue) {
+                //            var knownEnumValues = typeof(ScsBendTypeEnum).GetEnumValues() as ScsBendTypeEnum[];
+                //            if (knownEnumValues.Contains(p.BendType.Value))
+                //                continue;
+                //        }
+                //    }
+                //    else
+                //        errors.AddLast((p.Code, p.Height, p.Depth, p.BendType));
+                //}
+                var knownEnumValues = typeof(ScsBendTypeEnum).GetEnumValues() as ScsBendTypeEnum[];
+                var errors = products.Where(p => !((p.Height > 1 & p.Depth > 1) &&
+                        p.BendType.HasValue &&
+                        knownEnumValues.Contains(p.BendType.Value)))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Height)}:{p.Height}, {nameof(p.Depth)}:{p.Depth}, {nameof(p.BendType)}:{p.BendType}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1171,7 +1223,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Секция угловая горизонтальная\" должно быть не более одного сочетания параметров [высота борта, ширина элемента и угол поворота]
         /// </summary>
-        [ReportRule(@"Внутри серии элементов ""Секция угловая горизонтальная"" должно быть не более одного сочетания параметров [высота борта, ширина элемента и угол поворота].",
+        [ReportRule(@"Внутри серии элементов ""Секция угловая горизонтальная"" должно быть не более одного сочетания параметров [высота борта Height, ширина элемента Depth и угол поворота BendType].",
          2, 18)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_034() {
@@ -1194,13 +1246,13 @@ namespace Bs.Nano.Electric.Report {
 
             var ft = ScsGutterFittingTypeEnum.BEND;
             using (var context = connector.Connect()) {
-                var grours = context.ScsGcFittings
+                var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
                         .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth, p.BendType })
                         .ToArray()
                         .GroupBy(p => (p.FittingType, p.Series), p => (p.Height, p.Depth, p.BendType));
                 List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
+                foreach (var p in products) {
                     var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), p);
                     if (key != null) {
                         errors.Add(key.Value);
@@ -1224,15 +1276,19 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                     .Where(p => p.FittingType == ft)
-                    .Select(p => new { p.Code, p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch });
-                var errors = new LinkedList<(string Code, double?, double?, double?, double?)>();
-                foreach (var p in products) {
-                    if (p.Width1Branch > 1 & p.Height1Branch > 1 & p.Width2Branch > 1 & p.Height2Branch > 1) {
-                        continue;
-                    }
-                    else
-                        errors.AddLast((p.Code, p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch));
-                }
+                    .ToList();
+                //.Select(p => new { p.Code, p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch });
+                //var errors = new LinkedList<(string Code, double?, double?, double?, double?)>();
+                //foreach (var p in products) {
+                //    if (p.Width1Branch > 1 & p.Height1Branch > 1 & p.Width2Branch > 1 & p.Height2Branch > 1) {
+                //        continue;
+                //    }
+                //    else
+                //        errors.AddLast((p.Code, p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch));
+                //}
+                var errors = products.Where(p => !(p.Width1Branch > 1 & p.Height1Branch > 1 & p.Width2Branch > 1 & p.Height2Branch > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Width1Branch)}:{p.Width1Branch}, {nameof(p.Height1Branch)}:{p.Height1Branch}, {nameof(p.Width2Branch)}:{p.Width2Branch}, {nameof(p.Height2Branch)}:{p.Height2Branch}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1243,7 +1299,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Секция Х-образная горизонтальная\" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента, ширина основного и отходящего элемента]
         /// </summary>
-        [ReportRule("Внутри серии элементов \"Секция Х-образная горизонтальная\" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента, ширина основного и отходящего элемента].",
+        [ReportRule("Внутри серии элементов \"Секция Х-образная горизонтальная\" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента (Height1Branch, Height2Branch), ширина основного и отходящего элемента (Width1Branch, Width2Branch)].",
          2, 20)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_035() {
@@ -1266,13 +1322,13 @@ namespace Bs.Nano.Electric.Report {
 
             var ft = ScsGutterFittingTypeEnum.CROSS;
             using (var context = connector.Connect()) {
-                var grours = context.ScsGcFittings
+                var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
                         .Select(p => new { p.Code, p.Series, p.FittingType, p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch })
                         .ToArray()
                         .GroupBy(p => (p.FittingType, p.Series), p => (p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch));
                 List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
+                foreach (var p in products) {
                     var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), (IEnumerable<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)>)p);
                     if (key != null) {
                         errors.Add(key.Value);
@@ -1286,7 +1342,7 @@ namespace Bs.Nano.Electric.Report {
             }
         }
 
-        [ReportRule("Внутри серии элементов \"Секция Х-образная горизонтальная\" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента, ширина основного и отходящего элемента].",
+        [ReportRule("Внутри серии элементов \"Крышки\\Секция Х-образная горизонтальная\" должно быть не более одного сочетания параметров [ширина основного и отходящего элемента (CoverWidth1, CoverWidth2)].",
          2, 21)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_014() {
@@ -1313,7 +1369,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Крышка Т-образная горизонтальная\" должно быть не более одного сочетания параметров [ширина основного и отходящего элемента]
         /// </summary>
-        [ReportRule("Внутри серии элементов \"Крышка Т-образная горизонтальная\" должно быть не более одного сочетания параметров [ширина основного и отходящего элемента].",
+        [ReportRule("Внутри серии элементов \"Крышки\\Секция Т-образная горизонтальная\" должно быть не более одного сочетания параметров [ширина основного и отходящего элемента (CoverWidth1, CoverWidth2)].",
         2, 22)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_036() {
@@ -1336,13 +1392,13 @@ namespace Bs.Nano.Electric.Report {
 
             var ft = ScsGcCoverType.TRIPLE;
             using (var context = connector.Connect()) {
-                var grours = context.DbScsGcCoverUnits
+                var products = context.DbScsGcCoverUnits
                         .Where(p => p.CoverType == ft)
                         .Select(p => new { p.Code, p.Series, p.CoverType, p.CoverWidth1, p.CoverWidth2 })
                         .ToArray()
                         .GroupBy(p => (p.CoverType, p.Series), p => (p.CoverWidth1, p.CoverWidth2));
                 List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
+                foreach (var p in products) {
                     var key = CheckRule(((int)p.Key.CoverType, p.Key.Series), (IEnumerable<(double? CoverWidth1, double? CoverWidth2)>)p);
                     if (key != null) {
                         errors.Add(key.Value);
@@ -1355,25 +1411,27 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        public const string sRule015 = @"Для элементов ""Крышка угловая вертикальная внешняя"" должна быть внесена ширина элемента.";
+        //public const string sRule015 = @"Для элементов ""Крышка угловая вертикальная внешняя"" должна быть внесена ширина элемента.";
         [ReportRule(@"Для элементов ""Крышка угловая вертикальная внешняя"" должна быть внесена ширина элемента.",
          2, 23)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_015() {
-            Console.Write($"{GetIndex(nameof(Rule_02_015))}\t{sRule015}");
-
             var ft = ScsGcCoverType.VERTICAL_BEND_OUTER;
             using (var context = connector.Connect()) {
                 var products = context.DbScsGcCoverUnits
                     .Where(p => p.CoverType == ft)
-                    .Select(p => new { p.Code, p.CoverWidth });
-                var errors = new LinkedList<(string Code, double?)>();
-                foreach (var p in products) {
-                    if (p.CoverWidth > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.CoverWidth));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.CoverWidth });
+                //var errors = new LinkedList<(string Code, double?)>();
+                //foreach (var p in products) {
+                //    if (p.CoverWidth > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.CoverWidth));
+                //}
+                var errors = products.Where(p => !(p.CoverWidth > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.CoverWidth)}:{p.CoverWidth}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1384,7 +1442,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Крышка угловая вертикальная внешняя\" должно быть не более одного сочетания параметров [ширина элемента]
         /// </summary>
-        [ReportRule("Внутри серии элементов \"Крышка угловая вертикальная внешняя\" должно быть не более одного сочетания параметров [ширина элемента].",
+        [ReportRule("Внутри серии элементов \"Крышка угловая вертикальная внешняя\" должно быть не более одного сочетания параметров [ширина элемента CoverWidth].",
          2, 24)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_037() {
@@ -1407,13 +1465,13 @@ namespace Bs.Nano.Electric.Report {
 
             var ft = ScsGcCoverType.VERTICAL_BEND_OUTER;
             using (var context = connector.Connect()) {
-                var grours = context.DbScsGcCoverUnits
+                var products = context.DbScsGcCoverUnits
                         .Where(p => p.CoverType == ft)
                         .Select(p => new { p.Code, p.Series, p.CoverType, p.CoverWidth })
                         .ToArray()
                         .GroupBy(p => (p.CoverType, p.Series), p => (p.CoverWidth));
                 List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
+                foreach (var p in products) {
                     var key = CheckRule(((int)p.Key.CoverType, p.Key.Series), (IEnumerable<double?>)p);
                     if (key != null) {
                         errors.Add(key.Value);
@@ -1453,7 +1511,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Крышка угловая горизонтальная\" должно быть не более одного сочетания параметров [ширина элемента]
         /// </summary>
-        [ReportRule("Внутри серии элементов \"Крышка угловая горизонтальная\" должно быть не более одного сочетания параметров [ширина элемента].",
+        [ReportRule("Внутри серии элементов \"Крышка угловая горизонтальная\" должно быть не более одного сочетания параметров [ширина элемента CoverWidth].",
          2, 26)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_038() {
@@ -1476,13 +1534,13 @@ namespace Bs.Nano.Electric.Report {
 
             var ft = ScsGcCoverType.BEND;
             using (var context = connector.Connect()) {
-                var grours = context.DbScsGcCoverUnits
+                var products = context.DbScsGcCoverUnits
                         .Where(p => p.CoverType == ft)
                         .Select(p => new { p.Code, p.Series, p.CoverType, p.CoverWidth })
                         .ToArray()
                         .GroupBy(p => (p.CoverType, p.Series), p => (p.CoverWidth));
                 List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
+                foreach (var p in products) {
                     var key = CheckRule(((int)p.Key.CoverType, p.Key.Series), (IEnumerable<double?>)p);
                     if (key != null) {
                         errors.Add(key.Value);
@@ -1495,7 +1553,7 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        public const string sRule017 = @"Для элементов ""Крышка Х-образная горизонтальная"" должны быть внесены ширина основного и отходящего элемента.";
+        public const string sRule017 = @"Для элементов ""Крышка Х-образная горизонтальная"" должны быть внесены ширина основного и отходящего элемента (CoverWidth1, CoverWidth2).";
         [ReportRule(@"Для элементов ""Крышка Х-образная горизонтальная"" должны быть внесены ширина основного и отходящего элемента.",
          2, 27)]
         [RuleCategory("Полнота заполнения технических данных.")]
@@ -1504,14 +1562,18 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.DbScsGcCoverUnits
                     .Where(p => p.CoverType == ft)
-                    .Select(p => new { p.Code, p.CoverWidth1, p.CoverWidth2 });
-                var errors = new LinkedList<(string Code, double?, double?)>();
-                foreach (var p in products) {
-                    if (p.CoverWidth1 > 1 & p.CoverWidth2 > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.CoverWidth1, p.CoverWidth2));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.CoverWidth1, p.CoverWidth2 });
+                //var errors = new LinkedList<(string Code, double?, double?)>();
+                //foreach (var p in products) {
+                //    if (p.CoverWidth1 > 1 & p.CoverWidth2 > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.CoverWidth1, p.CoverWidth2));
+                //}
+                var errors = products.Where(p => !(p.CoverWidth1 > 1 & p.CoverWidth2 > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.CoverWidth1)}:{p.CoverWidth1}, {nameof(p.CoverWidth2)}:{p.CoverWidth2}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1522,7 +1584,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Крышка Х-образная горизонтальная\" должно быть не более одного сочетания параметров [ширина основного и отходящего элемента]
         /// </summary>
-        [ReportRule("Внутри серии элементов \"Крышка Х - образная горизонтальная\" должно быть не более одного сочетания параметров [ширина основного и отходящего элемента].",
+        [ReportRule("Внутри серии элементов \"Крышка Х - образная горизонтальная\" должно быть не более одного сочетания параметров [ширина основного и отходящего элемента (CoverWidth1, CoverWidth2)].",
          2, 28)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_039() {
@@ -1545,13 +1607,13 @@ namespace Bs.Nano.Electric.Report {
 
             var ft = ScsGcCoverType.CROSS;
             using (var context = connector.Connect()) {
-                var grours = context.DbScsGcCoverUnits
+                var products = context.DbScsGcCoverUnits
                         .Where(p => p.CoverType == ft)
                         .Select(p => new { p.Code, p.Series, p.CoverType, p.CoverWidth1, p.CoverWidth2 })
                         .ToArray()
                         .GroupBy(p => (p.CoverType, p.Series), p => (p.CoverWidth1, p.CoverWidth2));
                 List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
+                foreach (var p in products) {
                     var key = CheckRule(((int)p.Key.CoverType, p.Key.Series), p);
                     if (key != null) {
                         errors.Add(key.Value);
@@ -1573,14 +1635,18 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.DbScsGcCoverUnits
                     .Where(p => p.CoverType == ft)
-                    .Select(p => new { p.Code, p.CoverWidth });
-                var errors = new LinkedList<(string Code, double?)>();
-                foreach (var p in products) {
-                    if (p.CoverWidth > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.CoverWidth));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.CoverWidth });
+                //var errors = new LinkedList<(string Code, double?)>();
+                //foreach (var p in products) {
+                //    if (p.CoverWidth > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.CoverWidth));
+                //}
+                var errors = products.Where(p => !(p.CoverWidth1 > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.CoverWidth1)}:{p.CoverWidth1}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1591,7 +1657,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов \"Крышка угловая вертикальная внутренняя\" должно быть не более одного сочетания параметров [ширина элемента]
         /// </summary>
-        [ReportRule("Внутри серии элементов \"Крышка угловая вертикальная внутренняя\" должно быть не более одного сочетания параметров [ширина элемента].",
+        [ReportRule("Внутри серии элементов \"Крышка угловая вертикальная внутренняя\" должно быть не более одного сочетания параметров [ширина элемента CoverWidth].",
          2, 30)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_040() {
@@ -1614,13 +1680,13 @@ namespace Bs.Nano.Electric.Report {
 
             var ft = ScsGcCoverType.VERTICAL_BEND_INNER;
             using (var context = connector.Connect()) {
-                var grours = context.DbScsGcCoverUnits
+                var products = context.DbScsGcCoverUnits
                         .Where(p => p.CoverType == ft)
                         .Select(p => new { p.Code, p.Series, p.CoverType, p.CoverWidth })
                         .ToArray()
                         .GroupBy(p => (p.CoverType, p.Series), p => (p.CoverWidth));
                 List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
+                foreach (var p in products) {
                     var key = CheckRule(((int)p.Key.CoverType, p.Key.Series), (IEnumerable<double?>)p);
                     if (key != null) {
                         errors.Add(key.Value);
@@ -1633,21 +1699,25 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        public const string sRule020 = @"Для прямых секций лотков должны быть внесены полезная ширина, высота лотка";
-        [ReportRule(@"Для прямых секций лотков должны быть внесены полезная ширина, высота лотка.",
+        //public const string sRule020 = @"Для прямых секций лотков должны быть внесены полезная ширина, высота лотка";
+        [ReportRule(@"Для прямых секций лотков должны быть внесены полезная ширина GutterUsefullHeight, высота GutterUsefullDepth лотка.",
          2, 31)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_019() {
             using (var context = connector.Connect()) {
-                var scsGutterCanals = context.ScsGutterCanals
-                    .Select(p => new { p.Code, p.GutterUsefullHeight, p.GutterUsefullDepth });
-                var errors = new LinkedList<(string Code, double? GutterUsefullHeight, double? GutterUsefullDepth)>();
-                foreach (var p in scsGutterCanals) {
-                    if (p.GutterUsefullHeight > 1 & p.GutterUsefullDepth > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.GutterUsefullHeight, p.GutterUsefullDepth));
-                }
+                var products = context.ScsGutterCanals
+                    .ToList();
+                //    .Select(p => new { p.Code, p.GutterUsefullHeight, p.GutterUsefullDepth });
+                //var errors = new LinkedList<(string Code, double? GutterUsefullHeight, double? GutterUsefullDepth)>();
+                //foreach (var p in scsGutterCanals) {
+                //    if (p.GutterUsefullHeight > 1 & p.GutterUsefullDepth > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.GutterUsefullHeight, p.GutterUsefullDepth));
+                //}
+                var errors = products.Where(p => !(p.GutterUsefullHeight > 1 & p.GutterUsefullDepth > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.GutterUsefullHeight)}:{p.GutterUsefullHeight}, {nameof(p.GutterUsefullDepth)}:{p.GutterUsefullDepth}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1681,7 +1751,7 @@ namespace Bs.Nano.Electric.Report {
         /// Для всех лотков должен быть указан тип лотка и серия
         /// </summary>
         /// <remarks>Учитываются свойства GutterType, Series</remarks>
-        [ReportRule(@"Для всех лотков должен быть указан тип лотка и серия.",
+        [ReportRule(@"Для всех лотков должен быть указан тип лотка GutterType и серия Series.",
         2, 33)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_022() {
@@ -1712,7 +1782,7 @@ namespace Bs.Nano.Electric.Report {
         /// Внутри серии лотка должно быть не более одного сочетания параметров [Высота борта]x[ширина]x[длина секции]
         /// </summary>
         /// <remarks>Учитываются свойства GutterType, Series, GutterDepth, GutterHeight, SegLength</remarks>
-        [ReportRule(@"Внутри серии лотка должно быть не более одного сочетания параметров [Высота борта]x[ширина]x[длина секции].",
+        [ReportRule(@"Внутри серии лотка должно быть не более одного сочетания параметров [Высота борта GutterHeight]x[ширина GutterDepth]x[длина секции SegLength].",
           2, 34)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_023() {
@@ -1757,7 +1827,7 @@ namespace Bs.Nano.Electric.Report {
         /// Внутри серии разделительных перегородок должно быть не более одного сочетания параметров [Высота]x[длина секции]
         /// </summary>
         /// <remarks>Учитываются свойства Series, PartitionHeight, PartitionLength</remarks>
-        [ReportRule(@"Внутри серии разделительных перегородок должно быть не более одного сочетания параметров [Высота]x[длина секции].",
+        [ReportRule(@"Внутри серии разделительных перегородок должно быть не более одного сочетания параметров [Высота PartitionHeight]x[длина секции PartitionLength].",
          2, 35)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_026() {
@@ -1801,7 +1871,7 @@ namespace Bs.Nano.Electric.Report {
         /// Внутри серии крышек прямых секций лотков должно быть не более одного сочетания параметров [Ширина]x[длина секции]
         /// </summary>
         /// <remarks>Учитываются свойства Series, CoverWidth, CoverLength</remarks>
-        [ReportRule(@"Внутри серии крышек прямых секций лотков должно быть не более одного сочетания параметров [Ширина]x[длина секции].",
+        [ReportRule(@"Внутри серии крышек прямых секций лотков должно быть не более одного сочетания параметров [Ширина CoverWidth]x[длина секции CoverLength].",
           2, 36)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_027() {
@@ -1845,11 +1915,11 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Для элементов  \"Торцевая заглушка\" должны быть внесены параметры [высота борта, ширина элемента]
         /// </summary>
-        [ReportRule("Для элементов  \"Торцевая заглушка\" должны быть внесены параметры [высота борта, ширина элемента].",
+        [ReportRule("Для элементов  \"Торцевая заглушка\" должны быть внесены параметры [высота борта Height, ширина элемента Depth].",
          2, 37)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_041() {
-            bool CheckRule(string Code, string Series, double? Height, double? Depth) {
+            bool CheckRule(double? Height, double? Depth) {
 
                 bool isAllRight = Height.HasValue && Height.Value >= 1.0
                                     && Depth.HasValue && Depth.Value >= 1.0;
@@ -1858,17 +1928,21 @@ namespace Bs.Nano.Electric.Report {
             };
             var ft = ScsGutterFittingTypeEnum.CORK;
             using (var context = connector.Connect()) {
-                var grours = context.ScsGcFittings
-                        .Where(p => p.FittingType == ft)
-                        .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth })
-                        .ToArray()
-                        ;
-                var errors = new LinkedList<(string Code, string Series, double? Height, double? Depth)>();
-                foreach (var p in grours) {
-                    if (!CheckRule(p.Code, p.Series, p.Height, p.Depth)) {
-                        errors.AddLast((p.Code, p.Series, p.Height, p.Depth));
-                    }
-                }
+                var products = context.ScsGcFittings
+                        .Where(p => p.FittingType == ft).ToArray()
+                    .ToList();
+                //        .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth })
+                //        .ToArray()
+                //        ;
+                //var errors = new LinkedList<(string Code, string Series, double? Height, double? Depth)>();
+                //foreach (var p in grours) {
+                //    if (!CheckRule(p.Code, p.Series, p.Height, p.Depth)) {
+                //        errors.AddLast((p.Code, p.Series, p.Height, p.Depth));
+                //    }
+                //}
+                var errors = products.Where(p => !CheckRule(p.Height, p.Depth))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Height)}:{p.Height}, {nameof(p.Depth)}:{p.Depth}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1879,7 +1953,7 @@ namespace Bs.Nano.Electric.Report {
         /// <summary>
         /// Внутри серии элементов  \"Торцевая заглушка\" должно быть не более одного сочетания параметров [высота борта, ширина элемента]
         /// </summary>
-        [ReportRule("Внутри серии элементов  \"Торцевая заглушка\" должно быть не более одного сочетания параметров [высота борта, ширина элемента].",
+        [ReportRule("Внутри серии элементов  \"Торцевая заглушка\" должно быть не более одного сочетания параметров [высота борта Height, ширина элемента Depth].",
          2, 38)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_042() {
@@ -1900,13 +1974,13 @@ namespace Bs.Nano.Electric.Report {
             };
             var ft = ScsGutterFittingTypeEnum.CORK;
             using (var context = connector.Connect()) {
-                var grours = context.ScsGcFittings
+                var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
                         .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth })
                         .ToArray()
                         .GroupBy(p => (p.FittingType, p.Series), p => (p.Height, p.Depth));
                 var errors = new LinkedList<(int type, string serie)>();
-                foreach (var p in grours) {
+                foreach (var p in products) {
                     var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), p);
                     if (key != null) {
                         errors.AddLast(key.Value);
@@ -1929,14 +2003,18 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
                     .Where(p => p.CanalBoltingType == ft)
-                    .Select(p => new { p.Code, p.Length });
-                var errors = new LinkedList<(string Code, double?)>();
-                foreach (var p in products) {
-                    if (p.Length > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.Length));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.Length });
+                //var errors = new LinkedList<(string Code, double?)>();
+                //foreach (var p in products) {
+                //    if (p.Length > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.Length));
+                //}
+                var errors = products.Where(p => !(p.Length > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Length)}:{p.Length}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1952,14 +2030,18 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
                     .Where(p => p.CanalBoltingType == ft)
-                    .Select(p => new { p.Code, p.ProfileLength });
-                var errors = new LinkedList<(string Code, double?)>();
-                foreach (var p in products) {
-                    if (p.ProfileLength > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.ProfileLength));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.ProfileLength });
+                //var errors = new LinkedList<(string Code, double?)>();
+                //foreach (var p in products) {
+                //    if (p.ProfileLength > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.ProfileLength));
+                //}
+                var errors = products.Where(p => !(p.Length > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Length)}:{p.Length}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1967,7 +2049,7 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        [ReportRule(@"Для элементов ""Скоба"" должна быть внесена полезная ширина элемента.",
+        [ReportRule(@"Для элементов ""Скоба"" должна быть внесена полезная ширина элемента Length.",
          2, 41)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_03_003() {
@@ -1975,22 +2057,25 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
                     .Where(p => p.CanalBoltingType == ft)
-                    .Select(p => new { p.Code, p.Length });
-                var errors = new LinkedList<(string Code, double?)>();
-                foreach (var p in products) {
-                    if (p.Length > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.Length));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.Length });
+                //var errors = new LinkedList<(string Code, double?)>();
+                //foreach (var p in products) {
+                //    if (p.Length > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.Length));
+                //}
+                var errors = products.Where(p => !(p.Length > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Length)}:{p.Length}")
+                    .ToList();
                 if (errors.Count > 0) {
-
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
                 }
             }
         }
-        [ReportRule(@"Для элементов ""Стойка"" должны быть внесены крепление, вид стойки, высота элемента.",
+        [ReportRule(@"Для элементов ""Стойка"" должны быть внесены крепление MountType, вид стойки StandType, высота элемента Heigth.",
            2, 42)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_03_004() {
@@ -1998,8 +2083,8 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
                     .Where(p => p.CanalBoltingType == ft)
-                    .Select(p => new { p.Code, p.MountType, p.StandType, p.Heigth });
-                var errors = new LinkedList<(string Code, ScsGcStandMountType?, ScsGcStandType?, double?)>();
+                    .Select(p => new { p.Code, p.Series, p.MountType, p.StandType, p.Heigth });
+                var errors = new LinkedList<string>();
                 foreach (var p in products) {
                     if (p.Heigth > 1) {
                         if (p.MountType.HasValue) {
@@ -2014,7 +2099,7 @@ namespace Bs.Nano.Electric.Report {
                             }
                         }
                     }
-                    errors.AddLast((p.Code, p.MountType, p.StandType, p.Heigth));
+                    errors.AddLast($"({p.Series}\\{p.Code}  {nameof(p.MountType)}:{p.MountType}, {nameof(p.StandType)}:{p.StandType}, {nameof(p.Heigth)}:{p.Heigth}");
                 }
                 if (errors.Count > 0) {
 
@@ -2031,14 +2116,18 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
                     .Where(p => p.CanalBoltingType == ft)
-                    .Select(p => new { p.Code, p.Heigth });
-                var errors = new LinkedList<(string Code, double?)>();
-                foreach (var p in products) {
-                    if (p.Heigth > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.Heigth));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.Heigth });
+                //var errors = new LinkedList<(string Code, double?)>();
+                //foreach (var p in products) {
+                //    if (p.Heigth > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.Heigth));
+                //}
+                var errors = products.Where(p => !(p.Heigth > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Heigth)}:{p.Heigth}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -2054,14 +2143,18 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
                     .Where(p => p.CanalBoltingType == ft & (p.ConsoleMountType == ScsGcConsoleMountType.CELL | p.ConsoleMountType == ScsGcConsoleMountType.L_WALL))
-                    .Select(p => new { p.Code, p.Heigth });
-                var errors = new LinkedList<(string Code, double?)>();
-                foreach (var p in products) {
-                    if (p.Heigth > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.Heigth));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.Heigth });
+                //var errors = new LinkedList<(string Code, double?)>();
+                //foreach (var p in products) {
+                //    if (p.Heigth > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.Heigth));
+                //}
+                var errors = products.Where(p => !(p.Heigth > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Heigth)}:{p.Heigth}")
+                    .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -2077,14 +2170,18 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
                     .Where(p => p.CanalBoltingType == ft)
-                    .Select(p => new { p.Code, p.Length });
-                var errors = new LinkedList<(string Code, double?)>();
-                foreach (var p in products) {
-                    if (p.Length > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.Length));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.Length });
+                //var errors = new LinkedList<(string Code, double?)>();
+                //foreach (var p in products) {
+                //    if (p.Length > 1)
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.Length));
+                //}
+                var errors = products.Where(p => !(p.Length > 1))
+                   .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Length)}:{p.Length}")
+                   .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -2100,14 +2197,18 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsTubeFittings
                     .Where(p => p.FittingType == ScsTubeFittingTypeEnum.OTHER)
-                    .Select(p => new { p.Code, p.DbOtherName });
-                var errors = new LinkedList<(string Code, string?)>();
-                foreach (var p in products) {
-                    if (!string.IsNullOrEmpty(p.DbOtherName))
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.DbOtherName));
-                }
+                    .ToList();
+                //    .Select(p => new { p.Code, p.DbOtherName });
+                //var errors = new LinkedList<(string Code, string?)>();
+                //foreach (var p in products) {
+                //    if (!string.IsNullOrEmpty(p.DbOtherName))
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.DbOtherName));
+                //}
+                var errors = products.Where(p => !string.IsNullOrEmpty(p.DbOtherName))
+                   .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.DbOtherName)}:\"{p.DbOtherName}\"")
+                   .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
