@@ -297,79 +297,91 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"В базе значения артикула должны быть уникальными.", 4, 0), RuleCategory("Общие рекомендации.")]
         public void Rule_01_000() {
-            List<(string Code, string TableName)> allCodes = new List<(string Code, string TableName)>();
-
+            List<(string Code, string TableName, string TypeDescription)> allCodes = new ();
+            string getDescription(Type type) {
+                var attr = type.GetCustomAttribute<DefaultLocalizeValueAttribute>();
+                return attr?.DefaultLocalizeValue ?? string.Empty;
+            }
             using (var context = connector.Connect()) {
                 {
+                    var description = getDescription(typeof(ScsGutterCanal));
                     var products = context.ScsGutterCanals
                         .Select(p => p.Code)
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterCanals)));
+                        allCodes.Add((p, nameof(context.ScsGutterCanals), description));
                     }
                 }
                 {
+                    var description = getDescription(typeof(DbScsGutterCover));
                     var products = context.DbScsGutterCovers
                         .Select(p => p.Code)
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterCanals)));
+                        allCodes.Add((p, nameof(context.DbScsGutterCovers), description));
                     }
                 }
                 {
+                    var description = getDescription(typeof(DbScsGutterPartition));
                     var products = context.DbScsGutterPartitions
                         .Select(p => p.Code)
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterCanals)));
+                        allCodes.Add((p, nameof(context.DbScsGutterPartitions), description));
                     }
                 }
                 {
+                    var description = getDescription(typeof(ScsGcFitting));
                     var products = context.ScsGcFittings
                         .Select(p => p.Code)
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterCanals)));
+                        allCodes.Add((p, nameof(context.ScsGcFittings), description));
                     }
                 }
                 {
+                    var description = getDescription(typeof(DbScsGcCoverUnit));
                     var products = context.DbScsGcCoverUnits
                         .Select(p => p.Code)
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterCanals)));
+                        allCodes.Add((p, nameof(context.DbScsGcCoverUnits), description));
                     }
                 }
                 {
+                    var description = getDescription(typeof(DbScsGcAccessoryUnit));
                     var products = context.DbScsGcAccessoryUnits
                         .Select(p => p.Code)
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterCanals)));
+                        allCodes.Add((p, nameof(context.DbScsGcAccessoryUnits), description));
                     }
                 }
                 {
+                    var description = getDescription(typeof(ScsGutterBolting));
                     var products = context.ScsGutterBoltings
                         .Select(p => p.Code)
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterCanals)));
+                        allCodes.Add((p, nameof(context.ScsGutterBoltings), description));
                     }
                 }
                 {
+                    var description = getDescription(typeof(DbScsGcBoltingAccessoryUnit));
                     var products = context.DbScsGcBoltingAccessoryUnits
                         .Select(p => p.Code)
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterCanals)));
+                        allCodes.Add((p, nameof(context.DbScsGcBoltingAccessoryUnits), description));
                     }
                 }
                 {
+                    var description = getDescription(typeof(CaeMaterialUtility));
                     var products = context.CaeMaterialUtilities
                         .Select(p => p.Code)
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterCanals)));
+                        allCodes.Add((p, nameof(context.CaeMaterialUtilities), description));
                     }
                 }
                 CheckCodesIsUniqueness(allCodes);
@@ -380,7 +392,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         /// <param name="allCodes">Массив входных данных.</param>
         /// <exception cref="RuleTestException">Правило уникальности кода нарушено.</exception>
-        public static void CheckCodesIsUniqueness(IEnumerable<(string Code, string TableName)> allCodes) {
+        public static void CheckCodesIsUniqueness(IEnumerable<(string Code, string TableName, string TableDescription)> allCodes) {
             var errors = allCodes.GroupBy(item => item.Code)
                                 .Where(group => group.Count() > 1);
             if (errors.Any()) {
@@ -1644,8 +1656,8 @@ namespace Bs.Nano.Electric.Report {
                 //    else
                 //        errors.AddLast((p.Code, p.CoverWidth));
                 //}
-                var errors = products.Where(p => !(p.CoverWidth1 > 1))
-                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.CoverWidth1)}:{p.CoverWidth1}")
+                var errors = products.Where(p => !(p.CoverWidth > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.CoverWidth)}:{p.CoverWidth}")
                     .ToList();
                 if (errors.Count > 0) {
 
