@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Bs.Nano.Electric.Report {
@@ -235,7 +236,23 @@ namespace Bs.Nano.Electric.Report {
                 throw new AggregateException(exceptions);
             }
         }
-
+        public static void CheckRule(this MethodInfo testItem, Checker checker) {
+            ReportRuleAttribute rule = GetReportRule(testItem);
+            try {
+                var miParameters = testItem.GetParameters();
+                if (miParameters.Length == 0) {
+                    testItem.Invoke(checker, null);
+                }
+                else
+                    throw new NotImplementedException("Допускается вызов только методов без параметров.");
+            }
+            catch (TargetInvocationException tiEx) {
+                throw new RuleTestException($"Не пройдено правило проверки {rule}", tiEx.InnerException);
+            }
+            catch (Exception ex) {
+                throw new RuleTestException($"Не пройдено правило проверки {rule}", ex);
+            }
+        }
         public static IEnumerable<MethodInfo> GetTests<T>(this string testCategory) where T : class {
             int getPriority(MethodInfo mi) {
                 return mi.GetCustomAttribute<PriorityAttribute>()?.Priority ?? 0;

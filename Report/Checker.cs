@@ -411,7 +411,7 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var emptyImage = context.DbImages.FirstOrDefault(img => img.Id == 0);
                 if (emptyImage is null || emptyImage.Text != "File not found.png") {
-                    RuleTestException ex = new RuleTestException($"Не внесен эскиз \"File not found.png\".");
+                    throw new RuleTestException($"Не внесен эскиз \"File not found.png\".");
                 }
             }
         }
@@ -420,57 +420,58 @@ namespace Bs.Nano.Electric.Report {
         public void Rule_01_002() {
             using (var context = connector.Connect()) {
                 List<(string Code, string Description)> sketchNotFound = new List<(string Code, string Description)>();
+
                 var products = context.ScsGutterCanals
-                    .Where(p => p.DbImageRef == null | p.DbImageRef == 0)
+                    .Where(p => p.DbImageRef < 1)
                     .Select(p => new { p.Code, p.SpecDescription });
                 foreach (var p in products) {
                     sketchNotFound.Add((p.Code, p.SpecDescription));
                 }
                 products = context.DbScsGutterCovers
-                    .Where(p => p.DbImageRef == null | p.DbImageRef == 0)
+                    .Where(p => p.DbImageRef < 1)
                     .Select(p => new { p.Code, p.SpecDescription });
                 foreach (var p in products) {
                     sketchNotFound.Add((p.Code, p.SpecDescription));
                 }
                 products = context.DbScsGutterPartitions
-                    .Where(p => p.DbImageRef == null | p.DbImageRef == 0)
+                    .Where(p => p.DbImageRef < 1)
                     .Select(p => new { p.Code, p.SpecDescription });
                 foreach (var p in products) {
                     sketchNotFound.Add((p.Code, p.SpecDescription));
                 }
                 products = context.ScsGcFittings
-                    .Where(p => p.DbImageRef == null | p.DbImageRef == 0)
+                    .Where(p => p.DbImageRef < 1)
                     .Select(p => new { p.Code, p.SpecDescription });
                 foreach (var p in products) {
                     sketchNotFound.Add((p.Code, p.SpecDescription));
                 }
                 products = context.DbScsGcCoverUnits
-                    .Where(p => p.DbImageRef == null | p.DbImageRef == 0)
+                    .Where(p => p.DbImageRef < 1)
                     .Select(p => new { p.Code, p.SpecDescription });
                 foreach (var p in products) {
                     sketchNotFound.Add((p.Code, p.SpecDescription));
                 }
                 products = context.DbScsGcAccessoryUnits
-                    .Where(p => p.DbImageRef == null | p.DbImageRef == 0)
+                    .Where(p => p.DbImageRef < 1)
                     .Select(p => new { p.Code, p.SpecDescription });
                 foreach (var p in products) {
                     sketchNotFound.Add((p.Code, p.SpecDescription));
                 }
                 products = context.ScsGutterBoltings
-                    .Where(p => p.DbImageRef == null | p.DbImageRef == 0)
+                    .Where(p => p.DbImageRef < 1)
                     .Select(p => new { p.Code, p.SpecDescription });
                 foreach (var p in products) {
                     sketchNotFound.Add((p.Code, p.SpecDescription));
                 }
                 products = context.DbScsGcBoltingAccessoryUnits
-                     .Where(p => p.DbImageRef == null | p.DbImageRef == 0)
-                     .Select(p => new { p.Code, p.SpecDescription });
+                    .Where(p => p.DbImageRef < 1)
+                    .Select(p => new { p.Code, p.SpecDescription });
                 foreach (var p in products) {
                     sketchNotFound.Add((p.Code, p.SpecDescription));
                 }
                 products = context.CaeMaterialUtilities
-                     .Where(p => p.DbImageRef == null | p.DbImageRef == 0)
-                     .Select(p => new { p.Code, p.SpecDescription });
+                     .Where(p => p.DbImageRef < 1)
+                    .Select(p => new { p.Code, p.SpecDescription });
                 foreach (var p in products) {
                     sketchNotFound.Add((p.Code, p.SpecDescription));
                 }
@@ -493,40 +494,40 @@ namespace Bs.Nano.Electric.Report {
         [ReportRule(@"Для всех элементов должна быть внесена масса.",
             4, 3), RuleCategory("Общие рекомендации.")]
         public void Rule_01_003() {
-            List<(string Code, string Mass)> codes = new List<(string Code, string Mass)>(128);
-            void CheckRule(string code, string sWeight) {
+            List<(string Serie, string Code, string Mass)> codes = new List<(string Serie, string Code, string Mass)>(128);
+            void CheckRule(string serie, string code, string sWeight) {
                 bool isMatch = (double.TryParse(sWeight, NumberStyles.Float, CultureInfo.InvariantCulture, out double weight) || double.TryParse(sWeight, NumberStyles.Float, CultureInfo.CurrentCulture, out weight)) && weight > 0.0;
                 if (!isMatch) {
-                    codes.Add((code, sWeight));
+                    codes.Add((serie, code, sWeight));
                 }
             }
             using (var context = connector.Connect()) {
                 foreach (var el in context.ScsGutterCanals) {
-                    CheckRule(el.Code, el.Mass);
+                    CheckRule(el.Series, el.Code, el.Mass);
                 }
                 foreach (var el in context.DbScsGutterCovers) {
-                    CheckRule(el.Code, el.Mass);
+                    CheckRule(el.Series, el.Code, el.Mass);
                 }
                 foreach (var el in context.DbScsGutterPartitions) {
-                    CheckRule(el.Code, el.Mass);
+                    CheckRule(el.Series, el.Code, el.Mass);
                 }
                 foreach (var el in context.ScsGcFittings) {
-                    CheckRule(el.Code, el.Mass);
+                    CheckRule(el.Series, el.Code, el.Mass);
                 }
                 foreach (var el in context.DbScsGcCoverUnits) {
-                    CheckRule(el.Code, el.Mass);
+                    CheckRule(el.Series, el.Code, el.Mass);
                 }
                 foreach (var el in context.DbScsGcAccessoryUnits) {
-                    CheckRule(el.Code, el.Mass);
+                    CheckRule(el.Series, el.Code, el.Mass);
                 }
                 foreach (var el in context.ScsGutterBoltings) {
-                    CheckRule(el.Code, el.Mass);
+                    CheckRule(el.Series, el.Code, el.Mass);
                 }
                 foreach (var el in context.DbScsGcBoltingAccessoryUnits) {
-                    CheckRule(el.Code, el.Mass);
+                    CheckRule(el.Series, el.Code, el.Mass);
                 }
                 foreach (var el in context.CaeMaterialUtilities) {
-                    CheckRule(el.Code, el.Mass);
+                    CheckRule(el.Series, el.Code, el.Mass);
                 }
 
             }
@@ -560,7 +561,7 @@ namespace Bs.Nano.Electric.Report {
             void CheckRule((string code, string url) tack) {
                 (string code, string url) = tack;
                 if (string.IsNullOrWhiteSpace(url)) {
-                    errors.Add((code, url, "Ссылка на сайт производителя не заполнена."));
+                    errors.Add((code, url, string.Empty));
                     return;
                 }
                 try {
@@ -754,35 +755,36 @@ namespace Bs.Nano.Electric.Report {
             2, 5)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_028() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> sizes) {
-                HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> sizes) {
+            //    HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
 
             var ft = ScsGutterFittingTypeEnum.VERTICAL_PASSAGE;
             using (var context = connector.Connect()) {
-                var grours = context.ScsGcFittings
+                var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
-                        .Select(p => new { p.Code, p.Series, p.FittingType, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch })
                         .ToArray()
-                        .GroupBy(p => (p.FittingType, p.Series), p => (p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
-                LinkedList<string> errors = new();
-                foreach (var p in grours) {
-                    var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), (IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>)p);
-                    if (key != null) {
-                        errors.AddLast($"{p.Key.FittingType}, {p.Key.Series}");
+                        .GroupBy(p => p.Series, p =>(p.Name, size:(p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch)));
+                LinkedList<object> errors = new();
+                foreach (var p in products) {
+                    HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast(( p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -825,34 +827,24 @@ namespace Bs.Nano.Electric.Report {
             2, 7)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_029() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> sizes) {
-                HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+           //IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> CheckRule(IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> sizes) {
+           //     HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>();
+           //     return sizes.Where(size => !values.Add(size));
+           // };
 
             var ft = ScsGutterFittingTypeEnum.HORIZONTAL_PASSAGE;
             using (var context = connector.Connect()) {
-                var grours = context.ScsGcFittings
+                var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
-                        .Select(p => new { p.Code, p.Series, p.FittingType, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch })
                         .ToArray()
-                        .GroupBy(p => (p.FittingType, p.Series), p => (p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
-                LinkedList<string> errors = new();
-                foreach (var p in grours) {
-                    var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), (IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>)p);
-                    if (key != null) {
-                        errors.AddLast($"{p.Key.FittingType}, {p.Key.Series}");
+                        .GroupBy(p => p.Series, p =>(p.Name, size: (p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch)));
+                LinkedList<object> errors = new();
+                foreach (var p in products) {
+                    HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -921,34 +913,35 @@ namespace Bs.Nano.Electric.Report {
             2, 10)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_030() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> sizes) {
-                HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> sizes) {
+            //    HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
             var ft = ScsGutterFittingTypeEnum.TRIPLE;
             using (var context = connector.Connect()) {
-                var grours = context.ScsGcFittings
+                var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
-                        .Select(p => new { p.Code, p.Series, p.FittingType, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch })
                         .ToArray()
-                        .GroupBy(p => (p.FittingType, p.Series), p => (p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
-                    var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), (IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>)p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                        .GroupBy(p => p.Series, p =>(p.Name, size: (p.WidthMainBranch, p.HeightMainBranch, p.WidthOutBranch, p.HeightOutBranch)));
+                LinkedList<object> errors = new();
+                foreach (var p in products) {
+                    HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1000,33 +993,34 @@ namespace Bs.Nano.Electric.Report {
          2, 12)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_031() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> sizes) {
-                HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> values = new HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> sizes) {
+            //    HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> values = new HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
             var ft = ScsGutterFittingTypeEnum.VERTICAL_BEND_OUTER;
             using (var context = connector.Connect()) {
-                var grours = context.ScsGcFittings
+                var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
-                        .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth, p.VerticalBendType })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.Height, p.Depth, p.VerticalBendType })
                         .ToArray()
-                        .GroupBy(p => (p.FittingType, p.Series), p => (p.Height, p.Depth, p.VerticalBendType));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
-                    var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), (IEnumerable<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)>)p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                        .GroupBy(p => p.Series, p =>(p.Name,size: (p.Height, p.Depth, p.VerticalBendType)));
+                LinkedList<object> errors = new();
+                foreach (var p in products) {
+                    HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1078,35 +1072,36 @@ namespace Bs.Nano.Electric.Report {
          2, 14)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_032() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> sizes) {
-                HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> values = new HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> sizes) {
+            //    HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> values = new HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
 
             var ft = ScsGutterFittingTypeEnum.VERTICAL_BEND_INNER;
             using (var context = connector.Connect()) {
-                var grours = context.ScsGcFittings
+                var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
-                        .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth, p.VerticalBendType })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.Height, p.Depth, p.VerticalBendType })
                         .ToArray()
-                        .GroupBy(p => (p.FittingType, p.Series), p => (p.Height, p.Depth, p.VerticalBendType));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
-                    var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                        .GroupBy(p => p.Series, p =>(p.Name,size: (p.Height, p.Depth, p.VerticalBendType)));
+                LinkedList<object> errors = new();
+                foreach (var p in products) {
+                    HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1158,35 +1153,36 @@ namespace Bs.Nano.Electric.Report {
          2, 16)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_033() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsVerticalUniversalBendTypeEnum? VerticalUniversalBendType)> sizes) {
-                HashSet<(double? Height, double? Depth, ScsVerticalUniversalBendTypeEnum? VerticalUniversalBendType)> values = new HashSet<(double? Height, double? Depth, ScsVerticalUniversalBendTypeEnum? VerticalUniversalBendType)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsVerticalUniversalBendTypeEnum? VerticalUniversalBendType)> sizes) {
+            //    HashSet<(double? Height, double? Depth, ScsVerticalUniversalBendTypeEnum? VerticalUniversalBendType)> values = new HashSet<(double? Height, double? Depth, ScsVerticalUniversalBendTypeEnum? VerticalUniversalBendType)>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
 
             var ft = ScsGutterFittingTypeEnum.VERTICAL_BENT_UNIVERSE;
             using (var context = connector.Connect()) {
-                var grours = context.ScsGcFittings
+                var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
-                        .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth, p.VerticalUniversalBendType })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.Height, p.Depth, p.VerticalUniversalBendType })
                         .ToArray()
-                        .GroupBy(p => (p.FittingType, p.Series), p => (p.Height, p.Depth, p.VerticalUniversalBendType));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var p in grours) {
-                    var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                        .GroupBy(p => p.Series, p =>(p.Name, size: (p.Height, p.Depth, p.VerticalUniversalBendType)));
+                LinkedList<object> errors = new();
+                foreach (var p in products) {
+                    HashSet<(double? Height, double? Depth, ScsVerticalUniversalBendTypeEnum? VerticalUniversalBendType)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1239,35 +1235,36 @@ namespace Bs.Nano.Electric.Report {
          2, 18)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_034() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsBendTypeEnum? BendType)> sizes) {
-                HashSet<(double? Height, double? Depth, ScsBendTypeEnum? BendType)> values = new HashSet<(double? Height, double? Depth, ScsBendTypeEnum? BendType)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsBendTypeEnum? BendType)> sizes) {
+            //    HashSet<(double? Height, double? Depth, ScsBendTypeEnum? BendType)> values = new HashSet<(double? Height, double? Depth, ScsBendTypeEnum? BendType)>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
 
             var ft = ScsGutterFittingTypeEnum.BEND;
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
-                        .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth, p.BendType })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.Height, p.Depth, p.BendType })
                         .ToArray()
-                        .GroupBy(p => (p.FittingType, p.Series), p => (p.Height, p.Depth, p.BendType));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
+                        .GroupBy(p => p.Series, p =>(p.Name,size: (p.Height, p.Depth, p.BendType)));
+                LinkedList<object> errors = new();
                 foreach (var p in products) {
-                    var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                    HashSet<(double? Height, double? Depth, ScsBendTypeEnum? BendType)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1315,35 +1312,36 @@ namespace Bs.Nano.Electric.Report {
          2, 20)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_035() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)> sizes) {
-                HashSet<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)> values = new HashSet<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)> sizes) {
+            //    HashSet<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)> values = new HashSet<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
 
             var ft = ScsGutterFittingTypeEnum.CROSS;
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
-                        .Select(p => new { p.Code, p.Series, p.FittingType, p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch })
                         .ToArray()
-                        .GroupBy(p => (p.FittingType, p.Series), p => (p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
+                        .GroupBy(p => p.Series, p =>(p.Name, size: (p.Width1Branch, p.Height1Branch, p.Width2Branch, p.Height2Branch)));
+                LinkedList<object> errors = new();
                 foreach (var p in products) {
-                    var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), (IEnumerable<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)>)p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                    HashSet<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1363,13 +1361,16 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.DbScsGcCoverUnits
                     .Where(p => p.CoverType == ft)
-                    .Select(p => new { p.Code, p.CoverWidth1, p.CoverWidth2 });
-                var errors = new LinkedList<(string Code, double?, double?)>();
+                    .Select(p => new {p.Series, p.Name, p.Code, p.CoverWidth1, p.CoverWidth2 })
+                    .ToArray()
+                    .GroupBy(p=> p.Series, p=>(p.Name, size: (p.CoverWidth1, p.CoverWidth2)));
+                LinkedList<object> errors = new();
                 foreach (var p in products) {
-                    if (p.CoverWidth1 > 1 & p.CoverWidth2 > 1)
-                        continue;
-                    else
-                        errors.AddLast((p.Code, p.CoverWidth1, p.CoverWidth2));
+                    HashSet<(double? CoverWidth1, double? CoverWidth2)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
+                    }
                 }
                 if (errors.Count > 0) {
 
@@ -1385,35 +1386,36 @@ namespace Bs.Nano.Electric.Report {
         2, 22)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_036() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? CoverWidth1, double? CoverWidth2)> sizes) {
-                HashSet<(double? CoverWidth1, double? CoverWidth2)> values = new HashSet<(double? CoverWidth1, double? CoverWidth2)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? CoverWidth1, double? CoverWidth2)> sizes) {
+            //    HashSet<(double? CoverWidth1, double? CoverWidth2)> values = new HashSet<(double? CoverWidth1, double? CoverWidth2)>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
 
             var ft = ScsGcCoverType.TRIPLE;
             using (var context = connector.Connect()) {
                 var products = context.DbScsGcCoverUnits
                         .Where(p => p.CoverType == ft)
-                        .Select(p => new { p.Code, p.Series, p.CoverType, p.CoverWidth1, p.CoverWidth2 })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.CoverWidth1, p.CoverWidth2 })
                         .ToArray()
-                        .GroupBy(p => (p.CoverType, p.Series), p => (p.CoverWidth1, p.CoverWidth2));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
+                        .GroupBy(p => p.Series, p =>(p.Name,size: (p.CoverWidth1, p.CoverWidth2)));
+                LinkedList<object> errors = new();
                 foreach (var p in products) {
-                    var key = CheckRule(((int)p.Key.CoverType, p.Key.Series), (IEnumerable<(double? CoverWidth1, double? CoverWidth2)>)p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                    HashSet<(double? CoverWidth1, double? CoverWidth2)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1458,35 +1460,36 @@ namespace Bs.Nano.Electric.Report {
          2, 24)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_037() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<double?> sizes) {
-                HashSet<double?> values = new HashSet<double?>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<double?> sizes) {
+            //    HashSet<double?> values = new HashSet<double?>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
 
             var ft = ScsGcCoverType.VERTICAL_BEND_OUTER;
             using (var context = connector.Connect()) {
                 var products = context.DbScsGcCoverUnits
                         .Where(p => p.CoverType == ft)
-                        .Select(p => new { p.Code, p.Series, p.CoverType, p.CoverWidth })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.CoverWidth })
                         .ToArray()
-                        .GroupBy(p => (p.CoverType, p.Series), p => (p.CoverWidth));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
+                        .GroupBy(p => p.Series, p =>(p.Name,p.CoverWidth));
+                LinkedList<object> errors = new();
                 foreach (var p in products) {
-                    var key = CheckRule(((int)p.Key.CoverType, p.Key.Series), (IEnumerable<double?>)p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                    HashSet<double?> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.CoverWidth));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1527,35 +1530,36 @@ namespace Bs.Nano.Electric.Report {
          2, 26)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_038() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<double?> sizes) {
-                HashSet<double?> values = new HashSet<double?>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<double?> sizes) {
+            //    HashSet<double?> values = new HashSet<double?>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
 
             var ft = ScsGcCoverType.BEND;
             using (var context = connector.Connect()) {
                 var products = context.DbScsGcCoverUnits
                         .Where(p => p.CoverType == ft)
-                        .Select(p => new { p.Code, p.Series, p.CoverType, p.CoverWidth })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.CoverWidth })
                         .ToArray()
-                        .GroupBy(p => (p.CoverType, p.Series), p => (p.CoverWidth));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
+                        .GroupBy(p => p.Series, p =>(p.Name, p.CoverWidth));
+                LinkedList<object> errors = new();
                 foreach (var p in products) {
-                    var key = CheckRule(((int)p.Key.CoverType, p.Key.Series), (IEnumerable<double?>)p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                    HashSet<double?> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.CoverWidth));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1600,35 +1604,36 @@ namespace Bs.Nano.Electric.Report {
          2, 28)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_039() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? CoverWidth1, double? CoverWidth2)> sizes) {
-                HashSet<(double? CoverWidth1, double? CoverWidth2)> values = new HashSet<(double? CoverWidth1, double? CoverWidth2)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? CoverWidth1, double? CoverWidth2)> sizes) {
+            //    HashSet<(double? CoverWidth1, double? CoverWidth2)> values = new HashSet<(double? CoverWidth1, double? CoverWidth2)>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
 
             var ft = ScsGcCoverType.CROSS;
             using (var context = connector.Connect()) {
                 var products = context.DbScsGcCoverUnits
                         .Where(p => p.CoverType == ft)
-                        .Select(p => new { p.Code, p.Series, p.CoverType, p.CoverWidth1, p.CoverWidth2 })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.CoverWidth1, p.CoverWidth2 })
                         .ToArray()
-                        .GroupBy(p => (p.CoverType, p.Series), p => (p.CoverWidth1, p.CoverWidth2));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
+                        .GroupBy(p => p.Series, p =>(p.Name, size: (p.CoverWidth1, p.CoverWidth2)));
+                LinkedList<object> errors = new();
                 foreach (var p in products) {
-                    var key = CheckRule(((int)p.Key.CoverType, p.Key.Series), p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                    HashSet<(double? CoverWidth1, double? CoverWidth2)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1673,35 +1678,36 @@ namespace Bs.Nano.Electric.Report {
          2, 30)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_040() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<double?> sizes) {
-                HashSet<double?> values = new HashSet<double?>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<double?> sizes) {
+            //    HashSet<double?> values = new HashSet<double?>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
 
             var ft = ScsGcCoverType.VERTICAL_BEND_INNER;
             using (var context = connector.Connect()) {
                 var products = context.DbScsGcCoverUnits
                         .Where(p => p.CoverType == ft)
-                        .Select(p => new { p.Code, p.Series, p.CoverType, p.CoverWidth })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.CoverWidth })
                         .ToArray()
-                        .GroupBy(p => (p.CoverType, p.Series), p => (p.CoverWidth));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
+                        .GroupBy(p => p.Series, p =>(p.Name, p.CoverWidth));
+                LinkedList<object> errors = new();
                 foreach (var p in products) {
-                    var key = CheckRule(((int)p.Key.CoverType, p.Key.Series), (IEnumerable<double?>)p);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                    HashSet<double?> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.CoverWidth));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1799,31 +1805,32 @@ namespace Bs.Nano.Electric.Report {
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_023() {
 
-            (int GutterType, string Series)? CheckRule((int GutterType, string Series) key, IEnumerable<(double? GutterDepth, double? GutterHeight, double? SegLength)> sizes) {
-                HashSet<(double? GutterDepth, double? GutterHeight, double? SegLength)> values = new();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int GutterType, string Series)? CheckRule((int GutterType, string Series) key, IEnumerable<(double? GutterDepth, double? GutterHeight, double? SegLength)> sizes) {
+            //    HashSet<(double? GutterDepth, double? GutterHeight, double? SegLength)> values = new();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
             using (var context = connector.Connect()) {
-                var groups = context.ScsGutterCanals
-                    .Select(p => new { p.GutterType, p.Series, p.GutterDepth, p.GutterHeight, p.SegLength })
+               var products = context.ScsGutterCanals
+                    .Select(p => new { p.GutterType, p.Series, p.Name, p.GutterDepth, p.GutterHeight, p.SegLength })
                     .ToArray()
-                    .GroupBy(p => ((int)p.GutterType, p.Series), p => (p.GutterDepth, p.GutterHeight, p.SegLength));
-                List<(int type, string serie)> errors = new List<(int type, string serie)>();
-                foreach (var group in groups) {
-                    var key = CheckRule(group.Key, group);
-                    if (key != null) {
-                        errors.Add(key.Value);
+                    .GroupBy(p => (p.GutterType.GetDescription(), p.Series), p =>(p.Name, size: (p.GutterDepth, p.GutterHeight, p.SegLength)));
+                LinkedList<object> errors = new();
+                foreach (var p in products) {
+                    HashSet<(double? GutterDepth, double? GutterHeight, double? SegLength)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1843,32 +1850,33 @@ namespace Bs.Nano.Electric.Report {
          2, 35)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_026() {
-            string? CheckRule(string key, IEnumerable<(double? PartitionHeight, double? PartitionLength)> sizes) {
-                HashSet<(double? PartitionHeight, double? PartitionLength)> values = new();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //string? CheckRule(string key, IEnumerable<(double? PartitionHeight, double? PartitionLength)> sizes) {
+            //    HashSet<(double? PartitionHeight, double? PartitionLength)> values = new();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
             using (var context = connector.Connect()) {
-                var groups = context.DbScsGutterPartitions
-                    .Select(p => new { p.Series, p.PartitionHeight, p.PartitionLength })
+                var products = context.DbScsGutterPartitions
+                    .Select(p => new { p.Series,p.Name, p.PartitionHeight, p.PartitionLength })
                     .ToArray()
-                    .GroupBy(p => p.Series, p => (p.PartitionHeight, p.PartitionLength));
-                List<string> errors = new List<string>();
-                foreach (var group in groups) {
-                    var key = CheckRule(group.Key, group);
-                    if (key != null) {
-                        errors.Add(key);
+                    .GroupBy(p => p.Series, p =>(p.Name, size: (p.PartitionHeight, p.PartitionLength)));
+                LinkedList<object> errors = new();
+                foreach (var p in products) {
+                    HashSet<(double? PartitionHeight, double? PartitionLength)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -1888,40 +1896,39 @@ namespace Bs.Nano.Electric.Report {
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_027() {
 
-            string? CheckRule(string key, IEnumerable<(double? CoverWidth, double? CoverLength)> sizes) {
-                HashSet<(double?, double?)> values = new();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //string? CheckRule(string key, IEnumerable<(double? CoverWidth, double? CoverLength)> sizes) {
+            //    HashSet<(double?, double?)> values = new();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
 
             using (var context = connector.Connect()) {
-                var groups = context.DbScsGutterCovers
-                    .Select(p => new { p.Series, p.CoverWidth, p.CoverLength })
+                var products = context.DbScsGutterCovers
+                    .Select(p => new { p.Series,p.Name, p.CoverWidth, p.CoverLength })
                     .ToArray()
-                    .GroupBy(p => p.Series, p => (p.CoverWidth, p.CoverLength));
-                List<string> errors = new List<string>();
-                foreach (var group in groups) {
-                    var key = CheckRule(group.Key, group);
-                    if (key != null) {
-                        errors.Add(key);
+                    .GroupBy(p => p.Series, p =>(p.Name, size: (p.CoverWidth, p.CoverLength)));
+                LinkedList<object> errors = new();
+                foreach (var p in products) {
+                    HashSet<(double?, double?)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
-
                     FailRuleTest($"Тест не пройден для {errors.Count} серий.",
                         errors);
                 }
-
             }
         }
         /// <summary>
@@ -1969,33 +1976,34 @@ namespace Bs.Nano.Electric.Report {
          2, 38)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_02_042() {
-            (int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth)> sizes) {
-                HashSet<(double? Height, double? Depth)> values = new HashSet<(double? Height, double? Depth)>();
-                bool isHaveDuplicateSisez = false;
-                foreach (var size in sizes) {
-                    bool isMatch = values.Contains(size);
-                    if (isMatch) {
-                        isHaveDuplicateSisez = true;
-                        break;
-                    }
-                    else {
-                        values.Add(size);
-                    }
-                }
-                return (isHaveDuplicateSisez) ? key : null;
-            };
+            //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth)> sizes) {
+            //    HashSet<(double? Height, double? Depth)> values = new HashSet<(double? Height, double? Depth)>();
+            //    bool isHaveDuplicateSisez = false;
+            //    foreach (var size in sizes) {
+            //        bool isMatch = values.Contains(size);
+            //        if (isMatch) {
+            //            isHaveDuplicateSisez = true;
+            //            break;
+            //        }
+            //        else {
+            //            values.Add(size);
+            //        }
+            //    }
+            //    return (isHaveDuplicateSisez) ? key : null;
+            //};
             var ft = ScsGutterFittingTypeEnum.CORK;
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
                         .Where(p => p.FittingType == ft)
-                        .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth })
+                        .Select(p => new { p.Code, p.Series, p.Name, p.Height, p.Depth })
                         .ToArray()
-                        .GroupBy(p => (p.FittingType, p.Series), p => (p.Height, p.Depth));
-                var errors = new LinkedList<(int type, string serie)>();
+                        .GroupBy(p => p.Series, p =>(p.Name,size: (p.Height, p.Depth)));
+                LinkedList<object> errors = new();
                 foreach (var p in products) {
-                    var key = CheckRule(((int)p.Key.FittingType, p.Key.Series), p);
-                    if (key != null) {
-                        errors.AddLast(key.Value);
+                    HashSet<(double?, double?)> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.size));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
                     }
                 }
                 if (errors.Count > 0) {
@@ -2006,7 +2014,7 @@ namespace Bs.Nano.Electric.Report {
             }
         }
 
-        [ReportRule(@"Для элементов ""Консоль"" должна быть внесена полезная ширина элемента.",
+        [ReportRule(@"Для элементов ""Консоль"" должна быть внесена полезная ширина элемента Length.",
          2, 39)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_03_001() {
@@ -2034,7 +2042,7 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        [ReportRule(@"Для элементов ""Профиль"" должна быть внесена длина элемента.",
+        [ReportRule(@"Для элементов ""Профиль"" должна быть внесена длина элемента ProfileLength.",
          2, 40)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_03_002() {
@@ -2051,8 +2059,8 @@ namespace Bs.Nano.Electric.Report {
                 //    else
                 //        errors.AddLast((p.Code, p.ProfileLength));
                 //}
-                var errors = products.Where(p => !(p.Length > 1))
-                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.Length)}:{p.Length}")
+                var errors = products.Where(p => !(p.ProfileLength > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.ProfileLength)}:{p.ProfileLength}")
                     .ToList();
                 if (errors.Count > 0) {
 
@@ -2095,7 +2103,7 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
                     .Where(p => p.CanalBoltingType == ft)
-                    .Select(p => new { p.Code, p.Series, p.MountType, p.StandType, p.Heigth });
+                    .Select(p => new { p.Code, p.Series,p.Name, p.MountType, p.StandType, p.Heigth });
                 var errors = new LinkedList<string>();
                 foreach (var p in products) {
                     if (p.Heigth > 1) {
@@ -2111,7 +2119,7 @@ namespace Bs.Nano.Electric.Report {
                             }
                         }
                     }
-                    errors.AddLast($"({p.Series}\\{p.Code}  {nameof(p.MountType)}:{p.MountType}, {nameof(p.StandType)}:{p.StandType}, {nameof(p.Heigth)}:{p.Heigth}");
+                    errors.AddLast($"({p.Series}\\{p.Name}  {nameof(p.MountType)}:{p.MountType?.GetDescription()}, {nameof(p.StandType)}:{p.StandType?.GetDescription()}, {nameof(p.Heigth)}:{p.Heigth}");
                 }
                 if (errors.Count > 0) {
 
@@ -2120,7 +2128,7 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        [ReportRule(@"Для элементов ""Шпилька"" должна быть внесена высота элемента.",
+        [ReportRule(@"Для элементов ""Шпилька"" должна быть внесена высота элемента Heigth.",
          2, 43)]
         [RuleCategory("Полнота заполнения технических данных.")]
         public void Rule_03_005() {
