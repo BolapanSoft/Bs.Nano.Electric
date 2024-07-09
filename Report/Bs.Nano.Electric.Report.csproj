@@ -13,7 +13,7 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
-		<PackageReference Include="Bs.XML.SpreadSheet" Version="1.6.11" />
+		<PackageReference Include="Bs.XML.SpreadSheet" Version="1.6.14" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="8.0.0" />
