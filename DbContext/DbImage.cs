@@ -11,6 +11,10 @@ namespace Nano.Electric
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")]
         public int Id { get; set; }
+        /// <summary>
+        /// Образ изображения в памяти.
+        /// </summary>
+        /// <remarks>Внутренний формат хранения изображений в nanoCad Elecnro - .png</remarks>
         [MaxLength(-1)]
         public byte[] Image { get; set; }
 
