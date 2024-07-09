@@ -1656,8 +1656,8 @@ namespace Bs.Nano.Electric.Report {
                 //    else
                 //        errors.AddLast((p.Code, p.CoverWidth));
                 //}
-                var errors = products.Where(p => !(p.CoverWidth1 > 1))
-                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.CoverWidth1)}:{p.CoverWidth1}")
+                var errors = products.Where(p => !(p.CoverWidth > 1))
+                    .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.CoverWidth)}:{p.CoverWidth}")
                     .ToList();
                 if (errors.Count > 0) {
 
