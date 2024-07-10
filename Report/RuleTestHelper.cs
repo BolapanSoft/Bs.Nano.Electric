@@ -140,8 +140,8 @@ namespace Bs.Nano.Electric.Report {
         public RuleCategoryAttribute(string testCategory) {
             testCategories = new List<string>(1) { testCategory };
         }
-        public RuleCategoryAttribute(params string[] testCategoryes) {
-            testCategories = testCategoryes;
+        public RuleCategoryAttribute(params string[] testCategories) {
+            this.testCategories = testCategories;
         }
     }
     //

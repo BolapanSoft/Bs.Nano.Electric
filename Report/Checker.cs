@@ -652,7 +652,7 @@ namespace Bs.Nano.Electric.Report {
 
         public const string sRule201 = @"Для прямых секций лотков должны быть внесены длина, ширина, высота лотка";
         [ReportRule(@"Для прямых секций лотков должны быть внесены длина, ширина, высота лотка",
-            2, 1), RuleCategory("Полнота заполнения технических данных.")]
+            2, 1), RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterCanal))]
         public void Rule_02_001() {
             using (var context = connector.Connect()) {
                 var scsGutterCanals = context.ScsGutterCanals
@@ -677,7 +677,7 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для перегородок должны быть внесены длина, высота",
             2, 2)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGutterPartition))]
         public void Rule_02_002() {
             using (var context = connector.Connect()) {
                 var products = context.DbScsGutterPartitions.ToList();
@@ -700,7 +700,7 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для крышек прямых секций должны быть внесены ширина, высота",
             2, 3)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGutterCover))]
         public void Rule_02_003() {
             using (var context = connector.Connect()) {
                 var products = context.DbScsGutterCovers
@@ -724,7 +724,7 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Секция соединительная переходная вертикальная"" должны быть внесены высота борта основного и отходящего элемента, ширина основного и отходящего элемента.",
             2, 4)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_004() {
             var ft = ScsGutterFittingTypeEnum.VERTICAL_PASSAGE;
             using (var context = connector.Connect()) {
@@ -753,7 +753,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule(@"Внутри серии элементов \""Секция соединительная переходная вертикальная\"" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента (HeightMainBranch, HeightOutBranch), ширина основного и отходящего элемента (WidthMainBranch, WidthOutBranch)].",
             2, 5)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_028() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> sizes) {
             //    HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>();
@@ -795,7 +795,7 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов \""Секция соединительная переходная горизонтальная\"" должны быть внесены высота борта основного и отходящего элемента, ширина основного и отходящего элемента.",
             2, 6)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_005() {
             var ft = ScsGutterFittingTypeEnum.HORIZONTAL_PASSAGE;
             using (var context = connector.Connect()) {
@@ -825,7 +825,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule(@"Внутри серии элементов \""Секция соединительная переходная горизонтальная\"" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента (HeightMainBranch, HeightOutBranch), ширина основного и отходящего элемента (WidthMainBranch, WidthOutBranch)].",
             2, 7)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_029() {
            //IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> CheckRule(IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> sizes) {
            //     HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>();
@@ -856,7 +856,7 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Секция соединительная переходная горизонтальная"" должен быть установлен тип перехода GutterPassageType",
             2, 8)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_007() {
 
             var ft = ScsGutterFittingTypeEnum.HORIZONTAL_PASSAGE;
@@ -882,7 +882,7 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Секция Т-образная горизонтальная"" должны быть внесены [высота борта основного и отходящего элемента (HeightMainBranch, HeightOutBranch), ширина основного и отходящего элемента (WidthMainBranch, WidthOutBranch)].",
             2, 9)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_008() {
             var ft = ScsGutterFittingTypeEnum.TRIPLE;
             using (var context = connector.Connect()) {
@@ -911,7 +911,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule(@"Внутри серии элементов ""Секция Т-образная горизонтальная"" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента (HeightMainBranch, HeightOutBranch), ширина основного и отходящего элемента (WidthMainBranch, WidthOutBranch)].",
             2, 10)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_030() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> sizes) {
             //    HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)> values = new HashSet<(double? WidthMainBranch, double? HeightMainBranch, double? WidthOutBranch, double? HeightOutBranch)>();
@@ -952,7 +952,7 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Секция угловая вертикальная внешняя"" должны быть внесены высота борта, ширина элемента и угол поворота.",
             2, 11)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_009() {
 
             var ft = ScsGutterFittingTypeEnum.VERTICAL_BEND_OUTER;
@@ -991,7 +991,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule(@"Внутри серии элементов ""Секция угловая вертикальная внешняя"" должно быть не более одного сочетания параметров [высота борта Height, ширина элемента Depth и угол поворота VerticalBendType].",
          2, 12)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_031() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> sizes) {
             //    HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> values = new HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)>();
@@ -1032,7 +1032,7 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Секция угловая вертикальная внутренняя"" должны быть внесены высота борта Height, ширина элемента Depth и угол поворота VerticalBendType.",
             2, 13)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_010() {
             var ft = ScsGutterFittingTypeEnum.VERTICAL_BEND_INNER;
             using (var context = connector.Connect()) {
@@ -1070,7 +1070,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule(@"Внутри серии элементов ""Секция угловая вертикальная внутренняя"" должно быть не более одного сочетания параметров [высота борта Height, ширина элемента Depth и угол поворота VerticalBendType].",
          2, 14)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_032() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> sizes) {
             //    HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)> values = new HashSet<(double? Height, double? Depth, ScsVerticalBendTypeEnum? VerticalBendType)>();
@@ -1113,7 +1113,7 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Секция угловая вертикальная универсальная"" должны быть внесены высота борта Height, ширина элемента Depth и угол поворота VerticalUniversalBendType.",
          2, 15)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_011() {
             var ft = ScsGutterFittingTypeEnum.VERTICAL_BENT_UNIVERSE;
             using (var context = connector.Connect()) {
@@ -1151,7 +1151,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule(@"Внутри серии элементов ""Секция угловая вертикальная универсальная"" должно быть не более одного сочетания параметров [высота борта Height, ширина элемента Depth и угол поворота VerticalUniversalBendType].",
          2, 16)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_033() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsVerticalUniversalBendTypeEnum? VerticalUniversalBendType)> sizes) {
             //    HashSet<(double? Height, double? Depth, ScsVerticalUniversalBendTypeEnum? VerticalUniversalBendType)> values = new HashSet<(double? Height, double? Depth, ScsVerticalUniversalBendTypeEnum? VerticalUniversalBendType)>();
@@ -1195,7 +1195,7 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Секция угловая горизонтальная"" должны быть внесены высота борта Height, ширина элемента Depth и угол поворота BendType.",
             2, 17)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_012() {
             var ft = ScsGutterFittingTypeEnum.BEND;
             using (var context = connector.Connect()) {
@@ -1233,7 +1233,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule(@"Внутри серии элементов ""Секция угловая горизонтальная"" должно быть не более одного сочетания параметров [высота борта Height, ширина элемента Depth и угол поворота BendType].",
          2, 18)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_034() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth, ScsBendTypeEnum? BendType)> sizes) {
             //    HashSet<(double? Height, double? Depth, ScsBendTypeEnum? BendType)> values = new HashSet<(double? Height, double? Depth, ScsBendTypeEnum? BendType)>();
@@ -1277,7 +1277,7 @@ namespace Bs.Nano.Electric.Report {
         public const string sRule013 = @"Для элементов ""Секция Х-образная горизонтальная"" должны быть внесены высота борта основного и отходящего элемента, ширина основного и отходящего элемента.";
         [ReportRule(@"Для элементов ""Секция Х-образная горизонтальная"" должны быть внесены высота борта основного и отходящего элемента, ширина основного и отходящего элемента.",
          2, 19)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_013() {
             Console.Write($"{GetIndex(nameof(Rule_02_013))}\t{sRule013}");
 
@@ -1310,7 +1310,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule("Внутри серии элементов \"Секция Х-образная горизонтальная\" должно быть не более одного сочетания параметров [высота борта основного и отходящего элемента (Height1Branch, Height2Branch), ширина основного и отходящего элемента (Width1Branch, Width2Branch)].",
          2, 20)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_035() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)> sizes) {
             //    HashSet<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)> values = new HashSet<(double? Width1Branch, double? Height1Branch, double? Width2Branch, double? Height2Branch)>();
@@ -1354,7 +1354,7 @@ namespace Bs.Nano.Electric.Report {
 
         [ReportRule("Внутри серии элементов \"Крышки\\Секция Х-образная горизонтальная\" должно быть не более одного сочетания параметров [ширина основного и отходящего элемента (CoverWidth1, CoverWidth2)].",
          2, 21)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
         public void Rule_02_014() {
 
             var ft = ScsGcCoverType.TRIPLE;
@@ -1384,7 +1384,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule("Внутри серии элементов \"Крышки\\Секция Т-образная горизонтальная\" должно быть не более одного сочетания параметров [ширина основного и отходящего элемента (CoverWidth1, CoverWidth2)].",
         2, 22)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
         public void Rule_02_036() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? CoverWidth1, double? CoverWidth2)> sizes) {
             //    HashSet<(double? CoverWidth1, double? CoverWidth2)> values = new HashSet<(double? CoverWidth1, double? CoverWidth2)>();
@@ -1428,7 +1428,7 @@ namespace Bs.Nano.Electric.Report {
         //public const string sRule015 = @"Для элементов ""Крышка угловая вертикальная внешняя"" должна быть внесена ширина элемента.";
         [ReportRule(@"Для элементов ""Крышка угловая вертикальная внешняя"" должна быть внесена ширина элемента.",
          2, 23)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
         public void Rule_02_015() {
             var ft = ScsGcCoverType.VERTICAL_BEND_OUTER;
             using (var context = connector.Connect()) {
@@ -1458,7 +1458,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule("Внутри серии элементов \"Крышка угловая вертикальная внешняя\" должно быть не более одного сочетания параметров [ширина элемента CoverWidth].",
          2, 24)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
         public void Rule_02_037() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<double?> sizes) {
             //    HashSet<double?> values = new HashSet<double?>();
@@ -1502,7 +1502,7 @@ namespace Bs.Nano.Electric.Report {
         public const string sRule016 = @"Для элементов ""Крышка угловая горизонтальная"" должна быть внесена ширина элемента";
         [ReportRule(@"Для элементов ""Крышка угловая горизонтальная"" должна быть внесена ширина элемента.",
          2, 25)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
         public void Rule_02_016() {
             var ft = ScsGcCoverType.BEND;
             using (var context = connector.Connect()) {
@@ -1528,7 +1528,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule("Внутри серии элементов \"Крышка угловая горизонтальная\" должно быть не более одного сочетания параметров [ширина элемента CoverWidth].",
          2, 26)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
         public void Rule_02_038() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<double?> sizes) {
             //    HashSet<double?> values = new HashSet<double?>();
@@ -1572,7 +1572,7 @@ namespace Bs.Nano.Electric.Report {
         public const string sRule017 = @"Для элементов ""Крышка Х-образная горизонтальная"" должны быть внесены ширина основного и отходящего элемента (CoverWidth1, CoverWidth2).";
         [ReportRule(@"Для элементов ""Крышка Х-образная горизонтальная"" должны быть внесены ширина основного и отходящего элемента.",
          2, 27)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
         public void Rule_02_017() {
             var ft = ScsGcCoverType.CROSS;
             using (var context = connector.Connect()) {
@@ -1602,7 +1602,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule("Внутри серии элементов \"Крышка Х - образная горизонтальная\" должно быть не более одного сочетания параметров [ширина основного и отходящего элемента (CoverWidth1, CoverWidth2)].",
          2, 28)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
         public void Rule_02_039() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? CoverWidth1, double? CoverWidth2)> sizes) {
             //    HashSet<(double? CoverWidth1, double? CoverWidth2)> values = new HashSet<(double? CoverWidth1, double? CoverWidth2)>();
@@ -1646,7 +1646,7 @@ namespace Bs.Nano.Electric.Report {
         public const string sRule018 = @"Для элементов ""Крышка угловая вертикальная внутренняя"" должна быть внесена ширина элемента.";
         [ReportRule(@"Для элементов ""Крышка угловая вертикальная внутренняя"" должна быть внесена ширина элемента.",
          2, 29)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
         public void Rule_02_018() {
             var ft = ScsGcCoverType.VERTICAL_BEND_INNER;
             using (var context = connector.Connect()) {
@@ -1676,7 +1676,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule("Внутри серии элементов \"Крышка угловая вертикальная внутренняя\" должно быть не более одного сочетания параметров [ширина элемента CoverWidth].",
          2, 30)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
         public void Rule_02_040() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<double?> sizes) {
             //    HashSet<double?> values = new HashSet<double?>();
@@ -1720,7 +1720,7 @@ namespace Bs.Nano.Electric.Report {
         //public const string sRule020 = @"Для прямых секций лотков должны быть внесены полезная ширина, высота лотка";
         [ReportRule(@"Для прямых секций лотков должны быть внесены полезная ширина GutterUsefullHeight, высота GutterUsefullDepth лотка.",
          2, 31)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterCanal))]
         public void Rule_02_019() {
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterCanals
@@ -1746,7 +1746,7 @@ namespace Bs.Nano.Electric.Report {
         public const string sRule021 = @"Для прямых секций лотков должен быть внесен график допустимой нагрузки.";
         [ReportRule(@"Для прямых секций лотков должен быть внесен график допустимой нагрузки.",
          2, 32)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterCanal))]
         public void Rule_02_021() {
             using (var context = connector.Connect()) {
                 var scsGutterCanals = context.ScsGutterCanals
@@ -1771,7 +1771,7 @@ namespace Bs.Nano.Electric.Report {
         /// <remarks>Учитываются свойства GutterType, Series</remarks>
         [ReportRule(@"Для всех лотков должен быть указан тип лотка GutterType и серия Series.",
         2, 33)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterCanal))]
         public void Rule_02_022() {
             Dictionary<(int, string), (double, double, double)> knownSeries = new Dictionary<(int, string), (double, double, double)>();
 
@@ -1802,7 +1802,7 @@ namespace Bs.Nano.Electric.Report {
         /// <remarks>Учитываются свойства GutterType, Series, GutterDepth, GutterHeight, SegLength</remarks>
         [ReportRule(@"Внутри серии лотка должно быть не более одного сочетания параметров [Высота борта GutterHeight]x[ширина GutterDepth]x[длина секции SegLength].",
           2, 34)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterCanal))]
         public void Rule_02_023() {
 
             //(int GutterType, string Series)? CheckRule((int GutterType, string Series) key, IEnumerable<(double? GutterDepth, double? GutterHeight, double? SegLength)> sizes) {
@@ -1848,7 +1848,7 @@ namespace Bs.Nano.Electric.Report {
         /// <remarks>Учитываются свойства Series, PartitionHeight, PartitionLength</remarks>
         [ReportRule(@"Внутри серии разделительных перегородок должно быть не более одного сочетания параметров [Высота PartitionHeight]x[длина секции PartitionLength].",
          2, 35)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGutterPartition))]
         public void Rule_02_026() {
             //string? CheckRule(string key, IEnumerable<(double? PartitionHeight, double? PartitionLength)> sizes) {
             //    HashSet<(double? PartitionHeight, double? PartitionLength)> values = new();
@@ -1893,7 +1893,7 @@ namespace Bs.Nano.Electric.Report {
         /// <remarks>Учитываются свойства Series, CoverWidth, CoverLength</remarks>
         [ReportRule(@"Внутри серии крышек прямых секций лотков должно быть не более одного сочетания параметров [Ширина CoverWidth]x[длина секции CoverLength].",
           2, 36)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGutterCover))]
         public void Rule_02_027() {
 
             //string? CheckRule(string key, IEnumerable<(double? CoverWidth, double? CoverLength)> sizes) {
@@ -1936,7 +1936,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule("Для элементов  \"Торцевая заглушка\" должны быть внесены параметры [высота борта Height, ширина элемента Depth].",
          2, 37)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_041() {
             bool CheckRule(double? Height, double? Depth) {
 
@@ -1974,7 +1974,7 @@ namespace Bs.Nano.Electric.Report {
         /// </summary>
         [ReportRule("Внутри серии элементов  \"Торцевая заглушка\" должно быть не более одного сочетания параметров [высота борта Height, ширина элемента Depth].",
          2, 38)]
-        [RuleCategory("Полнота заполнения технических данных.")]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGcFitting))]
         public void Rule_02_042() {
             //(int type, string serie)? CheckRule((int type, string serie) key, IEnumerable<(double? Height, double? Depth)> sizes) {
             //    HashSet<(double? Height, double? Depth)> values = new HashSet<(double? Height, double? Depth)>();
@@ -2016,8 +2016,8 @@ namespace Bs.Nano.Electric.Report {
 
         [ReportRule(@"Для элементов ""Консоль"" должна быть внесена полезная ширина элемента Length.",
          2, 39)]
-        [RuleCategory("Полнота заполнения технических данных.")]
-        public void Rule_03_001() {
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterBolting))]
+        public void Rule_02_050() {
 
             var ft = ScsGutterBoltingTypeEnum.CONSOLE;
             using (var context = connector.Connect()) {
@@ -2044,8 +2044,8 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Профиль"" должна быть внесена длина элемента ProfileLength.",
          2, 40)]
-        [RuleCategory("Полнота заполнения технических данных.")]
-        public void Rule_03_002() {
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterBolting))]
+        public void Rule_02_051() {
             var ft = ScsGutterBoltingTypeEnum.PROFILE;
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
@@ -2071,8 +2071,8 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Скоба"" должна быть внесена полезная ширина элемента Length.",
          2, 41)]
-        [RuleCategory("Полнота заполнения технических данных.")]
-        public void Rule_03_003() {
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterBolting))]
+        public void Rule_02_052() {
             var ft = ScsGutterBoltingTypeEnum.CRAMP;
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
@@ -2097,8 +2097,8 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Стойка"" должны быть внесены крепление MountType, вид стойки StandType, высота элемента Heigth.",
            2, 42)]
-        [RuleCategory("Полнота заполнения технических данных.")]
-        public void Rule_03_004() {
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterBolting))]
+        public void Rule_02_053() {
             var ft = ScsGutterBoltingTypeEnum.POST;
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
@@ -2130,8 +2130,8 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Шпилька"" должна быть внесена высота элемента Heigth.",
          2, 43)]
-        [RuleCategory("Полнота заполнения технических данных.")]
-        public void Rule_03_005() {
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterBolting))]
+        public void Rule_02_054() {
             var ft = ScsGutterBoltingTypeEnum.STUD;
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
@@ -2157,8 +2157,8 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""L- подвес или C- подвес"" должны быть внесена высота элемента.",
          2, 44)]
-        [RuleCategory("Полнота заполнения технических данных.")]
-        public void Rule_03_006() {
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterBolting))]
+        public void Rule_02_055() {
             var ft = ScsGutterBoltingTypeEnum.CONSOLE;
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
@@ -2184,8 +2184,8 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Перекладина"" должна быть внесена полезная ширина элемента.",
          2, 45)]
-        [RuleCategory("Полнота заполнения технических данных.")]
-        public void Rule_03_007() {
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterBolting))]
+        public void Rule_02_056() {
             var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
             using (var context = connector.Connect()) {
                 var products = context.ScsGutterBoltings
@@ -2211,8 +2211,8 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" с типом элемента ""Другой"" должно быть внесено значение DbOtherName (Тип элемента).",
          2, 46)]
-        [RuleCategory("Полнота заполнения технических данных.")]
-        public void Rule_03_008() {
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
+        public void Rule_02_057() {
             //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
             using (var context = connector.Connect()) {
                 var products = context.ScsTubeFittings
