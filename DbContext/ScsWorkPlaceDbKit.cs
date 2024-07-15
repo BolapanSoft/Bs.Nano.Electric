@@ -33,7 +33,7 @@ namespace Nano.Electric
         public double? DbWidth { get; set; }
 
         public double? DbDepth { get; set; }
-
+        [MaxLength(-1)]
         public string KitStructure { get; set; }
 
         public int? OrderNumber { get; set; }

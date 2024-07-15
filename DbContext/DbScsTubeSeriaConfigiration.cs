@@ -23,7 +23,7 @@ namespace Nano.Electric
         public string TripleSeria { get; set; }
 
         public string CrossSeria { get; set; }
-
+        [MaxLength(-1)]
         public string KitStructure { get; set; }
 
         public int? OrderNumber { get; set; }

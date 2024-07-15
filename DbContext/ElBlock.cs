@@ -37,7 +37,7 @@ namespace Nano.Electric
 #if !InitDbContextEnums
         public int? ContactType { get; set; } 
 #endif
-
+        [MaxLength(-1)]
         public string KitStructure { get; set; }
 
         public int? CwPCode { get; set; }
