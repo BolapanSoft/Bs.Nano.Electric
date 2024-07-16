@@ -5,6 +5,9 @@ using System.Xml;
 using System.Xml.Serialization;
 
 namespace Nano.Electric {
+    /// <summary>
+    /// Представляет элемент комплектации "Стойка"
+    /// </summary>
     [XmlRoot("DbGcKnotStand")]
     public class DbGcKnotStand : KitElement, IXmlSerializable {
         public bool IsEnabled { get; set; }

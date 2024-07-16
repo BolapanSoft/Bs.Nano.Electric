@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Collections.Generic;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace Nano.Electric {
@@ -14,6 +15,7 @@ namespace Nano.Electric {
         public bool IsEnabled { get; set; }
         public bool IsUse { get; set; }
         public int Number { get; set; }
+        public IEnumerable<DbGcKnotPlain> KnotPlains=>GetChildren<DbGcKnotPlain>();
         public void AddChild(DbGcKnotPlain knotPlain) {
             Children.Add(knotPlain);
         }
