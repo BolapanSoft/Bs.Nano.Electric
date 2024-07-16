@@ -27,7 +27,7 @@ namespace Nano.Electric
         public bool? LayerIsPrintable { get; set; }
 
         public int? LayerLineWeigh { get; set; }
-
+        [MaxLength(-1)]
         public string KitStructure { get; set; }
 
         public int? OrderNumber { get; set; }

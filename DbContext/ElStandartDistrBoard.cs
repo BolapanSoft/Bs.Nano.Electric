@@ -51,7 +51,7 @@ namespace Nano.Electric
         public string SpecDescription { get; set; }
 
         public int? IsExplSafe { get; set; }
-
+        [MaxLength(-1)]
         public string KitStructure { get; set; }
 
         public int? CwPCode { get; set; }
