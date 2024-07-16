@@ -15,6 +15,7 @@ using System.Runtime.Remoting.Contexts;
 namespace Nano.Electric {
     public partial class Context {
         private static Dictionary<string, string[]> propertiesCache = new Dictionary<string, string[]>();
+        private static readonly Dictionary<Type, string> knownLocalizeValues = new Dictionary<Type, string>();
         public Context(DbConnection existingConnection, bool contextOwnsConnection) : base(existingConnection, contextOwnsConnection) {
 
         }
@@ -172,6 +173,14 @@ namespace Nano.Electric {
                 .ToArray();
             propertiesCache[typeName] = properties;
             return properties;
+        }
+        public static string GetDefaultLocalizeValue<T>() where T:class {
+            Type productType = typeof(T);
+            if (knownLocalizeValues.ContainsKey(productType))
+                return knownLocalizeValues[productType];
+            var value = productType.GetCustomAttribute<DefaultLocalizeValueAttribute>()?.DefaultLocalizeValue ?? string.Empty;
+            knownLocalizeValues.Add(productType, value);
+            return value;
         }
     }
 }
