@@ -52,8 +52,7 @@ namespace Nano.Electric
         public double? ShockIkz { get; set; }
 
         public string SpecDescription { get; set; }
-
-
+        [MaxLength(-1)]
         public string KitStructure { get; set; }
 
         public int? CwPCode { get; set; }
