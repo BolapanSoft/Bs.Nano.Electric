@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Bs.Nano.Electric.Model;
 using Bs.Nano.Electric;
 using System.Data.Entity;
+using System.Data.SqlServerCe;
 
 namespace Bs.Nano.Electric.Report {
     /// <summary>
@@ -125,22 +126,23 @@ namespace Bs.Nano.Electric.Report {
                     int count = 0;
                     try {
                         count = RuleTestHelper.GetCount(dbSet);
+                        if (count > 0) {
+                            logger.LogInformation($"Таблица \"{tableName}\": {count} элементов.");
+                        }
                     }
                     catch (Exception ex) {
-                        string getMessage(Exception ex) {
-                            if (ex.InnerException is null) {
-                                return ex.Message;
-                            }
-                            else {
-                                return getMessage(ex.InnerException);
-                            }
-                        }
-                        logger.LogError($"Ошибка обращения к таблице \"{tableName}\": {getMessage(ex)}");
+                        //string getMessage(Exception ex) {
+                        //    if (ex.InnerException is null) {
+                        //        return ex.Message;
+                        //    }
+                        //    else {
+                        //        return getMessage(ex.InnerException);
+                        //    }
+                        //}
+                        //logger.LogError($"Ошибка обращения к таблице \"{tableName}\": {getMessage(ex)}");
                         count = 0;
                     }
-                    if (count > 0) {
-                        logger.LogInformation($"Таблица \"{tableName}\": {count} элементов.");
-                    }
+                    
                 }
             }
         }
@@ -297,7 +299,12 @@ namespace Bs.Nano.Electric.Report {
         }
         [ReportRule(@"В базе значения артикула должны быть уникальными.", 4, 0), RuleCategory("Общие рекомендации.")]
         public void Rule_01_000() {
-            List<(string Code, string TableName, string TypeDescription)> allCodes = new ();
+            var allCodes = LoadAllCodes();
+            CheckCodesIsUniqueness(allCodes);
+        }
+
+        private List<(string Code, string ArticleName, string TableName, string TypeDescription)> LoadAllCodes() {
+            List<(string Code, string ArticleName, string TableName, string TypeDescription)> allCodes = new();
             string getDescription(Type type) {
                 var attr = type.GetCustomAttribute<DefaultLocalizeValueAttribute>();
                 return attr?.DefaultLocalizeValue ?? string.Empty;
@@ -306,93 +313,124 @@ namespace Bs.Nano.Electric.Report {
                 {
                     var description = getDescription(typeof(ScsGutterCanal));
                     var products = context.ScsGutterCanals
-                        .Select(p => p.Code)
+                        .Select(p => new { p.Code, p.SpecDescription })
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterCanals), description));
+                        allCodes.Add((p.Code, p.SpecDescription, nameof(context.ScsGutterCanals), description));
                     }
                 }
                 {
                     var description = getDescription(typeof(DbScsGutterCover));
                     var products = context.DbScsGutterCovers
-                        .Select(p => p.Code)
+                        .Select(p => new { p.Code, p.SpecDescription })
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.DbScsGutterCovers), description));
+                        allCodes.Add((p.Code, p.SpecDescription, nameof(context.DbScsGutterCovers), description));
                     }
                 }
                 {
                     var description = getDescription(typeof(DbScsGutterPartition));
                     var products = context.DbScsGutterPartitions
-                        .Select(p => p.Code)
+                        .Select(p => new { p.Code, p.SpecDescription })
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.DbScsGutterPartitions), description));
+                        allCodes.Add((p.Code, p.SpecDescription, nameof(context.DbScsGutterPartitions), description));
                     }
                 }
                 {
                     var description = getDescription(typeof(ScsGcFitting));
                     var products = context.ScsGcFittings
-                        .Select(p => p.Code)
+                        .Select(p => new { p.Code, p.SpecDescription })
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGcFittings), description));
+                        allCodes.Add((p.Code, p.SpecDescription, nameof(context.ScsGcFittings), description));
                     }
                 }
                 {
                     var description = getDescription(typeof(DbScsGcCoverUnit));
                     var products = context.DbScsGcCoverUnits
-                        .Select(p => p.Code)
+                        .Select(p => new { p.Code, p.SpecDescription })
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.DbScsGcCoverUnits), description));
+                        allCodes.Add((p.Code, p.SpecDescription, nameof(context.DbScsGcCoverUnits), description));
                     }
                 }
                 {
                     var description = getDescription(typeof(DbScsGcAccessoryUnit));
                     var products = context.DbScsGcAccessoryUnits
-                        .Select(p => p.Code)
+                        .Select(p => new { p.Code, p.SpecDescription })
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.DbScsGcAccessoryUnits), description));
+                        allCodes.Add((p.Code, p.SpecDescription, nameof(context.DbScsGcAccessoryUnits), description));
                     }
                 }
                 {
                     var description = getDescription(typeof(ScsGutterBolting));
                     var products = context.ScsGutterBoltings
-                        .Select(p => p.Code)
+                        .Select(p => new { p.Code, p.SpecDescription })
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.ScsGutterBoltings), description));
+                        allCodes.Add((p.Code, p.SpecDescription, nameof(context.ScsGutterBoltings), description));
                     }
                 }
                 {
                     var description = getDescription(typeof(DbScsGcBoltingAccessoryUnit));
                     var products = context.DbScsGcBoltingAccessoryUnits
-                        .Select(p => p.Code)
+                        .Select(p => new { p.Code, p.SpecDescription })
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.DbScsGcBoltingAccessoryUnits), description));
+                        allCodes.Add((p.Code, p.SpecDescription, nameof(context.DbScsGcBoltingAccessoryUnits), description));
                     }
                 }
                 {
                     var description = getDescription(typeof(CaeMaterialUtility));
                     var products = context.CaeMaterialUtilities
-                        .Select(p => p.Code)
+                        .Select(p => new { p.Code, p.SpecDescription })
                         ;
                     foreach (var p in products) {
-                        allCodes.Add((p, nameof(context.CaeMaterialUtilities), description));
+                        allCodes.Add((p.Code, p.SpecDescription, nameof(context.CaeMaterialUtilities), description));
                     }
                 }
-                CheckCodesIsUniqueness(allCodes);
+                
             }
+
+            return allCodes;
         }
+        public static List<string> GetTablesWithCodeFieldAndRecords(DbContext context) {
+            var tableNames = new List<string>();
+            var connection = (SqlCeConnection)context.Database.Connection;
+
+            // Открываем соединение
+            connection.Open();
+
+            var schema = connection.GetSchema("Tables");
+            foreach (System.Data.DataRow row in schema.Rows) {
+                string tableName = row["TABLE_NAME"].ToString();
+                string query = $"SELECT COUNT(*) FROM [{tableName}] WHERE [Code] IS NOT NULL";
+
+                using (var command = new SqlCeCommand(query, connection)) {
+                    try {
+                        int count = (int)command.ExecuteScalar();
+                        if (count > 0) {
+                            tableNames.Add(tableName);
+                        }
+                    }
+                    catch (SqlCeException) {
+                        // Пропускаем таблицы, у которых нет поля "Code"
+                    }
+                }
+            }
+
+            connection.Close();
+            return tableNames;
+        }
+
         /// <summary>
         /// Осуществляет проверку уникальности поля <paramref name="Code"/> во входных данных.
         /// </summary>
         /// <param name="allCodes">Массив входных данных.</param>
         /// <exception cref="RuleTestException">Правило уникальности кода нарушено.</exception>
-        public static void CheckCodesIsUniqueness(IEnumerable<(string Code, string TableName, string TableDescription)> allCodes) {
+        public static void CheckCodesIsUniqueness(IEnumerable<(string Code, string ArticleName, string TableName, string TableDescription)> allCodes) {
             var errors = allCodes.GroupBy(item => item.Code)
                                 .Where(group => group.Count() > 1);
             if (errors.Any()) {
@@ -402,7 +440,7 @@ namespace Bs.Nano.Electric.Report {
         }
 
         /**/
-        public const string sRule001 = @"В таблице DbImages должен быть внесен файл ""File not found"" под индексом id==0";
+        //public const string sRule001 = @"В таблице DbImages должен быть внесен файл ""File not found"" под индексом id==0";
         [ReportRule(@"В таблице DbImages должен быть внесен файл ""File not found.png"" под индексом id==0",
             4, 1), RuleCategory("Общие рекомендации.")]
         public void Rule_01_001() {
@@ -649,8 +687,19 @@ namespace Bs.Nano.Electric.Report {
 
             }
         }
+        [ReportRule(@"Для всех элементов должен быть внесен артикул.",
+            4, 5), RuleCategory("Общие рекомендации.")]
+        public void Rule_01_005() {
+            var allCodes = LoadAllCodes();
+            var errors = allCodes.Where(item => string.IsNullOrEmpty(item.Code));
+            if (errors.Any()) {
+                var message = $"Имеются не заполненные артикулы.";
+                FailRuleTest(message, errors);
+            }
+        }
+       
 
-        public const string sRule201 = @"Для прямых секций лотков должны быть внесены длина, ширина, высота лотка";
+        //public const string sRule201 = @"Для прямых секций лотков должны быть внесены длина, ширина, высота лотка";
         [ReportRule(@"Для прямых секций лотков должны быть внесены длина, ширина, высота лотка",
             2, 1), RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterCanal))]
         public void Rule_02_001() {
