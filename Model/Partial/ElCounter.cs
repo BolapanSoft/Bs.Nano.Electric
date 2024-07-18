@@ -14,6 +14,8 @@ namespace Nano.Electric {
         public ElDimensionType InnerDimensionType { get; set; }
         public ElCounterType CounterType { get; set; }
         public ElControlMeasureDeviceInstallType InstallType { get; set; }
+        public PhaseCountEnum? PoleCount { get; set; }
+        
 #endif
     }
 }

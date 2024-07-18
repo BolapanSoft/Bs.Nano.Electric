@@ -14,11 +14,12 @@ namespace Nano.Electric
         public int? DbInstType { get; set; }
         public int? DbSafeDegree { get; set; }
         public int? DbClimate { get; set; }
-  
+
 
 #endif
         public string Code { get; set; }
 
+        public int? PoleCount { get; set; } = 1;
 
         public double? DbDepth { get; set; }
 
@@ -63,7 +64,6 @@ namespace Nano.Electric
 
         public int? ExplodeLevel { get; set; }
 
-        public int? PoleCount { get; set; }
 
         public string EtmCode { get; set; }
 

@@ -22,6 +22,7 @@ namespace Nano.Electric
         public int? InnerDimensionType { get; set; }
         public int? CounterType { get; set; }
         public int? InstallType { get; set; }
+        public int? PoleCount { get; set; }
 
 #endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -49,7 +50,6 @@ namespace Nano.Electric
 
         public string Code { get; set; }
 
-        public int? PoleCount { get; set; }
 
         public string accuracyClass { get; set; }
 

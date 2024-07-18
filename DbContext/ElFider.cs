@@ -9,6 +9,9 @@ namespace Nano.Electric
     [Table("ElFider")]
     public partial class ElFider
     {
+#if !InitDbContextEnums
+#else
+#endif
         public int? BlockParent { get; set; }
 
         public int? BlockParent_index { get; set; }

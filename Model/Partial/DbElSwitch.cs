@@ -13,7 +13,6 @@ namespace Nano.Electric {
         public int? SafeDegree { get; set; }
         [Column("DbClimate")]
         public int? Climate { get; set; }
-
 #endif
     }
 }

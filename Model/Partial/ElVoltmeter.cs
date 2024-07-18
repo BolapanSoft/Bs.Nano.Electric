@@ -12,6 +12,8 @@ namespace Nano.Electric {
         public ElDimensionType DimensionType { get; set; }
         public ElDimensionType FacadeDimensionType { get; set; }
         public ElDimensionType InnerDimensionType { get; set; }
+        public PhaseCountEnum? PoleCount { get; set; } = PhaseCountEnum.THREE;
+
 #endif
     }
 }
