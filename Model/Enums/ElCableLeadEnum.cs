@@ -3,11 +3,11 @@ using System.ComponentModel;
 namespace Nano.Electric.Enums {
     public enum ElCableLeadEnum
 	{
-		[Description("Cверху")]
+		[Description("Сверху")]
 		LEAD_UP = 0,
-		[Description("Cнизу")]
+		[Description("Снизу")]
 		LEAD_DOWN = 1,
-		[Description("Cнизу и сверху")]
+		[Description("Снизу и сверху")]
 		LEAD_UP_DOWN = 2
 	}
 }
