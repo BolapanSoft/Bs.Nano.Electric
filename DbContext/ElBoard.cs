@@ -40,7 +40,6 @@ namespace Nano.Electric
 #if VER23_1
         public string DbClassificatorCode { get; set; }
         public string SafeDegreeIk { get; set; }
-        public int? DbGraphicRef { get; set; }
 #endif
         public double? DbVoltage { get; set; }
 
@@ -48,6 +47,7 @@ namespace Nano.Electric
 
         public double? ShockIkz { get; set; }
 
+        public int? DbGraphicRef { get; set; }
 
 
 

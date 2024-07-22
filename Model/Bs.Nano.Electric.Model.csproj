@@ -8,7 +8,7 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>Nano.Electric</RootNamespace>
 		<BaseOutputPath>..\bin\</BaseOutputPath>
-		<VersionSuffix>018</VersionSuffix>
+		<VersionSuffix>019</VersionSuffix>
 		<Version>$(VersionPrefix).$(VersionSuffix)</Version>
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>
