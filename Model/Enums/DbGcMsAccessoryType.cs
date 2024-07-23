@@ -5,26 +5,26 @@ using DescriptionAttribute = System.ComponentModel.DescriptionAttribute;
 namespace Nano.Electric.Enums {
     //[Enum(new object[]
     //{
-    //    DbGcMsAccesoryType.SWIVEL_V,
+    //    DbGcMsAccessoryType.SWIVEL_V,
     //    WireCommonLocalizationDictionary.ШарнирВертикальный,
-    //    DbGcMsAccesoryType.SWIVEL_H,
+    //    DbGcMsAccessoryType.SWIVEL_H,
     //    WireCommonLocalizationDictionary.ШарнирГоризонтальный,
-    //    DbGcMsAccesoryType.BRANCH_U,
+    //    DbGcMsAccessoryType.BRANCH_U,
     //    WireCommonLocalizationDictionary.ОтветвительУниверсальный,
-    //    DbGcMsAccesoryType.PASS_V,
+    //    DbGcMsAccessoryType.PASS_V,
     //    WireCommonLocalizationDictionary.ПереходникУниверсальныйВертикальный,
-    //    DbGcMsAccesoryType.PASS_H,
+    //    DbGcMsAccessoryType.PASS_H,
     //    WireCommonLocalizationDictionary.ПереходникУниверсальныйГоризонтальный,
-    //    DbGcMsAccesoryType.PLAIN_JOINT,
+    //    DbGcMsAccessoryType.PLAIN_JOINT,
     //    WireCommonLocalizationDictionary.ПластинаСоединительнаяНаБорт,
-    //    DbGcMsAccesoryType.PLAIN_RIGED,
+    //    DbGcMsAccessoryType.PLAIN_RIGED,
     //    WireCommonLocalizationDictionary.ПластинаСоединительнаяНаОснование,
-    //    DbGcMsAccesoryType.FOOT_ANGLE,
+    //    DbGcMsAccessoryType.FOOT_ANGLE,
     //    WireCommonLocalizationDictionary.УголокОпорный,
-    //    //DbGcMsAccesoryType.OTHER,
+    //    //DbGcMsAccessoryType.OTHER,
     //    // Cadwise.CAE.Model.Localization.CaeModelLocalizationDictionary.Другой
     //})]
-    public enum DbGcMsAccesoryType {
+    public enum DbGcMsAccessoryType {
         [Description("Другой")]
         OTHER = 0,
         [Description("Шарнир вертикальный")]

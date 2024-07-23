@@ -7,8 +7,8 @@ namespace Nano.Electric {
     /// Аксессуар
     /// </summary>
     /// <remarks>Представляет дочерний элемент конфигурации соединительных элементов.</remarks>
-    [XmlRoot(nameof(DbGcMsAcceesory))]
-    public class DbGcMsAcceesory : KitElement, IXmlSerializable {
+    [XmlRoot(nameof(DbGcMsAccessory))]
+    public class DbGcMsAccessory : KitElement, IXmlSerializable {
         /// <summary>
         /// Количество
         /// </summary>
@@ -22,16 +22,17 @@ namespace Nano.Electric {
         /// <summary>
         /// Тип аксессуара
         /// </summary>
-        public DbGcMsAccesoryType AccessoryType { get; set; }
-        public DbGcMsAcceesory() {
-            AccessoryType = DbGcMsAccesoryType.OTHER;
+        public DbGcMsAccessoryType AccessoryType { get; set; }
+        public DbGcMsAccessory() {
+            AccessoryType = DbGcMsAccessoryType.OTHER;
             Count = 1;
             //IsUse = true;
         }
-        public static DbGcMsAcceesory From(DbScsGcAccessoryUnit accessoryUnit) {
-            Throw.IfNull(accessoryUnit);
-            return new DbGcMsAcceesory {
-                AccessoryType = accessoryUnit.AccessoryType!.Value,
+        public static DbGcMsAccessory From(DbScsGcAccessoryUnit accessoryUnit) {
+            Throw.IfNull(accessoryUnit, nameof(accessoryUnit));
+            //Throw.IfNull(accessoryUnit.AccessoryType, nameof(accessoryUnit.AccessoryType));
+            return new DbGcMsAccessory {
+                AccessoryType = accessoryUnit.AccessoryType,
                 DbSeria = accessoryUnit.Series,
                 DbOtherName = accessoryUnit.DbOtherName
             };

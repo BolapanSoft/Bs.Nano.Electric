@@ -26,8 +26,8 @@ namespace Bs.Nano.Electric.Report {
         IdCounter counter = new IdCounter();
         //ILogger logger = DI.Provider.GetService<ILogger<Report>>()!;
         //INanocadDBConnector connector = DI.Provider.GetService<INanocadDBConnector>()!;
-        private readonly ILogger logger;
-        private readonly INanocadDBConnector connector;
+        protected readonly ILogger logger;
+        protected readonly INanocadDBConnector connector;
 
 
         public Checker(ILogger logger, INanocadDBConnector connector) {
@@ -244,7 +244,7 @@ namespace Bs.Nano.Electric.Report {
                     logger.LogInformation($"Таблица \"{Resources.ImageCategory["DbScsGcAccessoryUnit"]}\": {productCount} элементов.");
                     {
                         string GutterType(int value) {
-                            var enumValue = (DbGcMsAccesoryType)value;
+                            var enumValue = (DbGcMsAccessoryType)value;
                             return enumValue.GetDescription();
                         }
                         var group = Resources.ImageCategory["ScsGutterCanal"];
@@ -253,7 +253,7 @@ namespace Bs.Nano.Electric.Report {
                             .ToArray();
                         var groups = groupsArr
                             .Select(p => new {
-                                GutterType = GutterType(p.AccessoryType.HasValue ? (int)p.AccessoryType.Value : 0),
+                                GutterType = GutterType((int)p.AccessoryType),
                                 Serie = TopSerieLevel(p.Series)
                             })
                             .GroupBy(item => (item.GutterType, item.Serie))
@@ -2262,6 +2262,33 @@ namespace Bs.Nano.Electric.Report {
          2, 46)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
         public void Rule_02_057() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.ScsTubeFittings
+                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.OTHER)
+                    .ToList();
+                //    .Select(p => new { p.Code, p.DbOtherName });
+                //var errors = new LinkedList<(string Code, string?)>();
+                //foreach (var p in products) {
+                //    if (!string.IsNullOrEmpty(p.DbOtherName))
+                //        continue;
+                //    else
+                //        errors.AddLast((p.Code, p.DbOtherName));
+                //}
+                var errors = products.Where(p => !string.IsNullOrEmpty(p.DbOtherName))
+                   .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.DbOtherName)}:\"{p.DbOtherName}\"")
+                   .ToList();
+                if (errors.Count > 0) {
+
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для элементов ""Аксессуары лотков"" должно быть внесено значение AccessoryType (Тип элемента).",
+         2, 47)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcAccessoryUnit))]
+        public void Rule_02_047() {
             //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
             using (var context = connector.Connect()) {
                 var products = context.ScsTubeFittings
