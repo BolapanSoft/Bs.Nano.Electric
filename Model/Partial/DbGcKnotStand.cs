@@ -31,9 +31,11 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
         }
         public void AddChild(DbGcKnotLevel unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
         }
 
@@ -69,12 +71,14 @@ namespace Nano.Electric {
             IsUse = false;
         }
         public void SetGutterSeria(ScsGutterCanal element) {
+            Throw.IfNull(element);
             GutterSeria = element.Series;
             IsEnabled = true;
             IsUse = true;
             return;
         }
         public void SetGutterCoverSeria(DbScsGutterCover element) {
+            Throw.IfNull(element);
             GutterCoverSeria = element.Series;
             IsEnabled = true;
             return;
@@ -86,6 +90,7 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             IsEnabled = true;
             Children.Add(unit);
         }
@@ -128,6 +133,7 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             IsEnabled = true;
             Children.Add(unit);
         }
@@ -166,6 +172,7 @@ namespace Nano.Electric {
         public string? BendCoverSeria { get; private set; }
         public string? BendSeria { get; private set; }
         public void SetBendSeria(ScsGcFitting gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.FittingType == ScsGutterFittingTypeEnum.BEND
                   && IsCompatible(gutterFitting)) {
                 BendSeria = gutterFitting.Series;
@@ -178,6 +185,7 @@ namespace Nano.Electric {
                     $"Для присвоения серии элементу {ScsGutterFittingTypeEnum.BEND.GetDescription()} необходимо передать экземпляр типа \"Лотки\\{ScsGutterFittingTypeEnum.BEND.GetDescription()} с углом поворота {BendType.GetDescription()}\"");
         }
         public void SetBendCoverSeria(DbScsGcCoverUnit gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.CoverType == ScsGcCoverType.BEND) {
                 BendCoverSeria = gutterFitting.Series;
                 IsEnabled = true;
@@ -227,10 +235,12 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
         public void AddChild(DbGcMsAcceesory unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
@@ -265,6 +275,7 @@ namespace Nano.Electric {
         public string? BendInnerCoverSeria { get; private set; }
         public string? BendInnerSeria { get; private set; }
         public void SetBendInnerSeria(ScsGcFitting gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.FittingType == ScsGutterFittingTypeEnum.VERTICAL_BEND_INNER
                   && gutterFitting.VerticalBendType == this.BendType) {
                 BendInnerSeria = gutterFitting.Series;
@@ -277,6 +288,7 @@ namespace Nano.Electric {
                     $"Для присвоения серии элементу {ScsGutterFittingTypeEnum.VERTICAL_BEND_INNER.GetDescription()} необходимо передать экземпляр типа \"Лотки\\{ScsGutterFittingTypeEnum.VERTICAL_BEND_INNER.GetDescription()} с углом поворота {BendType.GetDescription()}\"");
         }
         public void SetBendInnerCoverSeria(DbScsGcCoverUnit gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.CoverType == ScsGcCoverType.VERTICAL_BEND_INNER) {
                 BendInnerCoverSeria = gutterFitting.Series;
                 IsEnabled = true;
@@ -308,10 +320,12 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
         public void AddChild(DbGcMsAcceesory unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
@@ -345,6 +359,7 @@ namespace Nano.Electric {
         public string? BendOuterCoverSeria { get; private set; }
         public string? BendOuterSeria { get; private set; }
         public void SetBendOuterSeria(ScsGcFitting gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.FittingType == ScsGutterFittingTypeEnum.VERTICAL_BEND_OUTER
                   && gutterFitting.VerticalBendType == this.BendType) {
                 BendOuterSeria = gutterFitting.Series;
@@ -357,6 +372,7 @@ namespace Nano.Electric {
                     $"Для присвоения серии элементу {ScsGutterFittingTypeEnum.VERTICAL_BEND_OUTER.GetDescription()} необходимо передать экземпляр типа \"Лотки\\{ScsGutterFittingTypeEnum.VERTICAL_BEND_OUTER.GetDescription()} с углом поворота {BendType.GetDescription()}\"");
         }
         public void SetBendOuterCoverSeria(DbScsGcCoverUnit gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.CoverType == ScsGcCoverType.VERTICAL_BEND_OUTER) {
                 BendOuterCoverSeria = gutterFitting.Series;
                 IsEnabled = true;
@@ -387,10 +403,12 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
         public void AddChild(DbGcMsAcceesory unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
@@ -424,6 +442,7 @@ namespace Nano.Electric {
         public bool IsUse { get; set; }
         public string? BendSeria { get; private set; }
         public void SetBendOuterSeria(ScsGcFitting gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.FittingType == ScsGutterFittingTypeEnum.VERTICAL_BENT_UNIVERSE
                   && gutterFitting.VerticalUniversalBendType == ScsVerticalUniversalBendTypeEnum.ANGLE_90) {
                 BendSeria = gutterFitting.Series;
@@ -452,10 +471,12 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
         public void AddChild(DbGcMsAcceesory unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
@@ -486,6 +507,7 @@ namespace Nano.Electric {
         public string? TripleCoverSeria { get; private set; }
         public string? TripleSeria { get; private set; }
         public void SetTripleSeria(ScsGcFitting gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.FittingType == ScsGutterFittingTypeEnum.TRIPLE) {
                 TripleSeria = gutterFitting.Series;
                 IsEnabled = true;
@@ -496,6 +518,7 @@ namespace Nano.Electric {
                 throw new ArgumentOutOfRangeException(TripleSeria, $"Для присвоения серии необходимо передать экземпляр типа \"Лотки\\{ScsGutterFittingTypeEnum.TRIPLE.GetDescription()}\"");
         }
         public void SetTripleCoverSeria(DbScsGcCoverUnit gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.CoverType == ScsGcCoverType.TRIPLE) {
                 TripleCoverSeria = gutterFitting.Series;
                 IsEnabled = true;
@@ -538,10 +561,12 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
         public void AddChild(DbGcMsAcceesory unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
@@ -575,6 +600,7 @@ namespace Nano.Electric {
         public string? CrossCoverSeria { get; private set; }
         public string? CrossSeria { get; private set; }
         public void SetCrossSeria(ScsGcFitting gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.FittingType == ScsGutterFittingTypeEnum.CROSS) {
                 CrossSeria = gutterFitting.Series;
                 IsEnabled = true;
@@ -585,6 +611,7 @@ namespace Nano.Electric {
                 throw new ArgumentOutOfRangeException(CrossSeria, $"Для присвоения серии необходимо передать экземпляр типа \"Лотки\\{ScsGutterFittingTypeEnum.CROSS.GetDescription()}\"");
         }
         public void SetCrossCoverSeria(DbScsGcCoverUnit gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (gutterFitting.CoverType == ScsGcCoverType.CROSS) {
                 CrossCoverSeria = gutterFitting.Series;
                 IsEnabled = true;
@@ -625,10 +652,12 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
         public void AddChild(DbGcMsAcceesory unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
@@ -662,6 +691,7 @@ namespace Nano.Electric {
         public string? PassageCoverSeria { get; private set; }
         public string? PassageSeria { get; private set; }
         public void SetPassageSeria(ScsGcFitting gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (IsVertical) {
                 if (gutterFitting.FittingType == ScsGutterFittingTypeEnum.VERTICAL_PASSAGE) {
                     PassageSeria = gutterFitting.Series;
@@ -685,6 +715,7 @@ namespace Nano.Electric {
             }
         }
         public void SetPassageCoverSeria(DbScsGcCoverUnit gutterFitting) {
+            Throw.IfNull(gutterFitting);
             if (IsVertical) {
                 if (gutterFitting.CoverType == ScsGcCoverType.VERTICAL_PASSAGE) {
                     PassageCoverSeria = gutterFitting.Series;
@@ -733,10 +764,12 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
         public void AddChild(DbGcMsAcceesory unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
@@ -770,6 +803,7 @@ namespace Nano.Electric {
         //public string? PassageCoverSeria { get; set; }
         public string? JointSeria { get; private set; }
         public void SetJointSeria(ScsGcFitting scsGcFitting) {
+            Throw.IfNull(scsGcFitting);
             if (scsGcFitting.FittingType == ScsGutterFittingTypeEnum.JOINT) {
                 JointSeria = scsGcFitting.Series;
                 IsEnabled = true;
@@ -802,10 +836,12 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
         public void AddChild(DbGcMsAcceesory unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
@@ -837,6 +873,7 @@ namespace Nano.Electric {
         //public string? PassageCoverSeria { get; set; }
         public string? CorkSeria { get; private set; }
         public void SetCorkSeria(ScsGcFitting scsGcFitting) {
+            Throw.IfNull(scsGcFitting);
             if (scsGcFitting.FittingType == ScsGutterFittingTypeEnum.CORK) {
                 CorkSeria = scsGcFitting.Series;
                 IsEnabled = true;
@@ -862,10 +899,12 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }
         public void AddChild(DbGcMsAcceesory unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
             IsEnabled = true;
         }

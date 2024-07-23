@@ -22,6 +22,7 @@ namespace Nano.Electric {
             }
         }
         public void AddChild(DbUtilityUnit unit) {
+            Throw.IfNull(unit);
             Children.Add(unit);
         }
         protected override void WriteProperties(XmlWriter writer) {

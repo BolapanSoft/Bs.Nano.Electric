@@ -29,6 +29,7 @@ namespace Nano.Electric {
             //IsUse = true;
         }
         public static DbGcMsAcceesory From(DbScsGcAccessoryUnit accessoryUnit) {
+            Throw.IfNull(accessoryUnit);
             return new DbGcMsAcceesory {
                 AccessoryType = accessoryUnit.AccessoryType!.Value,
                 DbSeria = accessoryUnit.Series,
