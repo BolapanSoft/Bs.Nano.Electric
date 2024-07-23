@@ -152,7 +152,7 @@ namespace Nano.Electric {
         /// <typeparam name="Tdest"></typeparam>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public string[] GetProductProperties<Tdest>() where Tdest : class {
+        public static string[] GetProductProperties<Tdest>() where Tdest : class {
             var type = typeof(Tdest);
             var typeName = type.Name;
             if (propertiesCache.TryGetValue(typeName, out var properties)) {
