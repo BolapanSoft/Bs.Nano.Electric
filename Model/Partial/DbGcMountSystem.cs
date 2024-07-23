@@ -27,6 +27,7 @@ namespace Nano.Electric {
         }
 
         public void Add(DbGcSystemPlain plain) {
+            Throw.IfNull(plain);
             Children.Add(plain);
         }
         protected override void WriteProperties(XmlWriter writer) {

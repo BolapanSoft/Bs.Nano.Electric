@@ -257,7 +257,7 @@ namespace Bs.Nano.Electric.Report {
             int getPriority(MethodInfo mi) {
                 return mi.GetCustomAttribute<PriorityAttribute>()?.Priority ?? 0;
             };
-            return typeof(T).GetMethods()
+            return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public)
             .Where(m => m.GetCustomAttributes<RuleCategoryAttribute>()
                 .Any(a => a.TestCategories.Contains(testCategory)))
             .OrderBy(mi => getPriority(mi));
