@@ -69,7 +69,8 @@ namespace Nano.Electric {
         public IEnumerable<DbUtilityUnit> GetChildren() {
             return base.GetChildren<DbUtilityUnit>().ToArray();
         }
-        public void Add(DbUtilityUnit child) {
+        public void AddChild(DbUtilityUnit child) {
+            Throw.IfNull(child);
             Children.Add(child);
         }
         public bool Remove(DbUtilityUnit child) {

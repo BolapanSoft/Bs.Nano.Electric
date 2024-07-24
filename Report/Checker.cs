@@ -131,15 +131,6 @@ namespace Bs.Nano.Electric.Report {
                         }
                     }
                     catch (Exception ex) {
-                        //string getMessage(Exception ex) {
-                        //    if (ex.InnerException is null) {
-                        //        return ex.Message;
-                        //    }
-                        //    else {
-                        //        return getMessage(ex.InnerException);
-                        //    }
-                        //}
-                        //logger.LogError($"Ошибка обращения к таблице \"{tableName}\": {getMessage(ex)}");
                         count = 0;
                     }
                     
