@@ -9,7 +9,7 @@ namespace Nano.Electric {
         string IProduct.Name { get=>DbName; set=>DbName=value; }
 #if InitDbContextEnums
         public EnvExplSafeBoolEnum? IsExplSafe { get; set; }
-        public ElCableLeadEnum CableLeadIn { get; set; }
+        public ElCableLeadEnum? CableLeadIn { get; set; }
         public PhaseCountEnum? PhaseCount { get; set; }
 
 #endif

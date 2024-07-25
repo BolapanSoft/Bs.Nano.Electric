@@ -5,6 +5,7 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Entity.Core.Mapping;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +15,25 @@ using System.Web;
 
 namespace Nano.Electric {
     internal static class ReflectionHelper {
+        private static class EnumConverter<TEnum> where TEnum : Enum {
+            private static readonly Dictionary<TEnum, string> descriptions;
+            static EnumConverter() {
+                descriptions = new Dictionary<TEnum, string>();
+                var knownValues =Enum.GetNames(typeof(TEnum));
+                foreach (var name in knownValues) {
+                    var memberInfo = typeof(TEnum).GetMember(name);
+                    var descriptionAttribute = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
+                    var value = (TEnum)Enum.Parse(typeof(TEnum), name);
+                    descriptions[value]=descriptionAttribute?.Description??string.Empty;
+                }
+            }
+            internal static string GetDescription(TEnum value) {
+                if(descriptions.TryGetValue(value, out string descr)) {
+                    return descr;
+                }
+                return string.Empty;
+            }
+        }
         private static MemoryCache memoryCache = new MemoryCache("ReflectionHelper");
         /// <summary>
         /// Для типа <typeparamref name="Type"/> формирует перечень публичных свойств типа <typeparamref name="Tret"/>
@@ -82,10 +102,7 @@ namespace Nano.Electric {
 
 
         public static string GetDescription<TEnum>(this TEnum enumValue) where TEnum : Enum {
-            string strValue = enumValue.ToString();
-            var memberInfo = typeof(TEnum).GetMember(strValue);
-            var descriptionAttribute = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
-            return descriptionAttribute?.Description ?? strValue;
+            return EnumConverter<TEnum>.GetDescription(enumValue);
         }
         /// <summary>
         /// Возвращает список геттеров экземпляра класса для свойств простого типа (string, double, int, bool).
