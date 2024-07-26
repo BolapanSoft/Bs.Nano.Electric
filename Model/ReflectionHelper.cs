@@ -3,6 +3,7 @@
 using Nano.Electric;
 using System;
 using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Entity.Core.Mapping;
@@ -14,26 +15,51 @@ using System.Runtime.CompilerServices;
 using System.Web;
 
 namespace Nano.Electric {
-    internal static class ReflectionHelper {
-        private static class EnumConverter<TEnum> where TEnum : Enum {
-            private static readonly Dictionary<TEnum, string> descriptions;
-            static EnumConverter() {
-                descriptions = new Dictionary<TEnum, string>();
-                var knownValues =Enum.GetNames(typeof(TEnum));
-                foreach (var name in knownValues) {
-                    var memberInfo = typeof(TEnum).GetMember(name);
-                    var descriptionAttribute = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
-                    var value = (TEnum)Enum.Parse(typeof(TEnum), name);
-                    descriptions[value]=descriptionAttribute?.Description??string.Empty;
-                }
-            }
-            internal static string GetDescription(TEnum value) {
-                if(descriptions.TryGetValue(value, out string descr)) {
-                    return descr;
-                }
-                return string.Empty;
+    internal static class EnumConverter<TEnum> where TEnum : Enum {
+        private static readonly string[] descriptions;
+        private static readonly string[] enumNames;
+        private static readonly TEnum[] enumValues;
+        static EnumConverter() {
+            GetEnumData(out string[] enumNames, out TEnum[] enumValues);
+            descriptions = new string[enumNames.Length];
+            for (int i = 0; i < enumNames.Length; i++) {
+                var name = enumNames[i];
+                var memberInfo = typeof(TEnum).GetMember(name);
+                var descriptionAttribute = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
+                var value = (TEnum)Enum.Parse(typeof(TEnum), name);
+                descriptions[i] = descriptionAttribute?.Description ?? string.Empty;
             }
         }
+        internal static string GetDescription(TEnum value) {
+            int i = Array.BinarySearch(enumValues, value);
+            if (i >= 0) {
+                return descriptions[i];
+            }
+            return string.Empty;
+        }
+        internal static bool IsDefineValue(TEnum value) {
+            int i = Array.BinarySearch(enumValues, value);
+            return i >= 0;
+        }
+        internal static bool IsDefineValue(string value) {
+            foreach (var item in enumNames) {
+                if (item == value)
+                    return true;
+            }
+            return false;
+        }
+        private static void GetEnumData(out string[] enumNames, out TEnum[] enumValues) {
+            string[] array2 = Enum.GetNames(typeof(TEnum));
+            Array.Sort(array2);
+            TEnum[] array = new TEnum[array2.Length];
+            for (int i = 0; i < array2.Length; i++) {
+                array[i] = (TEnum)Enum.Parse(typeof(TEnum), array2[i]);
+            }
+            enumNames = array2;
+            enumValues = array;
+        }
+    }
+    internal static class ReflectionHelper {
         private static MemoryCache memoryCache = new MemoryCache("ReflectionHelper");
         /// <summary>
         /// Для типа <typeparamref name="Type"/> формирует перечень публичных свойств типа <typeparamref name="Tret"/>

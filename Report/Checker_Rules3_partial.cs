@@ -41,18 +41,30 @@ NominalCurrent	DbPoleCountEnum	VoltageType	MaxCommutation	DynResistance
         public void Rule_03_101() {
             using (var context = connector.Connect()) {
                 var errors = context.ElAutomats
-                  .Where(p => !((p.NominalCurrent.HasValue & p.DbPoleCountEnum.HasValue & p.VoltageType.HasValue & p.MaxCommutation.HasValue & p.DynResistance.HasValue) &&
-                                (p.NominalCurrent > 0 & p.DbPoleCountEnum > 0 & p.VoltageType > 0 & p.MaxCommutation > 0 & p.DynResistance > 0)))
                     .Select(p => new { p.Code, p.Series, p.NominalCurrent, p.DbPoleCountEnum, p.VoltageType, p.MaxCommutation, p.DynResistance })
-                   .ToList();
+                    .ToList()
+                    .Where(p => !((p.NominalCurrent.HasValue & p.DbPoleCountEnum.HasValue & p.VoltageType.HasValue & p.MaxCommutation.HasValue & p.DynResistance.HasValue) &&
+                                (p.NominalCurrent > 0 & p.DbPoleCountEnum > 0 & IsDefined(p.VoltageType!.Value) & p.MaxCommutation > 0 & p.DynResistance > 0)))
+                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.NominalCurrent, p.DbPoleCountEnum?.GetDescription(), p.VoltageType?.GetDescription(), p.MaxCommutation, p.DynResistance))));
+                        errors.Select(p => (p.Series, p.Code, (p.NominalCurrent,
+                                p.DbPoleCountEnum.HasValue ? GetDescription(p.DbPoleCountEnum.Value) : string.Empty,
+                                p.VoltageType.HasValue ? GetDescription(p.VoltageType.Value) : string.Empty,
+                                p.MaxCommutation, p.DynResistance))));
                 }
             }
 
         }
-
+        private static bool IsDefined<TEnum>(TEnum value) where TEnum : Enum {
+            return EnumConverter<TEnum>.IsDefineValue(value);
+        }
+        private static string GetDescription<TEnum>(TEnum value) where TEnum : System.Enum {
+            if (!EnumConverter<TEnum>.IsDefineValue(value)) {
+                return $"Некорректное значение:{System.Convert.ToUInt64(value)}";
+            }
+            return EnumConverter<TEnum>.GetDescription(value);
+        }
         [ReportRule(@"Для автоматических выключателей должны быть заполнены механические данные:
 ContactType	MaxCordS
 Конструктивное исполнение	Макс. сечение проводника, мм^2",
@@ -61,13 +73,17 @@ ContactType	MaxCordS
         public void Rule_03_102() {
             using (var context = connector.Connect()) {
                 var errors = context.ElAutomats
-                  .Where(p => !((p.ContactType.HasValue & p.MaxCordS.HasValue) &&
-                                (p.MaxCordS > 0)))
-                    .Select(p => new { p.Code, p.Series, p.ContactType, p.MaxCordS })
+                   .Select(p => new { p.Code, p.Series, p.ContactType, p.MaxCordS })
+                   .ToList()
+                   .Where(p => !((p.MaxCordS.HasValue && p.MaxCordS > 0) &&
+                                 (p.ContactType.HasValue && IsDefined(p.ContactType.Value))
+                                 ))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.ContactType?.GetDescription(), p.MaxCordS))));
+                        errors.Select(p => (p.Series, p.Code,
+                            (p.ContactType.HasValue ? GetDescription(p.ContactType.Value) : string.Empty,
+                            p.MaxCordS))));
                 }
             }
 
@@ -97,13 +113,15 @@ Height	Width	Depth   DbIsModule
         public void Rule_03_104() {
             using (var context = connector.Connect()) {
                 var errors = context.ElAutomats
-                  .Where(p => !((p.MountType.HasValue) &&
-                                (p.MountType > 0)))
                     .Select(p => new { p.Code, p.Series, p.MountType })
-                   .ToList();
+                    .ToList()
+                    .Where(p => !(p.MountType.HasValue &&
+                                IsDefined(p.MountType.Value))
+                                )
+                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.MountType?.GetDescription()))));
+                        errors.Select(p => (p.Series, p.Code, (p.MountType.HasValue ? GetDescription(p.MountType.Value) : string.Empty))));
                 }
             }
 
@@ -188,12 +206,13 @@ IsHeatR	IsElMagR	IsElectronicR	HasUzo
             using (var context = connector.Connect()) {
                 var errors = context.ElAutomats
                     .Where(p => p.IsElMagR == true)
-                    .Where(p => p.CurrentChoice == null)
                     .Select(p => new { p.Code, p.Series, p.CurrentChoice })
+                   .ToList()
+                   .Where(p => !(p.CurrentChoice.HasValue && IsDefined(p.CurrentChoice.Value)))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.CurrentChoice?.GetDescription()))));
+                        errors.Select(p => (p.Series, p.Code, (p.CurrentChoice.HasValue ? GetDescription(p.CurrentChoice.Value) : string.Empty))));
                 }
             }
         }
@@ -324,11 +343,16 @@ CurrentChoice	IsMultiplicityOfCurrentForTmTime    KzInstantCurrentChoice
                     .Where(p => p.IsElectronicR == true)
                     .Select(p => new { p.Code, p.Series, p.CurrentChoice, p.IsMultiplicityOfCurrentForTmTime, p.KzInstantCurrentChoice })
                    .ToList()
-                   .Where(p => p.CurrentChoice == null | p.IsMultiplicityOfCurrentForTmTime == null | p.KzInstantCurrentChoice == null)
+                   .Where(p => !(p.CurrentChoice.HasValue && IsDefined(p.CurrentChoice.Value) &&
+                                    p.IsMultiplicityOfCurrentForTmTime.HasValue &&
+                                    p.KzInstantCurrentChoice.HasValue && IsDefined(p.KzInstantCurrentChoice.Value)))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.CurrentChoice?.GetDescription(), Convert(p.IsMultiplicityOfCurrentForTmTime), p.KzInstantCurrentChoice?.GetDescription()))));
+                        errors.Select(p => (p.Series, p.Code, 
+                            (p.CurrentChoice.HasValue ? GetDescription(p.CurrentChoice.Value) : string.Empty,
+                            Convert(p.IsMultiplicityOfCurrentForTmTime),
+                            p.KzInstantCurrentChoice.HasValue ? GetDescription(p.KzInstantCurrentChoice.Value) : string.Empty))));
                 }
             }
         }
@@ -366,7 +390,9 @@ KzIiScale	UnlinkTimeElectronicScale
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (TryParseAsDouble(p.KzIiScale, out _).Value, TryParseAsDouble(p.UnlinkTimeElectronicScale, out _).Value))));
+                        errors.Select(p => (p.Series, p.Code, 
+                                (TryParseAsDouble(p.KzIiScale, out _).Value, 
+                                TryParseAsDouble(p.UnlinkTimeElectronicScale, out _).Value))));
                 }
             }
         }
@@ -437,13 +463,16 @@ Voltage	NominalCurrent	DbPoleCountEnum	CurrentScale	MaxCommutation
                 var errors = context.ElSafeDevices
                     .Select(p => new { p.Code, p.Series, p.Voltage, p.DbPoleCountEnum, p.NominalCurrent, p.MaxCommutation, p.CurrentScale })
                    .ToList()
-                    .Where(p => !((p.Voltage.HasValue & p.NominalCurrent.HasValue & p.DbPoleCountEnum.HasValue & p.MaxCommutation.HasValue) &&
+                    .Where(p => !((p.Voltage.HasValue & p.NominalCurrent.HasValue &  p.MaxCommutation.HasValue) &&
                                 (p.Voltage > 0 & p.NominalCurrent > 0 & p.DbPoleCountEnum > 0 & p.MaxCommutation > 0) &&
-                                (TryParseAsInt(p.CurrentScale, out int cs).IsSuccess & cs > 0)))
+                                (TryParseAsInt(p.CurrentScale, out int cs).IsSuccess & cs > 0) &&
+                                p.DbPoleCountEnum.HasValue && IsDefined(p.DbPoleCountEnum.Value)))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.NominalCurrent, p.DbPoleCountEnum?.GetDescription(), TryParseAsInt(p.CurrentScale, out _).Value, p.MaxCommutation))));
+                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.NominalCurrent, 
+                                p.DbPoleCountEnum.HasValue ? GetDescription(p.DbPoleCountEnum.Value) : string.Empty,
+                                TryParseAsInt(p.CurrentScale, out _).Value, p.MaxCommutation))));
                 }
             }
 
@@ -473,13 +502,14 @@ Height	Width	Depth
         public void Rule_03_204() {
             using (var context = connector.Connect()) {
                 var errors = context.ElSafeDevices
-                  .Where(p => !((p.MountType.HasValue) &&
-                                (p.MountType > 0)))
                     .Select(p => new { p.Code, p.Series, p.MountType })
+                   .ToList()  
+                   .Where(p => !((p.MountType.HasValue) &&
+                                IsDefined(p.MountType.Value)))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.MountType?.GetDescription()))));
+                        errors.Select(p => (p.Series, p.Code, (p.MountType.HasValue ? GetDescription(p.MountType.Value) : string.Empty))));
                 }
             }
 
@@ -517,12 +547,15 @@ Voltage	NominalCurrent	Poles	MaxDynCurrent
                 var errors = context.ElKnifeSwitches
                     .Select(p => new { p.Code, p.Series, p.Voltage, p.Poles, p.NominalCurrent, p.MaxDynCurrent })
                    .ToList()
-                    .Where(p => !((p.Voltage.HasValue & p.NominalCurrent.HasValue & p.Poles.HasValue & p.MaxDynCurrent.HasValue) &&
-                                (p.Voltage > 0 & p.NominalCurrent > 0 & p.Poles > 0 & p.MaxDynCurrent > 0)))
+                    .Where(p => !((p.Voltage.HasValue & p.NominalCurrent.HasValue &  p.MaxDynCurrent.HasValue) &&
+                                (p.Voltage > 0 & p.NominalCurrent > 0 & p.MaxDynCurrent > 0) &&
+                                p.Poles.HasValue && IsDefined(p.Poles.Value)))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.NominalCurrent, p.Poles?.GetDescription(), p.MaxDynCurrent))));
+                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.NominalCurrent, 
+                                    p.Poles.HasValue ? GetDescription(p.Poles.Value) : string.Empty, 
+                                    p.MaxDynCurrent))));
                 }
             }
 
@@ -571,13 +604,15 @@ DbHeight	DbWidth	DbDepth    DbIsModule
         public void Rule_03_304() {
             using (var context = connector.Connect()) {
                 var errors = context.ElKnifeSwitches
-                  .Where(p => !((p.MountType.HasValue) &&
-                                (p.MountType > 0)))
+                  
                     .Select(p => new { p.Code, p.Series, p.MountType })
+                   .ToList()
+                   .Where(p => !((p.MountType.HasValue) &&
+                                IsDefined(p.MountType.Value)))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.MountType?.GetDescription()))));
+                        errors.Select(p => (p.Series, p.Code, (p.MountType.HasValue ? GetDescription(p.MountType.Value) : string.Empty))));
                 }
             }
 
@@ -643,16 +678,18 @@ DbVoltage	DbNominalCur	CurrentScaleUzo	DbPoleCountEnum
             }
             using (var context = connector.Connect()) {
                 var errors = context.ElUzoes
-                    .Select(p => new { p.Code, p.Series, p.DbVoltage, p.DbPoleCountEnum, p.DbNominalCur, p.CurrentScaleUzo})
+                    .Select(p => new { p.Code, p.Series, p.DbVoltage, p.DbPoleCountEnum, p.DbNominalCur, p.CurrentScaleUzo })
                    .ToList()
-                  .Where(p => !((p.DbVoltage.HasValue & p.DbPoleCountEnum.HasValue & p.DbNominalCur.HasValue) &&
-                                (p.DbVoltage > 0 & p.DbPoleCountEnum > 0 & p.DbNominalCur > 0 ) &&
+                  .Where(p => !((p.DbVoltage.HasValue &  p.DbNominalCur.HasValue) &&
+                                (p.DbVoltage > 0 &  p.DbNominalCur > 0) &&
+                                p.DbPoleCountEnum.HasValue && IsDefined(p.DbPoleCountEnum.Value) &&
                                 (TryParseAsDouble(p.CurrentScaleUzo, out double value).IsSuccess &&
                                 IsCorrectCurrentScaleUzo(value))))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.DbVoltage, p.DbNominalCur, convert(p.CurrentScaleUzo), p.DbPoleCountEnum?.GetDescription()))));
+                        errors.Select(p => (p.Series, p.Code, (p.DbVoltage, p.DbNominalCur, convert(p.CurrentScaleUzo), 
+                        p.DbPoleCountEnum.HasValue ? GetDescription(p.DbPoleCountEnum.Value) : string.Empty))));
                 }
             }
 
@@ -663,13 +700,13 @@ DbVoltage	DbNominalCur	CurrentScaleUzo	DbPoleCountEnum
         public void Rule_03_402() {
             using (var context = connector.Connect()) {
                 var errors = context.ElUzoes
-                  .Where(p => !(( p.MaxCordS.HasValue) &&
+                  .Where(p => !((p.MaxCordS.HasValue) &&
                                 (p.MaxCordS > 0)))
-                    .Select(p => new { p.Code, p.Series,  p.MaxCordS })
+                    .Select(p => new { p.Code, p.Series, p.MaxCordS })
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, ( p.MaxCordS))));
+                        errors.Select(p => (p.Series, p.Code, (p.MaxCordS))));
                 }
             }
 
@@ -699,13 +736,14 @@ DbHeight	DbWidth	DbDepth   DbIsModule
         public void Rule_03_404() {
             using (var context = connector.Connect()) {
                 var errors = context.ElUzoes
-                  .Where(p => !((p.MountType.HasValue) &&
-                                (p.MountType > 0)))
                     .Select(p => new { p.Code, p.Series, p.MountType })
+                   .ToList()
+                   .Where(p => !(p.MountType.HasValue &&
+                                IsDefined(p.MountType.Value)))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.MountType?.GetDescription()))));
+                        errors.Select(p => (p.Series, p.Code, (p.MountType.HasValue ? GetDescription(p.MountType.Value) : string.Empty))));
                 }
             }
 
@@ -748,26 +786,461 @@ DbHeight	DbWidth	DbDepth   DbIsModule
 
 
 
-        [ReportRule(@"Для элементов таблицы ""Пускатели, контакторы и реле"" должны быть внесены параметры ""Номинальное напряжение"", ""Номинальный ток"", ""Количество полюсов"".",
-                    3, 501)]
+        #region 500 Пускатели, контакторы и реле
+
+        [ReportRule(@"Для элементов таблицы ""Пускатели, контакторы и реле"" должны быть внесены параметры:
+Voltage	NominalCurrent	DbPoleCountEnum	CoilControlVoltage
+Номинальное напряжение Un, В	Номинальный ток In, А	Количество полюсов	Напряжение катушки управления, В",
+            3, 501)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
         public void Rule_03_501() {
             using (var context = connector.Connect()) {
-                var products = context.ElStarters
-                    .Select(p => new { p.Code, p.Series, p.DbDeviceType, p.Voltage, p.NominalCurrent, p.DbPoleCountEnum });
-                var errors = products
-                    .Where(p => !(p.Voltage > 0.0) | !(p.NominalCurrent > 0.0) | !p.DbPoleCountEnum.HasValue)
-                    .ToList()
-                    .Select(p => (Key: (p.DbDeviceType?.GetDescription(), p.Series, p.Code), Value: (p.Voltage, p.NominalCurrent, p.DbPoleCountEnum?.GetDescription())))
-                    .ToList();
-                if (errors.Count > 0) {
-                    FailRuleTest($"Тест не пройден для {errors.Count} серий.",
-                        errors);
+                var errors = context.ElStarters
+                  
+                    .Select(p => new { p.Code, p.Series, p.Voltage, p.NominalCurrent, p.DbPoleCountEnum, p.CoilControlVoltage })
+                   .ToList()
+                   .Where(p => !((p.NominalCurrent.HasValue &  p.Voltage.HasValue & p.CoilControlVoltage.HasValue) &&
+                                (p.NominalCurrent > 0 & p.CoilControlVoltage > 0) &&
+                                p.DbPoleCountEnum.HasValue && IsDefined(p.DbPoleCountEnum.Value)))
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.NominalCurrent,
+                        p.DbPoleCountEnum.HasValue ? GetDescription(p.DbPoleCountEnum.Value) : string.Empty, 
+                        p.CoilControlVoltage))));
                 }
             }
 
         }
+        [ReportRule(@"Для элементов таблицы ""Пускатели, контакторы и реле"" должны быть заполнен параметр: MaxCordS Макс. сечение проводника, мм^2",
+             3, 502)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
+        public void Rule_03_502() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElStarters
+                  .Where(p => !((p.MaxCordS.HasValue) &&
+                                (p.MaxCordS > 0)))
+                    .Select(p => new { p.Code, p.Series, p.MaxCordS })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.MaxCordS))));
+                }
+            }
 
+        }
+        [ReportRule(@"Для элементов таблицы ""Пускатели, контакторы и реле"" должны быть заполнены габариты:
+DbHeight	DbWidth	DbDepth   DbIsModule
+Высота, мм	Ширина, мм	Глубина, мм Модульный",
+                    3, 503)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
+        public void Rule_03_503() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElStarters
+                  .Where(p => !((p.DbHeight.HasValue & p.DbWidth.HasValue & p.DbDepth.HasValue & p.DbIsModule.HasValue) &&
+                                (p.DbHeight > 0 & p.DbWidth > 0 & p.DbDepth > 0)))
+                    .Select(p => new { p.Code, p.Series, p.DbHeight, p.DbWidth, p.DbDepth, p.DbIsModule })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DbHeight, p.DbWidth, p.DbDepth, Convert(p.DbIsModule.HasValue)))));
+                }
+            }
+
+        }
+        [ReportRule(@"Для элементов таблицы ""Пускатели, контакторы и реле"" должен быть заполнен тип монтажа: MountType Крепление",
+                    3, 504)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
+        public void Rule_03_504() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElStarters
+                  
+                    .Select(p => new { p.Code, p.Series, p.MountType })
+                   .ToList()
+                   .Where(p => !(p.MountType.HasValue &&
+                                IsDefined(p.MountType.Value)))
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.MountType.HasValue ? GetDescription(p.MountType.Value) : string.Empty))));
+                }
+            }
+
+        }
+        [ReportRule(@"Для элементов таблицы ""Пускатели, контакторы и реле"" должен быть заполнен параметр: DbDeviceType Тип аппарата",
+            3, 505)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
+        public void Rule_03_505() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElStarters
+                  
+                    .Select(p => new { p.Code, p.Series, p.DbDeviceType })
+                   .ToList()
+                   .Where(p => !(p.DbDeviceType.HasValue && IsDefined(p.DbDeviceType.Value)))
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DbDeviceType.HasValue ? GetDescription(p.DbDeviceType.Value) : string.Empty))));
+                }
+            }
+        }
+        [ReportRule(@"Для элементов таблицы ""Пускатели, контакторы и реле"" с креплением на монтажную рейку должен быть заполнен параметр: RailMountTypeFlagged Тип монтажной рейки",
+                        3, 510)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
+        public void Rule_03_510() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElStarters
+                   .Where(p => p.MountType == ElControlRegisterDeviceMountType.MOUNT_RAIL | p.MountType == ElControlRegisterDeviceMountType.MOUNT_RAIL_OR_BOARD)
+                  .Where(p => !(p.RailMountTypeFlagged.HasValue &&
+                                (p.RailMountTypeFlagged > 0)))
+                    .Select(p => new { p.Code, p.Series, p.RailMountTypeFlagged })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.RailMountTypeFlagged))));
+                }
+            }
+        }
+        [ReportRule(@"Для элементов таблицы ""Пускатели, контакторы и реле"" с указанием ""Модульный"" должен быть заполнен параметр: DbModuleCount Количество модулей 18мм, шт",
+                    3, 511)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
+        public void Rule_03_511() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElStarters
+                    .Where(p => p.DbIsModule == true)
+                    .Where(p => !((p.DbModuleCount.HasValue) &&
+                                (p.DbModuleCount > 0)))
+                    .Select(p => new { p.Code, p.Series, p.DbModuleCount })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DbModuleCount))));
+                }
+            }
+        }
+        [ReportRule(@"Для элементов таблицы ""Пускатели, контакторы и реле"" должен быть заполнен параметр: DbDeviceType Тип аппарата",
+                    3, 512)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
+        public void Rule_03_512() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElStarters
+                   .Select(p => new { p.Code, p.Series, p.DbDeviceType })
+                   .ToList()
+                   .Where(p => !(p.DbDeviceType.HasValue &&
+                                IsDefined(p.DbDeviceType.Value)))
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DbDeviceType.HasValue?GetDescription(p.DbDeviceType.Value):string.Empty))));
+                }
+            }
+        }
+        [ReportRule(@"Для пускателей должны быть заполнены параметры:
+DbStarterType	LowBoundFaultCurrent	HightBoundFaultCurrent	ContactNOCount	ContactNZCount
+Тип пускателя или контактора	Нижняя граница диапазона несрабатывания, А	Верхняя граница диапазона несрабатывания, А	Количество НО контактов	Количество НЗ контактов",
+                    3, 513)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
+        public void Rule_03_513() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElStarters
+                    .Where(p=>p.DbDeviceType==ElDeviceTypeEnum.STARTER)
+                    .Select(p => new { p.Code, p.Series, p.DbStarterType, p.LowBoundFaultCurrent, p.HightBoundFaultCurrent, p.ContactNOCount, p.ContactNZCount })
+                    .ToList()
+                    .Where(p => !(p.DbStarterType.HasValue && IsDefined(p.DbStarterType.Value) &&
+                                p.LowBoundFaultCurrent.HasValue && p.LowBoundFaultCurrent > 0 &&
+                                p.HightBoundFaultCurrent.HasValue && p.HightBoundFaultCurrent > 0 &&
+                                TryParseAsInt(p.ContactNOCount, out var intValue).IsSuccess && intValue >=0 &&
+                                TryParseAsInt(p.ContactNZCount, out var intValue1).IsSuccess && intValue1 >= 0))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DbStarterType.HasValue?GetDescription(p.DbStarterType.Value):string.Empty,
+                                p.LowBoundFaultCurrent,
+                                p.HightBoundFaultCurrent,
+                                TryParseAsInt(p.ContactNOCount, out _).Value,
+                                TryParseAsInt(p.ContactNZCount, out _).Value))));
+                }
+            }
+        }
+        [ReportRule(@"Для контакторов должны быть заполнены параметры:
+DbStarterType	ContactNOCount	ContactNZCount
+Тип пускателя или контактора	Количество НО контактов	Количество НЗ контактов",
+                    3, 514)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
+        public void Rule_03_514() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElStarters
+                    .Where(p=>p.DbDeviceType==ElDeviceTypeEnum.CONTACTOR)
+                    .Select(p => new { p.Code, p.Series, p.DbStarterType, p.ContactNOCount, p.ContactNZCount })
+                    .ToList()
+                    .Where(p => !(p.DbStarterType.HasValue && IsDefined(p.DbStarterType.Value) &&
+                                TryParseAsInt(p.ContactNOCount, out var intValue).IsSuccess && intValue >=0 &&
+                                TryParseAsInt(p.ContactNZCount, out var intValue1).IsSuccess && intValue1 >= 0))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DbStarterType.HasValue?GetDescription(p.DbStarterType.Value):string.Empty,
+                                TryParseAsInt(p.ContactNOCount, out _).Value,
+                                TryParseAsInt(p.ContactNZCount, out _).Value))));
+                }
+            }
+        }
+        [ReportRule(@"Для реле должен быть заполнен параметр:CurrentRelayType Тип реле",
+                    3, 515)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElStarter))]
+        public void Rule_03_515() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElStarters
+                    .Where(p=>p.DbDeviceType==ElDeviceTypeEnum.RELAY)
+                    .Select(p => new { p.Code, p.Series, p.CurrentRelayType})
+                    .ToList()
+                    .Where(p => !(string.IsNullOrEmpty(p.CurrentRelayType)))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code,(string.Empty))));
+                }
+            }
+        }
+        #endregion
+        #region 600 Ограничители перенапряжения
+        [ReportRule(@"Для ограничителей перенапряжения должны быть внесены параметры:
+Voltage	MaxVoltage	DischargeCurrent	MaxDischargeCurrent	PoleCount
+Номинальное напряжение Un, В	Максимальное рабочее напряжение Uc, В	Номинальный разрядный ток In, кА	Максимальный разрядный ток Imax, кА	Количество полюсов",
+            3, 601)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElOvervoltageSuppressor))]
+        public void Rule_03_601() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElOvervoltageSuppressors
+
+                    .Select(p => new { p.Code, p.Series, p.Voltage,p.MaxVoltage, p.DischargeCurrent, p.MaxDischargeCurrent, p.PoleCount })
+                   .ToList()
+                   .Where(p => !((p.Voltage.HasValue & p.MaxVoltage.HasValue & p.DischargeCurrent.HasValue& p.MaxDischargeCurrent.HasValue) &&
+                                (p.Voltage > 0 & p.MaxVoltage > 0 & p.DischargeCurrent > 0 & p.MaxDischargeCurrent > 0) &&
+                                p.PoleCount.HasValue && IsDefined(p.PoleCount.Value)))
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.MaxVoltage,p.DischargeCurrent, p.MaxDischargeCurrent,
+                        p.PoleCount.HasValue ? GetDescription(p.PoleCount.Value) : string.Empty))));
+                }
+            }
+
+        }
+        [ReportRule(@"Для ограничителей перенапряжения должны быть заполнен параметр: MaxCordS Макс. сечение проводника, мм^2",
+     3, 602)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElOvervoltageSuppressor))]
+        public void Rule_03_602() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElOvervoltageSuppressors
+                  .Where(p => !((p.MaxCordS.HasValue) &&
+                                (p.MaxCordS > 0)))
+                    .Select(p => new { p.Code, p.Series, p.MaxCordS })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.MaxCordS))));
+                }
+            }
+
+        }
+        [ReportRule(@"Для ограничителей перенапряжения должны быть заполнены габариты:
+DbHeight	DbWidth	DbDepth   IsModular
+Высота, мм	Ширина, мм	Глубина, мм Модульный",
+                    3, 603)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElOvervoltageSuppressor))]
+        public void Rule_03_603() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElOvervoltageSuppressors
+                  .Where(p => !((p.DbHeight.HasValue & p.DbWidth.HasValue & p.DbDepth.HasValue & p.IsModular.HasValue) &&
+                                (p.DbHeight > 0 & p.DbWidth > 0 & p.DbDepth > 0)))
+                    .Select(p => new { p.Code, p.Series, p.DbHeight, p.DbWidth, p.DbDepth, p.IsModular })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DbHeight, p.DbWidth, p.DbDepth, Convert(p.IsModular.HasValue)))));
+                }
+            }
+
+        }
+        [ReportRule(@"Для ограничителей перенапряжения должен быть заполнен тип монтажа: MountType Крепление",
+                    3, 604)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElOvervoltageSuppressor))]
+        public void Rule_03_604() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElOvervoltageSuppressors
+
+                    .Select(p => new { p.Code, p.Series, p.MountType })
+                   .ToList()
+                   .Where(p => !(p.MountType.HasValue &&
+                                IsDefined(p.MountType.Value)))
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.MountType.HasValue ? GetDescription(p.MountType.Value) : string.Empty))));
+                }
+            }
+
+        }
+        [ReportRule(@"Для ограничителей перенапряжения с креплением на монтажную рейку должен быть заполнен параметр: RailMountTypeFlagged Тип монтажной рейки",
+                        3, 610)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElOvervoltageSuppressor))]
+        public void Rule_03_610() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElOvervoltageSuppressors
+                   .Where(p => p.MountType == ElControlRegisterDeviceMountType.MOUNT_RAIL | p.MountType == ElControlRegisterDeviceMountType.MOUNT_RAIL_OR_BOARD)
+                  .Where(p => !(p.RailMountTypeFlagged.HasValue &&
+                                (p.RailMountTypeFlagged > 0)))
+                    .Select(p => new { p.Code, p.Series, p.RailMountTypeFlagged })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.RailMountTypeFlagged))));
+                }
+            }
+        }
+        [ReportRule(@"Для ограничителей перенапряжения с указанием ""Модульный"" должен быть заполнен параметр: ModuleCount Количество модулей 18мм, шт",
+                    3, 611)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElOvervoltageSuppressor))]
+        public void Rule_03_611() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElOvervoltageSuppressors
+                    .Where(p => p.IsModular == true)
+                    .Where(p => !((p.ModuleCount.HasValue) &&
+                                (p.ModuleCount > 0)))
+                    .Select(p => new { p.Code, p.Series, p.ModuleCount })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.ModuleCount))));
+                }
+            }
+        }
+        #endregion
+        #region 700 Допю оборудование КА
+        [ReportRule(@"Для элементов таблицы ""Доп. оборудование КА"" должны быть внесены параметры:
+FiderUtilityType	InstallationType
+Тип устройства	Монтаж",
+    3, 701)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElFiderUtility))]
+        public void Rule_03_701() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElFiderUtilities
+
+                    .Select(p => new { p.Code, p.Series, p.FiderUtilityType, p.InstallationType })
+                   .ToList()
+                   .Where(p => !(p.FiderUtilityType.HasValue && IsDefined(p.FiderUtilityType.Value) &&
+                                p.InstallationType.HasValue && IsDefined(p.InstallationType.Value)))
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (
+                        p.FiderUtilityType.HasValue ? GetDescription(p.FiderUtilityType.Value) : string.Empty,
+                        p.InstallationType.HasValue ? GetDescription(p.InstallationType.Value) : string.Empty
+                        ))));
+                }
+            }
+
+        }
+        [ReportRule(@"Для элементов таблицы ""Доп. оборудование КА"" с типом монтажа:""Внутрь шкафа"" должны быть внесены параметры:
+MountType	DbIsModule	DimensionType
+Крепление	Модульный	Габаритный тип",
+    3, 702)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElFiderUtility))]
+        public void Rule_03_702() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElFiderUtilities
+                    .Where(p=>p.InstallationType==ElInstallationType.InsideShell)
+                    .Select(p => new { p.Code, p.Series, p.MountType, p.DbIsModule, p.DimensionType })
+                   .ToList()
+                   .Where(p => !(p.MountType.HasValue && IsDefined(p.MountType.Value) &&
+                                p.DbIsModule.HasValue &&
+                                p.DimensionType.HasValue && IsDefined(p.DimensionType.Value)))
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (
+                        p.MountType.HasValue ? GetDescription(p.MountType.Value) : string.Empty,
+                        Convert(p.DbIsModule),
+                        p.DimensionType.HasValue ? GetDescription(p.DimensionType.Value) : string.Empty
+                        ))));
+                }
+            }
+
+        }
+        [ReportRule(@"Для элементов таблицы ""Доп. оборудование КА"" с типом монтажа:""Внутрь шкафа"" и с креплением на монтажную рейку должен быть заполнен параметр: RailMountTypeFlagged Тип монтажной рейки",
+                        3, 703)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElFiderUtility))]
+        public void Rule_03_703() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElFiderUtilities
+                   .Where(p => p.InstallationType == ElInstallationType.InsideShell & (p.MountType == ElControlRegisterDeviceMountType.MOUNT_RAIL | p.MountType == ElControlRegisterDeviceMountType.MOUNT_RAIL_OR_BOARD))
+                  .Where(p => !(p.RailMountTypeFlagged.HasValue &&
+                                (p.RailMountTypeFlagged > 0)))
+                    .Select(p => new { p.Code, p.Series, p.RailMountTypeFlagged })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.RailMountTypeFlagged))));
+                }
+            }
+        }
+        [ReportRule(@"Для элементов таблицы ""Доп. оборудование КА"" с типом монтажа:""Внутрь шкафа"" и с указанием ""Модульный"" должен быть заполнен параметр: DbModuleCount Количество модулей 18мм, шт",
+            3, 704)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElFiderUtility))]
+        public void Rule_03_704() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElFiderUtilities
+                    .Where(p => p.InstallationType == ElInstallationType.InsideShell & p.DbIsModule == true)
+                    .Where(p => !((p.DbModuleCount.HasValue) &&
+                                (p.DbModuleCount > 0)))
+                    .Select(p => new { p.Code, p.Series, p.DbModuleCount })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DbModuleCount))));
+                }
+            }
+        }
+        [ReportRule(@"Для элементов таблицы ""Доп. оборудование КА"" с типом монтажа:""Внутрь шкафа"" и с указанием Габаритный тип:""Параллелепипед"" должны быть заполнены параметры:
+Height	Width	Depth
+Высота, мм	Ширина, мм	Глубина, мм",
+            3, 705)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElFiderUtility))]
+        public void Rule_03_705() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElFiderUtilities
+                    .Where(p => p.InstallationType == ElInstallationType.InsideShell & p.DimensionType == ElDimensionType.Parallelepiped)
+                    .Where(p => !((p.Height.HasValue & p.Width.HasValue & p.Depth.HasValue ) &&
+                                (p.Height > 0 & p.Width > 0 & p.Depth > 0)))
+                    .Select(p => new { p.Code, p.Series, p.Height, p.Width, p.Depth })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.Height, p.Width, p.Depth))));
+                }
+            }
+        }
+        [ReportRule(@"Для элементов таблицы ""Доп. оборудование КА"" с типом монтажа:""Внутрь шкафа"" и с указанием Габаритный тип:""Цилиндр"" должны быть заполнены параметры:
+Diameter	Depth
+Диаметр, мм	Глубина, мм",
+            3, 706)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElFiderUtility))]
+        public void Rule_03_706() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElFiderUtilities
+                    .Where(p => p.InstallationType == ElInstallationType.InsideShell & p.DimensionType == ElDimensionType.Cylinder)
+                    .Where(p => !((p.Diameter.HasValue & p.Depth.HasValue ) &&
+                                (p.Diameter > 0 & p.Depth > 0)))
+                    .Select(p => new { p.Code, p.Series, p.Diameter, p.Depth })
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.Diameter, p.Depth))));
+                }
+            }
+        }
+        #endregion
         private static bool IsCorrectCurrentScaleUzo(double value) {
             if (((double)((int)value)) == value &&
                  value >= 1.0 && value <= 300.0
