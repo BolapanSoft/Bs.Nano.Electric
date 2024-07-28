@@ -106,7 +106,7 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        [ReportRule(@"Известные таблицы БДИ.", 0, 0), RuleCategory("Краткий отчет по базе изделий.")]
+        [ReportRule(@"Известные таблицы БДИ.", 0, 0), RuleCategory("Краткий отчет по базе изделий.","AllTables")]
         public void TotalKnownTablesCount() {
             using (Context context = connector.Connect()) {
                 var tables = context.GetKnownTables();

@@ -39,6 +39,27 @@ namespace Bs.Nano.Electric.Report {
             return Regex.IsMatch(word, @"\p{N}+([,.]\p{N}+)*");
         }
         /// <summary>
+        /// Проверяет что переданное значение входит в множество возможных значений перечисления.
+        /// </summary>
+        /// <typeparam name="TEnum"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static bool IsDefined<TEnum>(TEnum value) where TEnum : Enum {
+            return EnumConverter<TEnum>.IsDefineValue(value);
+        }
+        /// <summary>
+        /// Для элемента перечислений возвращает значение атрибута Description, если оно определено.
+        /// </summary>
+        /// <typeparam name="TEnum"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private static string GetDescription<TEnum>(TEnum value) where TEnum : System.Enum {
+            if (!EnumConverter<TEnum>.IsDefineValue(value)) {
+                return $"Некорректное значение:{System.Convert.ToUInt64(value)}";
+            }
+            return EnumConverter<TEnum>.GetDescription(value);
+        }
+        /// <summary>
         /// Возвращает запись индекса для имени переменной.
         /// </summary>
         /// <param name="ruleName"></param>

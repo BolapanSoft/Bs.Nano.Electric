@@ -16,44 +16,53 @@ using System.Web;
 
 namespace Nano.Electric {
     internal static class EnumConverter<TEnum> where TEnum : Enum {
-        private static readonly string[] descriptions;
-        private static readonly string[] enumNames;
-        private static readonly TEnum[] enumValues;
+
+        private static string[] _descriptions;
+        private static string[] _enumNames;
+        private static TEnum[] _enumValues;
         static EnumConverter() {
+            InitStaticFields();
+        }
+
+        private static void InitStaticFields() {
             GetEnumData(out string[] enumNames, out TEnum[] enumValues);
-            descriptions = new string[enumNames.Length];
+            EnumConverter<TEnum>._enumNames = enumNames;
+            EnumConverter<TEnum>._enumValues = enumValues;
+            _descriptions = new string[enumNames.Length];
             for (int i = 0; i < enumNames.Length; i++) {
                 var name = enumNames[i];
                 var memberInfo = typeof(TEnum).GetMember(name);
                 var descriptionAttribute = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
                 var value = (TEnum)Enum.Parse(typeof(TEnum), name);
-                descriptions[i] = descriptionAttribute?.Description ?? string.Empty;
+                _descriptions[i] = descriptionAttribute?.Description ?? string.Empty;
             }
         }
+
         internal static string GetDescription(TEnum value) {
-            int i = Array.BinarySearch(enumValues, value);
+            int i = Array.BinarySearch(_enumValues, value);
             if (i >= 0) {
-                return descriptions[i];
+                return _descriptions[i];
             }
             return string.Empty;
         }
         internal static bool IsDefineValue(TEnum value) {
-            int i = Array.BinarySearch(enumValues, value);
+            int i = Array.BinarySearch(_enumValues, value);
             return i >= 0;
         }
         internal static bool IsDefineValue(string value) {
-            foreach (var item in enumNames) {
+
+            foreach (var item in _enumNames) {
                 if (item == value)
                     return true;
             }
             return false;
         }
         private static void GetEnumData(out string[] enumNames, out TEnum[] enumValues) {
-            string[] array2 = Enum.GetNames(typeof(TEnum));
-            Array.Sort(array2);
-            TEnum[] array = new TEnum[array2.Length];
+            TEnum[] array = Enum.GetValues(typeof(TEnum)).Cast<TEnum>().ToArray();
+            Array.Sort(array);
+            string[] array2 = new string[array.Length];
             for (int i = 0; i < array2.Length; i++) {
-                array[i] = (TEnum)Enum.Parse(typeof(TEnum), array2[i]);
+                array2[i] = array[i].ToString();
             }
             enumNames = array2;
             enumValues = array;

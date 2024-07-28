@@ -1,4 +1,5 @@
-﻿using Nano.Electric;
+﻿using DocumentFormat.OpenXml.Vml;
+using Nano.Electric;
 using Nano.Electric.Enums;
 using System;
 using System.Collections.Generic;
@@ -34,36 +35,27 @@ namespace Bs.Nano.Electric.Report {
         #region 100 Автоматические выключчатели
 
         [ReportRule(@"Для автоматических выключателей должны быть заполнены технические данные:
-NominalCurrent	DbPoleCountEnum	VoltageType	MaxCommutation	DynResistance
-Номинальный ток, А	Количество полюсов	Номинальное напряжение сети, В	Предельная коммутационная способность при 380/220В Ics, кА	Электродинамическая стойкость при 380/220В Icm, кА",
+NominalCurrent	DbPoleCountEnum	VoltageType	MaxCommutation
+Номинальный ток, А	Количество полюсов	Номинальное напряжение сети, В	Предельная коммутационная способность при 380/220В Ics, кА",
                     3, 101)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
         public void Rule_03_101() {
             using (var context = connector.Connect()) {
                 var errors = context.ElAutomats
-                    .Select(p => new { p.Code, p.Series, p.NominalCurrent, p.DbPoleCountEnum, p.VoltageType, p.MaxCommutation, p.DynResistance })
+                    .Select(p => new { p.Code, p.Series, p.NominalCurrent, p.DbPoleCountEnum, p.VoltageType, p.MaxCommutation })
                     .ToList()
-                    .Where(p => !((p.NominalCurrent.HasValue & p.DbPoleCountEnum.HasValue & p.VoltageType.HasValue & p.MaxCommutation.HasValue & p.DynResistance.HasValue) &&
-                                (p.NominalCurrent > 0 & p.DbPoleCountEnum > 0 & IsDefined(p.VoltageType!.Value) & p.MaxCommutation > 0 & p.DynResistance > 0)))
+                    .Where(p => !((p.NominalCurrent.HasValue & p.DbPoleCountEnum.HasValue & p.VoltageType.HasValue & p.MaxCommutation.HasValue ) &&
+                                (p.NominalCurrent > 0 & p.DbPoleCountEnum > 0 & IsDefined(p.VoltageType!.Value) & p.MaxCommutation > 0 )))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
                         errors.Select(p => (p.Series, p.Code, (p.NominalCurrent,
                                 p.DbPoleCountEnum.HasValue ? GetDescription(p.DbPoleCountEnum.Value) : string.Empty,
                                 p.VoltageType.HasValue ? GetDescription(p.VoltageType.Value) : string.Empty,
-                                p.MaxCommutation, p.DynResistance))));
+                                p.MaxCommutation))));
                 }
             }
 
-        }
-        private static bool IsDefined<TEnum>(TEnum value) where TEnum : Enum {
-            return EnumConverter<TEnum>.IsDefineValue(value);
-        }
-        private static string GetDescription<TEnum>(TEnum value) where TEnum : System.Enum {
-            if (!EnumConverter<TEnum>.IsDefineValue(value)) {
-                return $"Некорректное значение:{System.Convert.ToUInt64(value)}";
-            }
-            return EnumConverter<TEnum>.GetDescription(value);
         }
         [ReportRule(@"Для автоматических выключателей должны быть заполнены механические данные:
 ContactType	MaxCordS
@@ -145,6 +137,25 @@ IsHeatR	IsElMagR	IsElectronicR	HasUzo
             }
 
         }
+        [ReportRule(@"Для автоматических выключателей должны быть заполнен технические данные: DynResistance	Электродинамическая стойкость при 380/220В Icm, кА",
+            3, 106)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
+        public void Rule_03_106() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElAutomats
+                    .Select(p => new { p.Code, p.Series, p.DynResistance })
+                    .ToList()
+                    .Where(p => !((p.DynResistance.HasValue) &&
+                                ( p.DynResistance > 0)))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DynResistance))));
+                }
+            }
+
+        }
+
         [ReportRule(@"Для автоматических выключателей с креплением на монтажную рейку должен быть заполнен параметр: RailMountTypeFlagged Тип монтажной рейки",
                     3, 110)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
@@ -450,6 +461,77 @@ KzKiScale	UnlinkTimeElectronicScale
                 }
             }
         }
+
+        [ReportRule(@"Для автоматических выключателей должны быть заполнены расчетные параметры:
+ActiveResistance	InductiveResistance
+Активное сопротивление полюса R, мОм	Реактивное сопротивление полюса X, мОм",
+                    3, 150)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
+        public void Rule_03_150() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElAutomats
+                    .Select(p => new { p.Code, p.Series, p.ActiveResistance, p.InductiveResistance})
+                    .ToList()
+                    .Where(p => !((p.ActiveResistance.HasValue & p.InductiveResistance.HasValue ) &&
+                                (p.ActiveResistance > 0 & p.InductiveResistance > 0 )))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.ActiveResistance,      p.InductiveResistance))));
+                }
+            }
+        }
+        [ReportRule(@"Для автоматических выключателей разброс значения параметра ""Активное сопротивление полюса R, мОм"" не должен превышать 120% от среднего значения.",
+                    3, 151)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
+        public void Rule_03_151() {
+            using (var context = connector.Connect()) {
+                var products = context.ElAutomats
+                    .Select(p => new { p.Code,p.Purpose, p.Series, p.ActiveResistance})
+                    .Where(p => ((p.ActiveResistance.HasValue) &&
+                                (p.ActiveResistance > 0 )))
+                    .ToList()
+                    .GroupBy(p=>new { p.Purpose, p.Series })
+                    .Select(gr=>new {gr.Key.Purpose, gr.Key.Series, 
+                                    ActiveResistanceMean= gr.Select(val=>val.ActiveResistance).Where(val=>val>0 & val<1500).Average(),
+                                    Products=gr})
+                    .ToList();
+                var errors = products
+                    .SelectMany(gr => gr.Products
+                        .Where(p => p.ActiveResistance > gr.ActiveResistanceMean * 2.2 )
+                        .Select(pr => (gr.Purpose, gr.Series, pr.Code, (pr.ActiveResistance))))
+                    .ToList(); 
+                if (errors.Any()) {
+                    FailRuleTest($"Не выполняется для {errors.Count} элементов.", errors);
+                }
+            }
+        }
+        [ReportRule(@"Для автоматических выключателей разброс значения параметра ""Реактивное сопротивление полюса X, мОм"" не должен превышать 120% от среднего значения.",
+                    3, 152)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
+        public void Rule_03_152() {
+            using (var context = connector.Connect()) {
+                var products = context.ElAutomats
+                    .Select(p => new { p.Code,p.Purpose, p.Series, p.InductiveResistance})
+                    .Where(p => ((p.InductiveResistance.HasValue) &&
+                                (p.InductiveResistance > 0 )))
+                    .ToList()
+                    .GroupBy(p=>new { p.Purpose, p.Series })
+                    .Select(gr=>new {gr.Key.Purpose, gr.Key.Series, 
+                                    InductiveResistanceMean= gr.Select(val=>val.InductiveResistance).Where(val=>val>0 & val<1500).Average(),
+                                    Products=gr})
+                    .ToList();
+                var errors = products
+                    .SelectMany(gr => gr.Products
+                        .Where(p => p.InductiveResistance > gr.InductiveResistanceMean * 2.2 )
+                        .Select(pr => (gr.Purpose, gr.Series, pr.Code, (pr.InductiveResistance))))
+                    .ToList(); 
+                if (errors.Any()) {
+                    FailRuleTest($"Не выполняется для {errors.Count} элементов.", errors);
+                }
+            }
+        }
+        
         #endregion
 
         #region 200 Предохранители
@@ -994,7 +1076,7 @@ DbStarterType	ContactNOCount	ContactNZCount
                     .Where(p=>p.DbDeviceType==ElDeviceTypeEnum.RELAY)
                     .Select(p => new { p.Code, p.Series, p.CurrentRelayType})
                     .ToList()
-                    .Where(p => !(string.IsNullOrEmpty(p.CurrentRelayType)))
+                    .Where(p => string.IsNullOrEmpty(p.CurrentRelayType))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
