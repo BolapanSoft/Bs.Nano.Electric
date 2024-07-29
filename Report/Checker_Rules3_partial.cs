@@ -461,6 +461,35 @@ KzKiScale	UnlinkTimeElectronicScale
                 }
             }
         }
+        [ReportRule(@"Для автоматических выключателей параметр MultiplScale	""Кратности уставки расцепителя Кm, о.е"" должен быть задан в виде числа формата ""0,##"" или списка чисел, разделенных символом ""/""",
+                    3, 123)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
+        public void Rule_03_123() {
+            bool isCorrectList(string strValues) {
+                if (string.IsNullOrWhiteSpace(strValues)) return false;
+                var values = strValues.Split('/');
+                foreach (var item in values) {
+                    if (!double.TryParse(item, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("Ru-ru"), out _))
+                        return false;
+                }
+                return true;
+            }
+            using (var context = connector.Connect()) {
+                var errors = context.ElAutomats
+                    .Where(p => (p.IsElMagR == true | p.IsElectronicR == true) & p.CurrentChoice == ElCurrentChoiseEnum.BY_MULTIPLICITY)
+                    .Select(p => new { p.Code, p.Series, p.MultiplScale})
+                    .ToList()
+                    .Where(p => !isCorrectList(p.MultiplScale) )
+                   .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.MultiplScale))
+                        ));
+                    ;
+                }
+            }
+        }
+
 
         [ReportRule(@"Для автоматических выключателей должны быть заполнены расчетные параметры:
 ActiveResistance	InductiveResistance

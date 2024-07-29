@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>1.1.59</VersionPrefix>
+		<VersionPrefix>1.1.60</VersionPrefix>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>9.0</LangVersion>
 		<Nullable>enable</Nullable>
@@ -154,6 +154,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="EntityFramework.SqlServerCompact" Version="6.4.4" />
+		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

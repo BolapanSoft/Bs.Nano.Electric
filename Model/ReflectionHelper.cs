@@ -12,16 +12,28 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Caching;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Web;
 
 namespace Nano.Electric {
     internal static class EnumConverter<TEnum> where TEnum : Enum {
-
+        private static readonly bool _isFlagsEnum;
+        private static readonly uint _allflags;
         private static string[] _descriptions;
         private static string[] _enumNames;
         private static TEnum[] _enumValues;
         static EnumConverter() {
+            bool isFlags = EnumConverter<TEnum>._isFlagsEnum = typeof(TEnum).GetCustomAttribute<FlagsAttribute>() is not null;
             InitStaticFields();
+            if (isFlags) {
+                _allflags = 0;
+                foreach (var item in _enumValues!) {
+                    _allflags += ToUint(item);
+                }
+            }
+            else {
+                _allflags = ToUint(_enumValues[_enumValues.Length - 1]);
+            }
         }
 
         private static void InitStaticFields() {
@@ -39,15 +51,38 @@ namespace Nano.Electric {
         }
 
         internal static string GetDescription(TEnum value) {
-            int i = Array.BinarySearch(_enumValues, value);
-            if (i >= 0) {
-                return _descriptions[i];
+            if (_isFlagsEnum) {
+                StringBuilder sb = new StringBuilder();
+                int i = 0;
+                for (; i < _enumValues.Length - 1; i++) {
+                    if ((ToUint(_enumValues[i]) & ToUint(value)) == ToUint(_enumValues[i])) {
+                        if (sb.Length > 0) {
+                            sb.Append("; ");
+                        }
+                        sb.Append(GetDescriptionSingleValue(_enumValues[i]));
+                    }
+                }
+                if ((ToUint(_enumValues[i]) & ToUint(value)) == ToUint(_enumValues[i])) {
+                    if (sb.Length > 0) {
+                        sb.Append("; ");
+                    }
+                    sb.Append(sb.Append(GetDescriptionSingleValue(_enumValues[i])));
+                }
+                return sb.ToString();
             }
-            return string.Empty;
+            else {
+                return GetDescriptionSingleValue(value);
+            }
         }
         internal static bool IsDefineValue(TEnum value) {
-            int i = Array.BinarySearch(_enumValues, value);
-            return i >= 0;
+            if (_isFlagsEnum) {
+                var uintValue = ToUint(value);
+                return ((~_allflags) & uintValue) == 0;
+            }
+            else {
+                int i = Array.BinarySearch(_enumValues, value);
+                return i >= 0;
+            }
         }
         internal static bool IsDefineValue(string value) {
 
@@ -66,6 +101,17 @@ namespace Nano.Electric {
             }
             enumNames = array2;
             enumValues = array;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static uint ToUint(TEnum val) {
+            return Unsafe.As<TEnum, uint>(ref val);
+        }
+        private static string GetDescriptionSingleValue(TEnum value) {
+            int i = Array.BinarySearch(_enumValues, value);
+            if (i >= 0) {
+                return _descriptions[i];
+            }
+            return string.Empty;
         }
     }
     internal static class ReflectionHelper {
