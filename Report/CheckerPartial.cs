@@ -1,9 +1,14 @@
-﻿using Nano.Electric;
+﻿using Bs.Nano.Electric.Model;
+using Nano.Electric;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data.Entity;
+using System.Data.SqlServerCe;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Bs.Nano.Electric.Report {
@@ -15,6 +20,10 @@ namespace Bs.Nano.Electric.Report {
             public int? DbImageRef { get; set; }
             public string Name { get; set; }
             public string Manufacturer { get; set; }
+        }
+        internal class Material {
+            public string Code { get; set; }
+            public string Mass { get; set; }
         }
         public static string[] SplitToWords(string value) {
             // Split the string into words based on letters and digits from any language
@@ -70,15 +79,30 @@ namespace Bs.Nano.Electric.Report {
                 return string.Empty;
             return ruleName!.Replace('_', '.');
         }
+        private List<(string Code, string ArticleName, string TableName, string TypeDescription)> LoadCodes(Context context, IQueryable dbSet, string tableName, Type entityType) {
+            string typeDescription = Context.GetDefaultLocalizeValue(entityType);
+            if (typeof(IProduct).IsAssignableFrom(entityType)) {
+                List<(string Code, string ArticleName, string TableName, string TypeDescription)> products = new(1024);
+                /*using (var context = connector.Connect())*/
+                {
+                    //var query = dbSet.Cast<object>().ToList();// Convert dbSet to query
+                    // Load all entity from dbSet query
+                    foreach (var entity in dbSet.AsNoTracking()) {
+                        IProduct product = (IProduct)entity;
+                        products.Add((product.Code, product.Name, tableName, typeDescription));
+                    }
+                }
+                return products;
+            }
+            else {
+                return new();
+            }
+        }
         private List<(string Code, string ArticleName, string TableName, string TypeDescription)> LoadAllCodes() {
             List<(string Code, string ArticleName, string TableName, string TypeDescription)> allCodes = new();
-            string getDescription(Type type) {
-                var attr = type.GetCustomAttribute<DefaultLocalizeValueAttribute>();
-                return attr?.DefaultLocalizeValue ?? string.Empty;
-            }
             using (var context = connector.Connect()) {
                 {
-                    var description = getDescription(typeof(ScsGutterCanal));
+                    var description = Context.GetDefaultLocalizeValue(typeof(ScsGutterCanal));
                     var products = context.ScsGutterCanals
                         .Select(p => new { p.Code, p.SpecDescription })
                         ;
@@ -87,7 +111,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 {
-                    var description = getDescription(typeof(DbScsGutterCover));
+                    var description = Context.GetDefaultLocalizeValue(typeof(DbScsGutterCover));
                     var products = context.DbScsGutterCovers
                         .Select(p => new { p.Code, p.SpecDescription })
                         ;
@@ -96,7 +120,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 {
-                    var description = getDescription(typeof(DbScsGutterPartition));
+                    var description = Context.GetDefaultLocalizeValue(typeof(DbScsGutterPartition));
                     var products = context.DbScsGutterPartitions
                         .Select(p => new { p.Code, p.SpecDescription })
                         ;
@@ -105,7 +129,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 {
-                    var description = getDescription(typeof(ScsGcFitting));
+                    var description = Context.GetDefaultLocalizeValue(typeof(ScsGcFitting));
                     var products = context.ScsGcFittings
                         .Select(p => new { p.Code, p.SpecDescription })
                         ;
@@ -114,7 +138,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 {
-                    var description = getDescription(typeof(DbScsGcCoverUnit));
+                    var description = Context.GetDefaultLocalizeValue(typeof(DbScsGcCoverUnit));
                     var products = context.DbScsGcCoverUnits
                         .Select(p => new { p.Code, p.SpecDescription })
                         ;
@@ -123,7 +147,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 {
-                    var description = getDescription(typeof(DbScsGcAccessoryUnit));
+                    var description = Context.GetDefaultLocalizeValue(typeof(DbScsGcAccessoryUnit));
                     var products = context.DbScsGcAccessoryUnits
                         .Select(p => new { p.Code, p.SpecDescription })
                         ;
@@ -132,7 +156,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 {
-                    var description = getDescription(typeof(ScsGutterBolting));
+                    var description = Context.GetDefaultLocalizeValue(typeof(ScsGutterBolting));
                     var products = context.ScsGutterBoltings
                         .Select(p => new { p.Code, p.SpecDescription })
                         ;
@@ -141,7 +165,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 {
-                    var description = getDescription(typeof(DbScsGcBoltingAccessoryUnit));
+                    var description = Context.GetDefaultLocalizeValue(typeof(DbScsGcBoltingAccessoryUnit));
                     var products = context.DbScsGcBoltingAccessoryUnits
                         .Select(p => new { p.Code, p.SpecDescription })
                         ;
@@ -150,7 +174,7 @@ namespace Bs.Nano.Electric.Report {
                     }
                 }
                 {
-                    var description = getDescription(typeof(CaeMaterialUtility));
+                    var description = Context.GetDefaultLocalizeValue(typeof(CaeMaterialUtility));
                     var products = context.CaeMaterialUtilities
                         .Select(p => new { p.Code, p.SpecDescription })
                         ;
@@ -184,6 +208,110 @@ namespace Bs.Nano.Electric.Report {
                 ex.Data.Add(item.Key, item.Value);
             }
             throw ex;
+        }
+        private static List<string> GetTablesWithCodeFieldAndRecords(DbContext context) {
+            var tableNames = new List<string>();
+            var connection = (SqlCeConnection)context.Database.Connection;
+
+            // Открываем соединение
+            connection.Open();
+
+            var schema = connection.GetSchema("Tables");
+            foreach (System.Data.DataRow row in schema.Rows) {
+                string tableName = row["TABLE_NAME"].ToString();
+                string query = $"SELECT COUNT(*) FROM [{tableName}] WHERE [Code] IS NOT NULL";
+
+                using (var command = new SqlCeCommand(query, connection)) {
+                    try {
+                        int count = (int)command.ExecuteScalar();
+                        if (count > 0) {
+                            tableNames.Add(tableName);
+                        }
+                    }
+                    catch (SqlCeException) {
+                        // Пропускаем таблицы, у которых нет поля "Code"
+                    }
+                }
+            }
+
+            connection.Close();
+            return tableNames;
+        }
+        private static (bool isHaveField, IEnumerable<T> values) GetValues<T>(INanocadDBConnector connector, string tableName, string columnName) where T : struct {
+            List<T> values = new();
+            bool allRight = false;
+            if (!(IsCorrectTableName(tableName) && IsCorrectColumnName(columnName))) {
+                return (allRight, values);
+            }
+            try {
+                using (var context = connector.Connect()) {
+                    string strQuery = $"SELECT [{columnName}] FROM [{tableName}]";
+                    var query = context.Database.SqlQuery<T>(strQuery);
+                    values = query.ToList();
+                    allRight = true;
+                }
+            }
+            catch (Exception) {
+            }
+            return (allRight, values);
+        }
+        private static (bool isHaveMaterial, IEnumerable<Material> values) GetMaterialValues(INanocadDBConnector connector, string tableName) {
+            List<Material> values = new();
+            bool allRight = false;
+            if (!(IsCorrectTableName(tableName) )) {
+                return (allRight, Array.Empty<Material>());
+            }
+            try {
+                using (var context = connector.Connect()) {
+                    string strQuery = $"SELECT [Code], [Mass] FROM [{tableName}]";
+                    var query = context.Database.SqlQuery<Material>(strQuery);
+                    values = query.ToList();
+                    allRight = true;
+                }
+            }
+            catch (Exception ex) {
+                ;
+            }
+            return (allRight, values);
+        }
+        private static bool IsCorrectTableName(string tableName) {
+            // Check for null or empty
+            if (string.IsNullOrEmpty(tableName))
+                return false;
+
+            // Check for valid length (usually <= 128 characters in many SQL implementations)
+            if (tableName.Length > 128)
+                return false;
+
+            // Check for allowed characters (letters, digits, underscores)
+            // Adjust the allowed pattern if necessary (e.g., for case sensitivity or specific naming conventions)
+            var validTableNamePattern = @"^[a-zA-Z0-9_]+$";
+            if (!System.Text.RegularExpressions.Regex.IsMatch(tableName, validTableNamePattern))
+                return false;
+
+            // Additional checks can be added here (e.g., reserved words, specific prefix requirements)
+
+            return true;
+        }
+
+        private static bool IsCorrectColumnName(string columnName) {
+            // Check for null or empty
+            if (string.IsNullOrEmpty(columnName))
+                return false;
+
+            // Check for valid length (usually <= 128 characters in many SQL implementations)
+            if (columnName.Length > 128)
+                return false;
+
+            // Check for allowed characters (letters, digits, underscores)
+            // Adjust the allowed pattern if necessary (e.g., for case sensitivity or specific naming conventions)
+            var validColumnNamePattern = @"^[a-zA-Z0-9_]+$";
+            if (!System.Text.RegularExpressions.Regex.IsMatch(columnName, validColumnNamePattern))
+                return false;
+
+            // Additional checks can be added here (e.g., reserved words, specific prefix requirements)
+
+            return true;
         }
 
     }

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Globalization;
@@ -176,6 +177,13 @@ namespace Nano.Electric {
         }
         public static string GetDefaultLocalizeValue<T>() where T:class {
             Type productType = typeof(T);
+            return GetDefaultLocalizeValue(productType);
+        }
+        public static string GetDatabaseTableName(Type productType) {
+            var table = productType.GetCustomAttribute<TableAttribute>()?.Name??productType.Name; 
+            return table;
+        }
+        public static string GetDefaultLocalizeValue(Type productType) {
             if (knownLocalizeValues.ContainsKey(productType))
                 return knownLocalizeValues[productType];
             var value = productType.GetCustomAttribute<DefaultLocalizeValueAttribute>()?.DefaultLocalizeValue ?? string.Empty;

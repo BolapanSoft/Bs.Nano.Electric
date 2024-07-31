@@ -277,7 +277,7 @@ namespace Bs.Nano.Electric.Report {
 
             return 0;
         }
-        public static IEnumerable<(object property, string tableName)> GetKnownTables(this DbContext source) {
+        public static IEnumerable<(object property, string tableDescription, Type EntityType)> GetKnownTables(this DbContext source) {
             var dbSetProperties = source.GetType().GetProperties()
         .Where(p => p.PropertyType.IsGenericType &&
                     p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>) &&
@@ -285,10 +285,9 @@ namespace Bs.Nano.Electric.Report {
 
             foreach (PropertyInfo propInfo in dbSetProperties) {
                 Type propType = propInfo.PropertyType.GetGenericArguments()[0];
-                string tableName = propType.GetCustomAttribute<DefaultLocalizeValueAttribute>()?.DefaultLocalizeValue
-                                   ?? propType.Name;
+                string tableDescription = Context.GetDefaultLocalizeValue(propType);
                 object dbSetInstance = propInfo.GetValue(source); // Get the instance of the DbSet<T> property
-                yield return (dbSetInstance, tableName);
+                yield return (dbSetInstance, tableDescription, propType);
             }
         }
     }
