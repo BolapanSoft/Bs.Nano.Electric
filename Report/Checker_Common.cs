@@ -435,7 +435,7 @@ namespace Bs.Nano.Electric.Report {
                             if (string.IsNullOrEmpty(mass) ) {
                                 errors.Enqueue((tableDescription, row.Code, mass));
                             }
-                            if(! double.TryParse(mass, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("Ru-ru"), out _)) {
+                           else if(! double.TryParse(mass, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("Ru-ru"), out _)) {
                                 errors.Enqueue((tableDescription,  row.Code, $"Значение \"{mass}\" не соответствует шаблону 0,##"));
 
                             }
