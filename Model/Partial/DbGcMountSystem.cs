@@ -7,7 +7,7 @@ namespace Nano.Electric {
     /// <summary>
     /// Конфигурация трасс лотков
     /// </summary>
-    public partial class DbGcMountSystem : KitElement, IXmlSerializable, IProduct {
+    public partial class DbGcMountSystem : KitElement, IXmlSerializable/*, IProduct*/, IHaveId {
         [NotMapped]
         public string Code => DbName;
         [NotMapped]

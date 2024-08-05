@@ -9,7 +9,7 @@ using System.Xml.Serialization;
 namespace Nano.Electric {
 
     [XmlRoot(nameof(DbScsGutterUtilitySet))]
-    public partial class DbScsGutterUtilitySet : KitElement, IXmlSerializable, IProduct {
+    public partial class DbScsGutterUtilitySet : KitElement, IXmlSerializable/*, IProduct*/, IHaveId {
         /// <summary>
         /// Тип несущего элемента
         /// </summary>
@@ -45,11 +45,11 @@ namespace Nano.Electric {
             }
         }
 
-        string IProduct.Code => DbName;
+        //string IProduct.Code => DbName;
 
-        int? IProduct.DbImageRef { get => DbImageRef; set => DbImageRef = value; }
-        string IProduct.Name { get => DbDescription; set => DbDescription = value; }
-        string IProduct.Manufacturer { get => string.Empty; set => throw new NotImplementedException(); }
+        //int? IProduct.DbImageRef { get => DbImageRef; set => DbImageRef = value; }
+        //string IProduct.Name { get => DbDescription; set => DbDescription = value; }
+        //string IProduct.Manufacturer { get => string.Empty; set => throw new NotImplementedException(); }
 
         public IEnumerable<DbUtilityUnit> GetChildren() {
             return base.GetChildren<DbUtilityUnit>().ToArray();
