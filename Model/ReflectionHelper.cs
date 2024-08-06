@@ -16,7 +16,7 @@ using System.Text;
 using System.Web;
 
 namespace Nano.Electric {
-    internal static class EnumConverter<TEnum> where TEnum : Enum {
+    public static class EnumConverter<TEnum> where TEnum : Enum {
         private static readonly bool _isFlagsEnum;
         private static readonly uint _allflags;
         private static string[] _descriptions;
@@ -50,7 +50,7 @@ namespace Nano.Electric {
             }
         }
 
-        internal static string GetDescription(TEnum value) {
+        public static string GetDescription(TEnum value) {
             if (_isFlagsEnum) {
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
@@ -74,7 +74,7 @@ namespace Nano.Electric {
                 return GetDescriptionSingleValue(value);
             }
         }
-        internal static bool IsDefineValue(TEnum value) {
+        public static bool IsDefineValue(TEnum value) {
             if (_isFlagsEnum) {
                 var uintValue = ToUint(value);
                 return ((~_allflags) & uintValue) == 0;
@@ -84,7 +84,7 @@ namespace Nano.Electric {
                 return i >= 0;
             }
         }
-        internal static bool IsDefineValue(string value) {
+        public static bool IsDefineValue(string value) {
 
             foreach (var item in _enumNames) {
                 if (item == value)
