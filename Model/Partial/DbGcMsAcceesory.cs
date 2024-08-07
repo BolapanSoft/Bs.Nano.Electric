@@ -7,7 +7,7 @@ namespace Nano.Electric {
     /// Аксессуар
     /// </summary>
     /// <remarks>Представляет дочерний элемент конфигурации соединительных элементов.</remarks>
-    [XmlRoot(nameof(DbGcMsAccessory))]
+    [XmlRoot("DbGcMsAcceesory")]
     public class DbGcMsAccessory : KitElement, IXmlSerializable {
         /// <summary>
         /// Количество
