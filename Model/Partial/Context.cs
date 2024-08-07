@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Remoting.Contexts;
@@ -23,7 +24,7 @@ namespace Nano.Electric {
 
         partial void InitializeModel(DbModelBuilder modelBuilder) {
             modelBuilder.Conventions.Add(new NanoCadPropertiesConvention());
-            
+
             modelBuilder.Entity<CaeMaterialUtility>()
                 .Property(t => t.MeashureUnits)
                 .HasColumnName("MeashureUnits");
@@ -44,15 +45,15 @@ namespace Nano.Electric {
             modelBuilder.Entity<ElLighting>()
                 .HasOptional(p => p.DbLtKiTable)
                 .WithMany()
-                .Map(m=>m.MapKey("KiTable"));
+                .Map(m => m.MapKey("KiTable"));
             modelBuilder.Entity<ElWireMark>()
                 .HasOptional(p => p.IsolationMaterial)
                 .WithMany()
-                .Map(m=>m.MapKey("isolationMaterialId"));
+                .Map(m => m.MapKey("isolationMaterialId"));
             modelBuilder.Entity<ElWireMark>()
                 .HasOptional(p => p.Material)
                 .WithMany()
-                .Map(m=>m.MapKey("materialId"));
+                .Map(m => m.MapKey("materialId"));
 
 #endif
             //modelBuilder.Entity<DbLtKiTable>()
@@ -93,7 +94,7 @@ namespace Nano.Electric {
                 if (propertyInfo == null || !propertyInfo.CanWrite) {
                     continue;
                 }
-             
+
                 if (propertyInfo.GetCustomAttribute<KeyAttribute>() != null) {
                     results.Add((propName, new InvalidOperationException($"Операция не разрешена. Свойство {propName} является частью ключа.")));
 
@@ -106,13 +107,13 @@ namespace Nano.Electric {
                 try {
                     propertyInfo.SetValue(product, sourceValue, BindingFlags.Public, FieldBinder.Instance, null, CultureInfo.GetCultureInfo("Ru-ru"));
                 }
-                catch(Exception ex) {
-                    results.Add((propName, new InvalidOperationException($"Операция не выполнена. Значение \"{sourceValue}\" столбца {propName} не удается привести к типу {propertyInfo.PropertyType}.",ex)));
+                catch (Exception ex) {
+                    results.Add((propName, new InvalidOperationException($"Операция не выполнена. Значение \"{sourceValue}\" столбца {propName} не удается привести к типу {propertyInfo.PropertyType}.", ex)));
                 }
             }
             return results;
         }
-        public bool TrySetProperty<Tdest,Tprop>(Tdest product, string propName, Tprop sourceValue) where Tdest : class {
+        public bool TrySetProperty<Tdest, Tprop>(Tdest product, string propName, Tprop sourceValue) where Tdest : class {
             var propertyInfo = product.GetType().GetProperty(propName);
             if (propertyInfo == null || !propertyInfo.CanWrite) {
                 return false;
@@ -120,7 +121,7 @@ namespace Nano.Electric {
             if (propertyInfo.GetCustomAttribute<KeyAttribute>() != null) {
                 throw new InvalidOperationException($"Операция не разрешена. Свойство {propName} является частью ключа.");
             }
-            try {  
+            try {
                 propertyInfo.SetValue(product, sourceValue, BindingFlags.Public, FieldBinder.Instance, null, CultureInfo.GetCultureInfo("Ru-ru"));
                 return true;
             }
@@ -146,7 +147,7 @@ namespace Nano.Electric {
                 return false;
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -175,12 +176,12 @@ namespace Nano.Electric {
             propertiesCache[typeName] = properties;
             return properties;
         }
-        public static string GetDefaultLocalizeValue<T>() where T:class {
+        public static string GetDefaultLocalizeValue<T>() where T : class {
             Type productType = typeof(T);
             return GetDefaultLocalizeValue(productType);
         }
         public static string GetDatabaseTableName(Type productType) {
-            var table = productType.GetCustomAttribute<TableAttribute>()?.Name??productType.Name; 
+            var table = productType.GetCustomAttribute<TableAttribute>()?.Name ?? productType.Name;
             return table;
         }
         public static string GetDefaultLocalizeValue(Type productType) {
@@ -190,5 +191,20 @@ namespace Nano.Electric {
             knownLocalizeValues.Add(productType, value);
             return value;
         }
+        public DbImage CreateImage(string? imgName, string category, byte[] image) {
+            DbImage dbImg = this.DbImages.Create();
+            int id = 1;
+            if (this.DbImages.Count() > 0) {
+                id=Math.Max(this.DbImages.Max(img => img.Id) + 1, this.DbImages.Local.Max(img => img.Id) + 1);
+            }
+            dbImg.Id = id;
+            dbImg.Text = imgName ?? string.Empty;
+            dbImg.Category = category;
+            dbImg.Image = image;
+            //var data = image;
+            this.DbImages.Add(dbImg);
+            return dbImg;
+        }
+        
     }
 }
