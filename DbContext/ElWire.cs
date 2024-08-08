@@ -57,8 +57,8 @@ namespace Nano.Electric
         public int? wireMark { get; set; }
 
         public string wireName { get; set; }
-
-        public string DbCode { get; set; }
+        [Column("DbCode")]
+        public string Code { get; set; }
 
         public double? CountPerBox { get; set; }
 
