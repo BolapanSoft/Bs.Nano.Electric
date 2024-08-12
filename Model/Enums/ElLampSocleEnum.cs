@@ -125,5 +125,36 @@ namespace Nano.Electric.Enums {
         [Description("PGJ5")]
         SOCLE_PGJ5 = 61
     }
-
+    public enum EnvLightingTypeEnum {
+        [DefaultLocalizeValue("лампа накаливания")]
+        [Description("ЛН")]
+        LN = 0,
+        [DefaultLocalizeValue("люминесцентная лампа")]
+        [Description("ЛЛ")]
+        LL = 1,
+        [DefaultLocalizeValue("компактная люминесцентная лампа")]
+        [Description("КЛЛ")]
+        KLL = 4,
+        [DefaultLocalizeValue("кварцевая галогенная лампа")]
+        [Description("КГ")]
+        KG = 5,
+        [DefaultLocalizeValue("металлогалогенная лампа")]
+        [Description("МГЛ")]
+        MGL = 6,
+        [DefaultLocalizeValue("натриевая лампа низкого давления")]
+        [Description("НЛНД")]
+        NLND = 7,
+        [DefaultLocalizeValue("натриевая лампа высокого давления")]
+        [Description("НЛВД")]
+        NLVD = 8,
+        [DefaultLocalizeValue("ртутная лампа высокого давления")]
+        [Description("РЛВД")]
+        RLVD = 2,
+        [DefaultLocalizeValue("светодиодная лампа")]
+        [Description("СД")]
+        DIOD = 3,
+        [DefaultLocalizeValue("индукционная лампа")]
+        [Description("ИЛ")]
+        IL = 9
+    }
 }

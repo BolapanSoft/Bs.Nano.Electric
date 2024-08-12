@@ -42,8 +42,8 @@ namespace Nano.Electric
         public double? PowerCoef { get; set; }
 
         public int? SafeDegree { get; set; }
-
-        public string Siries { get; set; }
+        [Column("Siries")]
+        public string Series { get; set; }
 
         public string SpecDescription { get; set; }
 

@@ -20,8 +20,8 @@ namespace Nano.Electric
         public string Name { get; set; }
 
         public string OtherType { get; set; }
-
-        public string Siries { get; set; }
+        [Column("Siries")]
+        public string Series { get; set; }
 
         public string Description { get; set; }
 
