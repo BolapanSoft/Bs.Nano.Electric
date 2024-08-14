@@ -95,6 +95,10 @@ namespace Nano.Electric {
     public partial class ElWireMark { }
     [DefaultLocalizeValue("Кабельно-проводниковая продукция\\Кабели и провода")]
     public partial class ElWire { }
+    [DefaultLocalizeValue("Кабельно-проводниковая продукция\\Типы кабельных систем")]
+    public partial class ScsCableSystemType { }
+    [DefaultLocalizeValue("Кабельно-проводниковая продукция\\Патч-корды")]
+    public partial class ScsPatchCord { }
 
     [DefaultLocalizeValue("Распределительные устройства\\Шкафы")]
     public partial class ElBoard { }

@@ -23,11 +23,14 @@ namespace Nano.Electric {
     public partial class ClimateTable : IHaveId { }
     public partial class DbLtKiTable : IHaveId { }
     public partial class ExplodeSafeLevel : IHaveId { }
+    public partial class ElWire : IProduct, IHaveImageRef { }
     public partial class ElWireConductMaterial : IHaveId { }
     public partial class ElWireIsolationMaterial : IHaveId { }
+    public partial class ScsCableSystemType : IHaveId { }
     public partial class ScsGutterCanal : IProduct, IHaveImageRef { }
     public partial class ScsCabelCanal : IProduct, IHaveImageRef { }
     public partial class ScsCableFitting : IProduct, IHaveImageRef { }
+    public partial class ScsPatchCord : IProduct, IHaveImageRef { }
     public partial class ScsPipe : IProduct, IHaveImageRef { }
     public partial class ScsTubeFitting : IProduct, IHaveImageRef { }
     public partial class DbScsGutterCover : IProduct, IHaveImageRef { }

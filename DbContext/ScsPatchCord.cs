@@ -9,11 +9,14 @@ namespace Nano.Electric
     [Table("ScsPatchCord")]
     public partial class ScsPatchCord
     {
+#if !InitDbContextEnums
+       public int? EnvType { get; set; }
+
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public int? EnvType { get; set; }
-
+ 
         public double? DbLength { get; set; }
 
         public int? CordCordCount { get; set; }

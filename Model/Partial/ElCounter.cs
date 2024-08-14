@@ -1,6 +1,7 @@
 ﻿// Ignore Spelling: Expl
 
 using Nano.Electric.Enums;
+using System.Collections.Concurrent;
 
 namespace Nano.Electric {
     public partial class ElCounter {
@@ -15,7 +16,13 @@ namespace Nano.Electric {
         public ElCounterType CounterType { get; set; }
         public ElControlMeasureDeviceInstallType InstallType { get; set; }
         public PhaseCountEnum? PoleCount { get; set; }
-        
+
+#endif
+    }
+    public partial class ScsPatchCord {
+#if InitDbContextEnums
+       public CordTypeEnum? EnvType { get; set; }
+
 #endif
     }
 }

@@ -10,4 +10,10 @@ namespace Nano.Electric.Enums {
 		[Description("Снизу и сверху")]
 		LEAD_UP_DOWN = 2
 	}
+    public enum CordTypeEnum {
+		[Description("Медный")]
+        CUPRUM = 1,
+		[Description("Оптический")]
+        OPTIC
+    }
 }
