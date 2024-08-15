@@ -9,12 +9,13 @@ namespace Nano.Electric
     [Table("ScsPortType")]
     public partial class ScsPortType
     {
+#if !InitDbContextEnums
+        public int? EnvType { get; set; }
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
         public string PortType { get; set; }
-
-        public int? EnvType { get; set; }
 
         public int? InletCordCount { get; set; }
 

@@ -19,10 +19,4 @@ namespace Nano.Electric {
 
 #endif
     }
-    public partial class ScsPatchCord {
-#if InitDbContextEnums
-       public CordTypeEnum? EnvType { get; set; }
-
-#endif
-    }
 }

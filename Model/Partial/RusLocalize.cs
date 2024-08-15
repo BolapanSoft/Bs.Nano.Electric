@@ -84,6 +84,8 @@ namespace Nano.Electric {
 
     [DefaultLocalizeValue("Маркировка по взрывозащите")]
     public partial class ExplodeSafeLevel { }
+    [DefaultLocalizeValue("Рабочие места\\Типы портов")]
+    public partial class ScsPortType { }
 
     [DefaultLocalizeValue("Кабельно-проводниковая продукция\\Материалы изоляции кабелей")]
     public partial class ElWireIsolationMaterial { }

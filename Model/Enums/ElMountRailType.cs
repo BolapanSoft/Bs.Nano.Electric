@@ -17,10 +17,22 @@ namespace Nano.Electric.Enums {
         [Description("27x15")]
         SIZE_27X15 = 0x20
     }
-    public enum TbTypeEnum {
-        [Description("Жесткая")]
-        Rigid = 0,
-        [Description("Гибкая")]
-        Flexible = 1
+    public enum ElWireThreadType {
+        [Description("Однопроволочная")]
+        SINGLE_THREAD = 0,
+        [Description("Многопроволочная")]
+        MULTY_THREAD = 1
+    }
+    public enum ElWireShapeEnum {
+        [Description("Круглая")]
+        ROUND = 0,
+        [Description("Не задана")]
+        NOT_ROUND = 1,
+        [Description("Секторная")]
+        SECTOR = 2,
+        [Description("")]
+        PLAIN = 3,
+        [Description("Другая")]
+        OTHER = 4
     }
 }

@@ -9,6 +9,12 @@ namespace Nano.Electric
     [Table("ElWire")]
     public partial class ElWire
     {
+#if !InitDbContextEnums
+        public int? ThreadType { get; set; }
+        public int? ThreadCondShape { get; set; }
+        public int? CableSystemType { get; set; }
+        public int? wireMark { get; set; }
+#endif
         public string AutoDbSpecDescription { get; set; }
 
         public int? conductorsNumberL { get; set; }
@@ -50,11 +56,8 @@ namespace Nano.Electric
 
         public double? SpecificReactanceNullSeq { get; set; }
 
-        public int? ThreadCondShape { get; set; }
 
-        public int? ThreadType { get; set; }
 
-        public int? wireMark { get; set; }
 
         public string wireName { get; set; }
         [Column("DbCode")]
@@ -74,7 +77,6 @@ namespace Nano.Electric
 
         public int? DbImageRef { get; set; }
 
-        public int? CableSystemType { get; set; }
 
         public string EtmCode { get; set; }
 

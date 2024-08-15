@@ -54,7 +54,14 @@ namespace Nano.Electric {
                 .HasOptional(p => p.Material)
                 .WithMany()
                 .Map(m => m.MapKey("materialId"));
-
+            modelBuilder.Entity<ElWire>()
+                .HasOptional(p => p.CableSystemType)
+                .WithMany()
+                .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ElWire>()
+                .HasOptional(p => p.wireMark)
+                .WithMany()
+                .Map(m => m.MapKey("wireMark"));
 #endif
             //modelBuilder.Entity<DbLtKiTable>()
             //    .Property(p => p.CurveDb)

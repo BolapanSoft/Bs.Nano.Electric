@@ -23,6 +23,7 @@ namespace Nano.Electric {
     public partial class ClimateTable : IHaveId { }
     public partial class DbLtKiTable : IHaveId { }
     public partial class ExplodeSafeLevel : IHaveId { }
+    public partial class ScsPortType : IHaveId { }
     public partial class ElWire : IProduct, IHaveImageRef { }
     public partial class ElWireConductMaterial : IHaveId { }
     public partial class ElWireIsolationMaterial : IHaveId { }
