@@ -17,5 +17,51 @@ namespace Nano.Electric {
 
 #endif
     }
+    public partial class ScsUtpSocket {
+#if InitDbContextEnums
+        public ScsCableSystemType? CableSystemType { get; set; }
+        public ScsUtpSocketTypeEnum? UtpSocketType { get; set; }
+        public int? PortType { get; set; }
+#endif
 
+    }
+    public partial class ScsCommutatorPanel {
+#if InitDbContextEnums
+        // Сохранить в поле KitStructure
+        ActiveDeviceType DeviceType { get; set; }
+        public string BlockName { get; set; }
+        public string BackBlockName { get; set; }
+        public string BlockFileName { get; set; } = "19-PANELS.dwg";
+        public string BackBlockFileName { get; set; } = "19-PANELS.dwg";
+#endif
+
+    }
+    public partial class ScsOrganaizerPanel {
+#if InitDbContextEnums
+        public string BlockName { get; set; }
+        public string BackBlockName { get; set; }
+        public string BlockFileName { get; set; } = "19-PANELS.dwg";
+        public string BackBlockFileName { get; set; } = "19-PANELS.dwg";
+#endif
+
+    }
+    public partial class ScsSwitchUtpPanel {
+#if InitDbContextEnums
+        public string BlockName { get; set; }
+        public string BackBlockName { get; set; }
+        public string BlockFileName { get; set; } = "19-PANELS.dwg";
+        public string BackBlockFileName { get; set; } = "19-PANELS.dwg";
+#endif
+
+    }
+    public partial class ScsSwitchSocketPanel {
+#if InitDbContextEnums
+        public string BlockName { get; set; }
+        public string BackBlockName { get; set; }
+        public string BlockFileName { get; set; } = "19-PANELS.dwg";
+        public string BackBlockFileName { get; set; } = "19-PANELS.dwg";
+        public ScsCableSystemType? CableSystemType { get; set; }
+#endif
+
+    }
 }

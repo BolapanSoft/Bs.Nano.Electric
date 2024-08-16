@@ -9,10 +9,12 @@ namespace Nano.Electric
     [Table("ScsShellUtility")]
     public partial class ScsShellUtility
     {
+#if !InitDbContextEnums
+        public int? DbShellUtilityType { get; set; }
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public int? DbShellUtilityType { get; set; }
 
         public string DbOtherName { get; set; }
 

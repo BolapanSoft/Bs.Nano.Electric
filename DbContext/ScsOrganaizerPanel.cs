@@ -9,6 +9,14 @@ namespace Nano.Electric
     [Table("ScsOrganaizerPanel")]
     public partial class ScsOrganaizerPanel
     {
+#if !InitDbContextEnums
+        public string BlockName { get; set; }
+   public string BlockFileName { get; set; }
+
+        public string BackBlockFileName { get; set; }
+
+        public string BackBlockName { get; set; }
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
@@ -30,7 +38,6 @@ namespace Nano.Electric
 
         public int? SlotSize { get; set; }
 
-        public string BlockName { get; set; }
         [MaxLength(-1)]
         public string KitStructure { get; set; }
 
@@ -46,12 +53,7 @@ namespace Nano.Electric
 
         public string EtmCode { get; set; }
 
-        public string BlockFileName { get; set; }
-
-        public string BackBlockFileName { get; set; }
-
-        public string BackBlockName { get; set; }
-
+     
         public double? Depth { get; set; }
 
         public double? Width { get; set; }

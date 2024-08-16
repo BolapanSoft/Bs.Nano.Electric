@@ -9,6 +9,9 @@ namespace Nano.Electric
     [Table("ScsSwitchUtpPanel")]
     public partial class ScsSwitchUtpPanel
     {
+#if !InitDbContextEnums
+        public string BlockName { get; set; }
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
@@ -35,8 +38,6 @@ namespace Nano.Electric
         public string Mass { get; set; }
 
         public int? SlotSize { get; set; }
-
-        public string BlockName { get; set; }
 
         public double? Depth { get; set; }
 

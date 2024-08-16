@@ -9,10 +9,13 @@ namespace Nano.Electric
     [Table("ScsUtpSocket")]
     public partial class ScsUtpSocket
     {
+#if !InitDbContextEnums
+        public int? CableSystemType { get; set; }
+        public int? UtpSocketType { get; set; }
+        public int? PortType { get; set; }
+#endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
-
-        public int? UtpSocketType { get; set; }
 
         public string OtherType { get; set; }
 
@@ -46,8 +49,5 @@ namespace Nano.Electric
 
         public int? DbImageRef { get; set; }
 
-        public int? CableSystemType { get; set; }
-
-        public int? PortType { get; set; }
     }
 }

@@ -9,6 +9,12 @@ namespace Nano.Electric
     [Table("ScsCommutatorPanel")]
     public partial class ScsCommutatorPanel
     {
+#if !InitDbContextEnums
+        // Сохранить в поле KitStructure
+        public string BlockName { get; set; }
+       
+#endif
+
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
@@ -38,7 +44,6 @@ namespace Nano.Electric
 
         public int? SlotSize { get; set; }
 
-        public string BlockName { get; set; }
 
         public double? Depth { get; set; }
 

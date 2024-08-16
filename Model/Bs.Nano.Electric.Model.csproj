@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>1.1.68</VersionPrefix>
+		<VersionPrefix>1.1.69</VersionPrefix>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>9.0</LangVersion>
 		<Nullable>enable</Nullable>
@@ -13,17 +13,9 @@
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>
 	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);DBNE85</DefineConstants>
+		<DefineConstants>$(DefineConstants);DBNE85;InitDbContextEnums</DefineConstants>
 	</PropertyGroup>
 
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DefineConstants>$(DefineConstants);InitDbContextEnums</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DefineConstants>$(DefineConstants);InitDbContextEnums</DefineConstants>
-	</PropertyGroup>
 
 	<ItemGroup>
 		<Compile Remove="Cadwise\Exporter.cs" />

@@ -9,6 +9,11 @@ namespace Nano.Electric
     [Table("ScsSwitchSocketPanel")]
     public partial class ScsSwitchSocketPanel
     {
+#if !InitDbContextEnums
+        public int? CableSystemType { get; set; }
+        public string BlockName { get; set; }
+#endif
+
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
@@ -36,7 +41,6 @@ namespace Nano.Electric
 
         public int? SlotSize { get; set; }
 
-        public string BlockName { get; set; }
 
         public double? Depth { get; set; }
 
@@ -54,7 +58,6 @@ namespace Nano.Electric
 
         public int? PortType { get; set; }
 
-        public int? CableSystemType { get; set; }
 
         public int? DbGraphicRef { get; set; }
 
