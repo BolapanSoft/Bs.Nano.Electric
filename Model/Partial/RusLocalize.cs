@@ -217,30 +217,30 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Приборы контроля и учета\\Вольтметры")]
     public partial class ElVoltmeter { }
 
-    [DefaultLocalizeValue("Монтажные шкафы и панели. Аксессуары панелей")]
-    public partial class ScsPanelUtilityUnit { }
-    [DefaultLocalizeValue("Монтажные шкафы и панели. Аксессуары шкафов")]
-    public partial class ScsShellUtility { }
-    [DefaultLocalizeValue("Монтажные шкафы и панели. Блоки розеток")]
-    public partial class ScsSwitchSocketPanel { }
-    [DefaultLocalizeValue("Монтажные шкафы и панели. Кабельные организаторы")]
-    public partial class ScsOrganaizerPanel { }
     [DefaultLocalizeValue("Монтажные шкафы и панели. Коммутационные панели")]
     public partial class ScsSwitchUtpPanel { }
+    [DefaultLocalizeValue("Монтажные шкафы и панели. Кабельные организаторы")]
+    public partial class ScsOrganaizerPanel { }
+    [DefaultLocalizeValue("Монтажные шкафы и панели. Блоки розеток")]
+    public partial class ScsSwitchSocketPanel { }
+    [DefaultLocalizeValue("Монтажные шкафы и панели. Аксессуары шкафов")]
+    public partial class ScsShellUtility { }
+    [DefaultLocalizeValue("Монтажные шкафы и панели. Аксессуары панелей")]
+    public partial class ScsPanelUtilityUnit { }
+   [DefaultLocalizeValue("Монтажные шкафы и панели. Активное оборудование")]
+    public partial class ScsCommutatorPanel { }
     [DefaultLocalizeValue("Монтажные шкафы и панели. Монтажные шкафы 19″")]
     public partial class ScsShellDistr { }
+    [DefaultLocalizeValue("Приборы. Сервисные колонны")]
+    public partial class ScsServiceColumn { }
+    [DefaultLocalizeValue("Приборы. Аксессуары сервисных колонн")]
+    public partial class ScsServiceColumnUtilityUnit { }
+    [DefaultLocalizeValue("Приборы. Лючки")]
+    public partial class ScsHatch { }
+     [DefaultLocalizeValue("Приборы. Аксессуары лючков")]
+    public partial class ScsHatchUtilityUnit { }
     [DefaultLocalizeValue("Приборы. Розетки телекоммуникационные")]
     public partial class ScsUtpSocket { }
-    [DefaultLocalizeValue("Активное оборудование")]
-    public partial class ScsCommutatorPanel { }
-    [DefaultLocalizeValue("Аксессуары лючков")]
-    public partial class ScsHatchUtilityUnit { }
-    [DefaultLocalizeValue("Аксессуары сервисных колонн")]
-    public partial class ScsServiceColumnUtilityUnit { }
-    [DefaultLocalizeValue("Лючки")]
-    public partial class ScsHatch { }
-    [DefaultLocalizeValue("Сервисные колонны")]
-    public partial class ScsServiceColumn { }
     /* 
 
     [DefaultLocalizeValue("")]
