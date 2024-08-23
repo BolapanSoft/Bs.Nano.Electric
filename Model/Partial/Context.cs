@@ -58,6 +58,14 @@ namespace Nano.Electric {
                 .HasOptional(p => p.CableSystemType)
                 .WithMany()
                 .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ScsSwitchSocketPanel>()
+                .HasOptional(p => p.CableSystemType)
+                .WithMany()
+                .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ScsUtpSocket>()
+                .HasOptional(p => p.CableSystemType)
+                .WithMany()
+                .Map(m => m.MapKey("CableSystemType"));
             modelBuilder.Entity<ElWire>()
                 .HasOptional(p => p.wireMark)
                 .WithMany()
@@ -201,8 +209,11 @@ namespace Nano.Electric {
         public DbImage CreateImage(string? imgName, string category, byte[] image) {
             DbImage dbImg = this.DbImages.Create();
             int id = 1;
-            if (this.DbImages.Count() > 0) {
-                id=Math.Max(this.DbImages.Max(img => img.Id) + 1, this.DbImages.Local.Max(img => img.Id) + 1);
+            if (this.DbImages.Local.Any()) {
+                id = Math.Max(id, this.DbImages.Local.Max(img => img.Id) + 1);
+            }
+            if (this.DbImages.Any()) {
+                id = Math.Max(this.DbImages.Max(img => img.Id) + 1, id);
             }
             dbImg.Id = id;
             dbImg.Text = imgName ?? string.Empty;
@@ -212,6 +223,6 @@ namespace Nano.Electric {
             this.DbImages.Add(dbImg);
             return dbImg;
         }
-        
+
     }
 }
