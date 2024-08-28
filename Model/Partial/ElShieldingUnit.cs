@@ -1,10 +1,14 @@
 ﻿// Ignore Spelling: Expl
 
 using Nano.Electric.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace Nano.Electric {
-    public partial class ElShieldingUnit {
+    [XmlRoot(nameof(ElShieldingUnit))]
+    public partial class ElShieldingUnit:KitElement {
         [NotMapped]
         string IProduct.Name { get=>DbName; set=>DbName=value; }
 #if InitDbContextEnums
@@ -13,5 +17,10 @@ namespace Nano.Electric {
         public PhaseCountEnum? PhaseCount { get; set; }
 
 #endif
+        [MaxLength(-1)]
+        public string KitStructure { get => GetKitStructureAsXML(this); set {; } }
+        protected override void WriteProperties(XmlWriter writer) {
+            ;
+        }
     }
 }

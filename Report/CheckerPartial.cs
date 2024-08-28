@@ -1,4 +1,5 @@
 ﻿using Bs.Nano.Electric.Model;
+using Microsoft.Extensions.Logging;
 using Nano.Electric;
 using System;
 using System.Collections.Generic;
@@ -82,17 +83,23 @@ namespace Bs.Nano.Electric.Report {
         private List<(string Code, string ArticleName, string TableName, string TypeDescription)> LoadCodes(Context context, IQueryable dbSet, string tableName, Type entityType) {
             string typeDescription = Context.GetDefaultLocalizeValue(entityType);
             if (typeof(IProduct).IsAssignableFrom(entityType)) {
-                List<(string Code, string ArticleName, string TableName, string TypeDescription)> products = new(1024);
-                /*using (var context = connector.Connect())*/
-                {
-                    //var query = dbSet.Cast<object>().ToList();// Convert dbSet to query
-                    // Load all entity from dbSet query
-                    foreach (var entity in dbSet.AsNoTracking()) {
-                        IProduct product = (IProduct)entity;
-                        products.Add((product.Code, product.Name, tableName, typeDescription));
+                try {
+                    List<(string Code, string ArticleName, string TableName, string TypeDescription)> products = new(1024);
+                    /*using (var context = connector.Connect())*/
+                    {
+                        //var query = dbSet.Cast<object>().ToList();// Convert dbSet to query
+                        // Load all entity from dbSet query
+                        foreach (var entity in dbSet.AsNoTracking()) {
+                            IProduct product = (IProduct)entity;
+                            products.Add((product.Code, product.Name, tableName, typeDescription));
+                        }
                     }
+                    return products;
                 }
-                return products;
+                catch (Exception ex) {
+                    logger.LogWarning(ex.ToString());
+                    return new();
+                }
             }
             else {
                 return new();
@@ -273,6 +280,22 @@ namespace Bs.Nano.Electric.Report {
                 ;
             }
             return (allRight, values);
+        }
+        private static IEnumerable<(string code, string uri)> GetUriValues(Context context, string tableName) {
+            List<(string code, string uri)> values = new();
+            if (!(IsCorrectTableName(tableName))) {
+                return Array.Empty<(string code, string uri)>();
+            }
+            try {
+                    string strQuery = $"SELECT [Code], [Uri] FROM [{tableName}]";
+                    var query = context.Database.SqlQuery<(string code, string uri)>(strQuery);
+                    values = query.ToList();
+                return values;
+                
+            }
+            catch (Exception ex) {
+                return Array.Empty<(string code, string uri)>();
+            }
         }
         private static bool IsCorrectTableName(string tableName) {
             // Check for null or empty

@@ -69,7 +69,7 @@ namespace Nano.Electric {
     public partial class DbCaeMaterialUtilitySet { }
 
     [DefaultLocalizeValue("Изображения")]
-    public partial class DbImages { }
+    public partial class DbImage { }
 
     [DefaultLocalizeValue("Графика")]
     public partial class DbGraphic { }

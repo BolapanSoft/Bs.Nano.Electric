@@ -10,6 +10,8 @@ using Bs.Nano.Electric.Model;
 using System.Data.Entity;
 using System.Data.SqlServerCe;
 using System.ComponentModel;
+using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Bs.Nano.Electric.Report {
     /// <summary>
@@ -112,17 +114,12 @@ namespace Bs.Nano.Electric.Report {
             using (Context context = connector.Connect()) {
                 var tables = context.GetKnownTables();
                 foreach (var tableProperty in tables) {
-                    (object property, string tableDescription, _) = tableProperty;
-                    IQueryable dbSet = (IQueryable)property;
-                    int count = 0;
-                    try {
-                        count = RuleTestHelper.GetCount(dbSet);
-                        if (count > 0) {
-                            logger.LogInformation($"Таблица \"{tableDescription}\": {count} элементов.");
-                        }
+                    (object property, string tableDescription, Type entityType, int count) = tableProperty;
+                    if (string.IsNullOrEmpty(tableDescription)) {
+                        tableDescription = entityType.Name.Split('.').Last();
                     }
-                    catch (Exception ex) {
-                        count = 0;
+                    if (count > 0) {
+                        logger.LogInformation($"Таблица \"{tableDescription}\": {count} элементов.");
                     }
 
                 }
@@ -286,8 +283,19 @@ namespace Bs.Nano.Electric.Report {
             using (Context context = connector.Connect()) {
                 var tables = context.GetKnownTables();
                 foreach (var tableDef in tables) {
-                    var tableCodes = LoadCodes(context, (IQueryable)tableDef.property, Context.GetDatabaseTableName(tableDef.EntityType), tableDef.EntityType);
-                    allCodes.AddRange(tableCodes);
+                    IQueryable dbSet = (IQueryable)tableDef.property;
+                    var tableName = Context.GetDatabaseTableName(tableDef.EntityType);
+                    try {
+                        int count = tableDef.count;
+                        if (count > 0) {
+                            var tableCodes = LoadCodes(context, dbSet, tableName, tableDef.EntityType);
+                            allCodes.AddRange(tableCodes);
+                        }
+                    }
+                    catch (Exception ex) {
+                        logger.LogWarning(ex, "При загрузке таблицы  \"{}\" произошла ошибка.", tableName);
+                    }
+
                 }
             }
             CheckCodesIsUniqueness(allCodes);
@@ -323,20 +331,28 @@ namespace Bs.Nano.Electric.Report {
         [ReportRule(@"Для всех элементов должен быть внесен эскиз.",
             0, 3), RuleCategory("Общие рекомендации.", "AllTables")]
         public void Rule_00_003() {
-            Queue<(string TableName, string Code, string ArticleName )> errors = new();
+            Queue<(string TableName, string Code, string ArticleName)> errors = new();
             using (Context context = connector.Connect()) {
-                IEnumerable<(object property, string tableDescription, Type EntityType)> tables = context.GetKnownTables();
-                foreach (var tableDef in tables) {
-                    (object property, string tableDescription, Type entityType) = tableDef;
+                foreach (var tableDef in context.GetKnownTables()) {
+                    (object property, string tableDescription, Type entityType, int count) = tableDef;
                     var dbSet = (IQueryable)property;
                     if (typeof(IHaveImageRef).IsAssignableFrom(entityType) & typeof(IProduct).IsAssignableFrom(entityType)) {
-                        foreach (var entity in dbSet.AsNoTracking()) {
-                            IHaveImageRef product = (IHaveImageRef)entity;
-                            if (!(
-                                ((IHaveImageRef)entity).DbImageRef.HasValue &&
-                                ((IHaveImageRef)entity).DbImageRef > 0
-                                )) {
-                                errors.Enqueue((tableDescription,  ((IProduct)entity).Code, ((IProduct)entity).Name));
+                        var tableName = Context.GetDatabaseTableName(tableDef.EntityType);
+                        if (count > 0) {
+                            try {
+                                foreach (object? entity in dbSet.AsNoTracking()) {
+                                    IHaveImageRef product = (IHaveImageRef)entity;
+                                    if (!(
+                                        ((IHaveImageRef)entity).DbImageRef.HasValue &&
+                                        ((IHaveImageRef)entity).DbImageRef > 0
+                                        )) {
+                                        errors.Enqueue((tableDescription, ((IProduct)entity).Code, ((IProduct)entity).Name));
+                                    }
+                                }
+                            }
+                            catch (Exception ex) {
+                                logger.LogWarning(ex, "При загрузке таблицы \"{}\" произошла ошибка.", tableName);
+
                             }
                         }
                     }
@@ -346,152 +362,46 @@ namespace Bs.Nano.Electric.Report {
                 var message = $"Эскиз не внесен для {errors.Count} элементов.";
                 FailRuleTest(message, errors);
             }
-            //using (var context = connector.Connect()) {
-            //    List<(string Code, string Description)> sketchNotFound = new List<(string Code, string Description)>();
 
-            //    var products = context.ScsGutterCanals
-            //        .Where(p => p.DbImageRef < 1)
-            //        .Select(p => new { p.Code, p.SpecDescription });
-            //    foreach (var p in products) {
-            //        sketchNotFound.Add((p.Code, p.SpecDescription));
-            //    }
-            //    products = context.DbScsGutterCovers
-            //        .Where(p => p.DbImageRef < 1)
-            //        .Select(p => new { p.Code, p.SpecDescription });
-            //    foreach (var p in products) {
-            //        sketchNotFound.Add((p.Code, p.SpecDescription));
-            //    }
-            //    products = context.DbScsGutterPartitions
-            //        .Where(p => p.DbImageRef < 1)
-            //        .Select(p => new { p.Code, p.SpecDescription });
-            //    foreach (var p in products) {
-            //        sketchNotFound.Add((p.Code, p.SpecDescription));
-            //    }
-            //    products = context.ScsGcFittings
-            //        .Where(p => p.DbImageRef < 1)
-            //        .Select(p => new { p.Code, p.SpecDescription });
-            //    foreach (var p in products) {
-            //        sketchNotFound.Add((p.Code, p.SpecDescription));
-            //    }
-            //    products = context.DbScsGcCoverUnits
-            //        .Where(p => p.DbImageRef < 1)
-            //        .Select(p => new { p.Code, p.SpecDescription });
-            //    foreach (var p in products) {
-            //        sketchNotFound.Add((p.Code, p.SpecDescription));
-            //    }
-            //    products = context.DbScsGcAccessoryUnits
-            //        .Where(p => p.DbImageRef < 1)
-            //        .Select(p => new { p.Code, p.SpecDescription });
-            //    foreach (var p in products) {
-            //        sketchNotFound.Add((p.Code, p.SpecDescription));
-            //    }
-            //    products = context.ScsGutterBoltings
-            //        .Where(p => p.DbImageRef < 1)
-            //        .Select(p => new { p.Code, p.SpecDescription });
-            //    foreach (var p in products) {
-            //        sketchNotFound.Add((p.Code, p.SpecDescription));
-            //    }
-            //    products = context.DbScsGcBoltingAccessoryUnits
-            //        .Where(p => p.DbImageRef < 1)
-            //        .Select(p => new { p.Code, p.SpecDescription });
-            //    foreach (var p in products) {
-            //        sketchNotFound.Add((p.Code, p.SpecDescription));
-            //    }
-            //    products = context.CaeMaterialUtilities
-            //         .Where(p => p.DbImageRef < 1)
-            //        .Select(p => new { p.Code, p.SpecDescription });
-            //    foreach (var p in products) {
-            //        sketchNotFound.Add((p.Code, p.SpecDescription));
-            //    }
-
-            //    if (sketchNotFound.Count > 0) {
-            //        //StringBuilder sb = new StringBuilder();
-            //        //sb.AppendLine($"Не внесены эскизы для {sketchNotFound.Count} элементов:");
-            //        //sb.AppendLine("Code\tSpecDescription");
-            //        //foreach (var item in sketchNotFound.Take(50)) {
-            //        //    sb.AppendLine($"{item.Code}\t{item.Description}");
-            //        //}
-            //        //if (sketchNotFound.Count > 100) {
-            //        //    sb.AppendLine($"... обрезано {sketchNotFound.Count - 50} элементов.");
-            //        //}
-            //        var message = $"Не внесены эскизы для {sketchNotFound.Count} элементов";
-            //        FailRuleTest(message, sketchNotFound);
-            //    }
         }
 
         [ReportRule(@"Для всех элементов должна быть внесена масса.",
             0, 4), RuleCategory("Общие рекомендации.", "AllTables")]
         public void Rule_00_004() {
-            Queue<(string tableDescription, string Code, string message)> errors = new();
+            Queue<(string tableDescription, string Code)> errorsIsNull = new();
+            Queue<(string tableDescription, string Code, string message)> errorsFormat = new();
             using (Context context = connector.Connect()) {
-                IEnumerable<(object property, string tabltableDescriptioneName, Type EntityType)> tables = context.GetKnownTables();
-                foreach (var tableDef in tables) {
-                    (object property, string tableDescription, Type entityType) = tableDef;
-                    var typeDescription = Context.GetDefaultLocalizeValue(entityType);
-                    (bool isHaveField, IEnumerable<Material> values) = GetMaterialValues(connector, Context.GetDatabaseTableName(entityType));
-                    if (isHaveField) {
-                        foreach (var row in values) {
-                            string mass = row.Mass;
-                            if (string.IsNullOrEmpty(mass) ) {
-                                errors.Enqueue((tableDescription, row.Code, mass));
-                            }
-                           else if(! double.TryParse(mass, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("Ru-ru"), out _)) {
-                                errors.Enqueue((tableDescription,  row.Code, $"Значение \"{mass}\" не соответствует шаблону 0,##"));
+                foreach (var tableDef in context.GetKnownTables()) {
+                    (object property, string tableDescription, Type entityType, int count) = tableDef;
+                    if (count > 0) {
+                        //var typeDescription = Context.GetDefaultLocalizeValue(entityType);
+                        (bool isHaveField, IEnumerable<Material> values) = GetMaterialValues(connector, Context.GetDatabaseTableName(entityType));
+                        if (isHaveField) {
+                            foreach (var row in values) {
+                                string mass = row.Mass;
+                                if (string.IsNullOrEmpty(mass)) {
+                                    errorsIsNull.Enqueue((tableDescription, row.Code));
+                                }
+                                else if (!double.TryParse(mass, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("Ru-ru"), out _)) {
+                                    errorsFormat.Enqueue((tableDescription, row.Code, mass));
 
+                                }
                             }
                         }
                     }
                 }
             }
-            if (errors.Count > 0) {
-                var message = $"Масса не внесена или внесена некорректно для {errors.Count} элементов.";
-                FailRuleTest(message, errors);
+            if (errorsIsNull.Count > 0) {
+                var message = $"Масса не внесена для {errorsIsNull.Count} элементов.";
+                FailRuleTest(message, errorsIsNull);
             }
-
-            //List<(string Serie, string Code, string Mass)> codes = new List<(string Serie, string Code, string Mass)>(128);
-            //void CheckRule(string serie, string code, string sWeight) {
-            //    bool isMatch = (double.TryParse(sWeight, NumberStyles.Float, CultureInfo.InvariantCulture, out double weight) || double.TryParse(sWeight, NumberStyles.Float, CultureInfo.CurrentCulture, out weight)) && weight > 0.0;
-            //    if (!isMatch) {
-            //        codes.Add((serie, code, sWeight));
-            //    }
-            //}
-            //using (var context = connector.Connect()) {
-            //    foreach (var el in context.ScsGutterCanals) {
-            //        CheckRule(el.Series, el.Code, el.Mass);
-            //    }
-            //    foreach (var el in context.DbScsGutterCovers) {
-            //        CheckRule(el.Series, el.Code, el.Mass);
-            //    }
-            //    foreach (var el in context.DbScsGutterPartitions) {
-            //        CheckRule(el.Series, el.Code, el.Mass);
-            //    }
-            //    foreach (var el in context.ScsGcFittings) {
-            //        CheckRule(el.Series, el.Code, el.Mass);
-            //    }
-            //    foreach (var el in context.DbScsGcCoverUnits) {
-            //        CheckRule(el.Series, el.Code, el.Mass);
-            //    }
-            //    foreach (var el in context.DbScsGcAccessoryUnits) {
-            //        CheckRule(el.Series, el.Code, el.Mass);
-            //    }
-            //    foreach (var el in context.ScsGutterBoltings) {
-            //        CheckRule(el.Series, el.Code, el.Mass);
-            //    }
-            //    foreach (var el in context.DbScsGcBoltingAccessoryUnits) {
-            //        CheckRule(el.Series, el.Code, el.Mass);
-            //    }
-            //    foreach (var el in context.CaeMaterialUtilities) {
-            //        CheckRule(el.Series, el.Code, el.Mass);
-            //    }
-
-            //}
-            ////count = errors.Count;
-            //if (codes.Count > 0) {
-            //    FailRuleTest($"Не внесена масса для {codes.Count} артикулов.", codes);
-            //}
+            if (errorsFormat.Count > 0) {
+                var message = $"Значение не соответствует шаблону 0,## для {errorsFormat.Count} элементов.";
+                FailRuleTest(message, errorsFormat);
+            }
         }
         [ReportRule(@"Для всех элементов должна быть внесена ссылка на сайт производителя.",
-            0, 5), RuleCategory("Общие рекомендации.")]
+            0, 5), RuleCategory("Общие рекомендации.", "AllTables")]
         public void Rule_00_005() {
             int count = 0;
             List<(string code, string url, string err)> errors = new List<(string code, string url, string err)>(1024);
@@ -531,54 +441,58 @@ namespace Bs.Nano.Electric.Report {
                 }
 
             }
+            var tasks = new List<(string Code, string Uri)>(1024 * 8);
 
-            var tasks = new List<(string Code, string Ur)>(1024 * 8);
             using (var context = connector.Connect()) {
-                tasks.AddRange(
-                 context.ScsGutterCanals
-                    .ToArray()
-                    .Select(el => (el.Code, el.Url))
-                );
-                tasks.AddRange(
-                context.DbScsGutterCovers
-                    .ToArray()
-                    .Select(el => (el.Code, el.Url))
-                );
-                tasks.AddRange(
-                context.DbScsGutterPartitions
-                    .ToArray()
-                    .Select(el => (el.Code, el.Url))
-                );
-                tasks.AddRange(
-                context.ScsGcFittings
-                    .ToArray()
-                    .Select(el => (el.Code, el.Url))
-                );
-                tasks.AddRange(
-                context.DbScsGcCoverUnits
-                    .ToArray()
-                    .Select(el => (el.Code, el.Url))
-                );
-                tasks.AddRange(
-                context.DbScsGcAccessoryUnits
-                    .ToArray()
-                    .Select(el => (el.Code, el.Url))
-                );
-                tasks.AddRange(
-                context.ScsGutterBoltings
-                    .ToArray()
-                    .Select(el => (el.Code, el.Url))
-                );
-                tasks.AddRange(
-                context.DbScsGcBoltingAccessoryUnits
-                    .ToArray()
-                    .Select(el => (el.Code, el.Url))
-                );
-                tasks.AddRange(
-                context.CaeMaterialUtilities
-                    .ToArray()
-                    .Select(el => (el.Code, el.Url))
-                );
+                foreach (var tableDef in context.GetKnownTables()) {
+                    string tableName = Context.GetDatabaseTableName(tableDef.EntityType);
+                    tasks.AddRange(GetUriValues(context, tableName));
+                }
+                //tasks.AddRange(
+                //     context.ScsGutterCanals
+                //        .ToArray()
+                //        .Select(el => (el.Code, el.Url))
+                //    );
+                //tasks.AddRange(
+                //context.DbScsGutterCovers
+                //    .ToArray()
+                //    .Select(el => (el.Code, el.Url))
+                //);
+                //tasks.AddRange(
+                //context.DbScsGutterPartitions
+                //    .ToArray()
+                //    .Select(el => (el.Code, el.Url))
+                //);
+                //tasks.AddRange(
+                //context.ScsGcFittings
+                //    .ToArray()
+                //    .Select(el => (el.Code, el.Url))
+                //);
+                //tasks.AddRange(
+                //context.DbScsGcCoverUnits
+                //    .ToArray()
+                //    .Select(el => (el.Code, el.Url))
+                //);
+                //tasks.AddRange(
+                //context.DbScsGcAccessoryUnits
+                //    .ToArray()
+                //    .Select(el => (el.Code, el.Url))
+                //);
+                //tasks.AddRange(
+                //context.ScsGutterBoltings
+                //    .ToArray()
+                //    .Select(el => (el.Code, el.Url))
+                //);
+                //tasks.AddRange(
+                //context.DbScsGcBoltingAccessoryUnits
+                //    .ToArray()
+                //    .Select(el => (el.Code, el.Url))
+                //);
+                //tasks.AddRange(
+                //context.CaeMaterialUtilities
+                //    .ToArray()
+                //    .Select(el => (el.Code, el.Url))
+                //);
                 //tasks.AddRange(
                 //context.ScsGutterCanals
                 //    .ToArray()
@@ -604,7 +518,7 @@ namespace Bs.Nano.Electric.Report {
             }
         }
         [ReportRule(@"Для всех элементов должен быть внесен артикул.",
-            0, 6), RuleCategory("Общие рекомендации.")]
+            0, 6), RuleCategory("Общие рекомендации.", "AllTables")]
         public void Rule_00_006() {
             var allCodes = LoadAllCodes();
             var errors = allCodes.Where(item => string.IsNullOrEmpty(item.Code));

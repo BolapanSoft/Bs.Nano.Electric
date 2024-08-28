@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -40,6 +41,16 @@ namespace Nano.Electric {
             writer.WriteEndElement();
         }
         protected abstract void WriteProperties(XmlWriter writer);
+        protected static string GetKitStructureAsXML<Tkit>(Tkit kit) where Tkit : KitElement {
+            var serializer = new XmlSerializer(typeof(Tkit));
+            StringBuilder stringBuilder = new StringBuilder();
+            XmlWriterSettings settings = new XmlWriterSettings { Indent = true };
+            using (XmlWriter xmlWriter = XmlWriter.Create(stringBuilder, settings)) {
+                serializer.Serialize(xmlWriter, kit);
+            }
+            string xml = stringBuilder.ToString();
+            return xml;
+        }
         protected static XmlRootAttribute GetXmlRootAttribute(IXmlSerializable instance) {
             if (instance is null)
                 return null;

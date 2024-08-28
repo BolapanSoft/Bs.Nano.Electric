@@ -1,7 +1,12 @@
 ﻿// Ignore Spelling: Expl
 
+using System.ComponentModel.DataAnnotations;
+using System.Xml;
+using System.Xml.Serialization;
+
 namespace Nano.Electric {
-    public partial class ScsSwitchSocketPanel {
+    [XmlRoot(nameof(ScsSwitchSocketPanel))]
+    public partial class ScsSwitchSocketPanel:KitElement {
 #if InitDbContextEnums
         public string BlockName { get; set; }
         public string BackBlockName { get; set; }
@@ -9,6 +14,10 @@ namespace Nano.Electric {
         public string BackBlockFileName { get; set; } = "19-PANELS.dwg";
         public ScsCableSystemType? CableSystemType { get; set; }
 #endif
-
+        [MaxLength(-1)]
+        public string KitStructure { get => GetKitStructureAsXML(this); set {; } }
+        protected override void WriteProperties(XmlWriter writer) {
+            ;
+        }
     }
 }

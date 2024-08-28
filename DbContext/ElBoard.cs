@@ -82,8 +82,7 @@ namespace Nano.Electric
         public int? RowCount { get; set; }
 
         public int? ModuleCountInRow { get; set; }
-        [MaxLength(-1)]
-        public string KitStructure { get; set; }
+        
 
         public int? OrderNumber { get; set; }
 
