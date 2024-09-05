@@ -24,7 +24,7 @@ namespace Nano.Electric.Enums {
         SOCLE_G13 = 10,
         [Description("G23")]
         SOCLE_G23 = 11,
-        [Description("G53")]
+        [Description("Существует множество типов цоколей для ламп светильников, каждый из которых имеет свои особенности и области применения. Вот наиболее полный список:\r\n\r\nРезьбовые (E):\r\nE10, E11, E12, E14, E17, E26, E27, E39, E40\r\nШтыковые (G):\r\nG4, G5.3, G6.35, G8, G9, G12, G13, G23, G24, G53\r\nШтифтовые (B):\r\nB15d, B22d\r\nСофитные (S):\r\nS6, S8.5, S14, S14s, S15, S15s, S19\r\nФланцевые (P):\r\nP28s, P40s\r\nТелефонные (T):\r\nT2, T3, T4, T5\r\nС утопленным контактом ®:\r\nR7s\r\nКабельные (K):\r\nK19d, K27d\r\nПроволочные или бесцокольные (W):\r\nW2.1x9.5d, W3x16d\r\nКсеноновые (H):\r\nH1, H3, H4, H7, H11")]
         SOCLE_G53 = 12,
         [Description("2G7")]
         SOCLE_2G7 = 13,
@@ -124,6 +124,11 @@ namespace Nano.Electric.Enums {
         SOCLE_W4_3 = 60,
         [Description("PGJ5")]
         SOCLE_PGJ5 = 61
+#if DBNE23_1
+            ,
+        [Description("GX70")]
+        SOCLE_GX70 = 62
+#endif  
     }
     public enum EnvLightingTypeEnum {
         [DefaultLocalizeValue("лампа накаливания")]

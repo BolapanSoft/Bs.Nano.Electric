@@ -1,19 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>1.1.71</VersionPrefix>
+		<VersionPrefix>1.23.1</VersionPrefix>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>9.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>Nano.Electric</RootNamespace>
 		<BaseOutputPath>..\bin\</BaseOutputPath>
-		<VersionSuffix>034</VersionSuffix>
+		<VersionSuffix>035</VersionSuffix>
 		<Version>$(VersionPrefix).$(VersionSuffix)</Version>
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>
 	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);DBNE85;InitDbContextEnums</DefineConstants>
+		<DefineConstants>$(DefineConstants);DBNE85;DBNE201;DBNE23_1;InitDbContextEnums</DefineConstants>
 	</PropertyGroup>
 
 
