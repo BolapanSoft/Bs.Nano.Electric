@@ -13,7 +13,7 @@ namespace Nano.Electric {
         public ElLightingPurpouse LightingPurpouse { get; set; }
         public LampExistance LampExistance { get; set; }
         public ElLampSocleEnum Socle { get; set; }
-        //public ElLamp Lamp { get; set; }
+        public ElLamp Lamp { get; set; }
         public KccTypeEnum KccPmType { get; set; }
         public InstLightingEnum DbInstType { get; set; }
         //public EnvExplSafeBoolEnum IsExplosionSafe { get; set; }

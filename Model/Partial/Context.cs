@@ -70,6 +70,10 @@ namespace Nano.Electric {
                 .HasOptional(p => p.wireMark)
                 .WithMany()
                 .Map(m => m.MapKey("wireMark"));
+            modelBuilder.Entity<ElLighting>()
+                .HasOptional(l => l.Lamp)
+                .WithMany()
+                .Map(m => m.MapKey("Lamp"));
 #endif
             //modelBuilder.Entity<DbLtKiTable>()
             //    .Property(p => p.CurveDb)
