@@ -50,6 +50,8 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Короба\\Перегородки")]
     public partial class DbCableCanalPartition { }
 
+    [DefaultLocalizeValue("Короба\\Крышки")]
+    public partial class DcCableCanalCover { }
     [DefaultLocalizeValue("Трубы")]
     public partial class ScsPipe { }
 
@@ -175,9 +177,7 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Общая информация")]
     public partial class DSInformation { }
 
-    [DefaultLocalizeValue("Короба\\Крышки")]
-    public partial class DcCableCanalCover { }
-
+  
     [DefaultLocalizeValue("Электроустановочные изделия\\Выключатели")]
     public partial class DbElSwitch { }
 

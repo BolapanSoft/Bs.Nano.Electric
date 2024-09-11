@@ -47,6 +47,8 @@ namespace Nano.Electric {
     public partial class DbScsGcAccessoryUnit : IProduct, IHaveImageRef { }
     public partial class ScsGutterBolting : IProduct, IHaveImageRef { }
     public partial class DbScsGcBoltingAccessoryUnit : IProduct, IHaveImageRef { }
+    public partial class DcCableCanalCover : IProduct, IHaveImageRef   { }
+    public partial class DbCableCanalPartition : IProduct, IHaveImageRef   { }
     public partial class CaeMaterialUtility : IProduct, IHaveImageRef { }
     public partial class ElBoard : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElBox : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }

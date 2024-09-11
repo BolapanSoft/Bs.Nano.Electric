@@ -1122,18 +1122,90 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" с типом элемента ""Другой"" должно быть внесено значение DbOtherName (Тип элемента).",
-         7, 46)]
+        //[ReportRule(@"Для элементов ""Аксессуары лотков"" должно быть внесено значение AccessoryType (Тип элемента).",
+        // 7, 47)]
+        //[RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcAccessoryUnit))]
+        //public void Rule_07_047() {
+        //    using (var context = connector.Connect()) {
+        //        var products = context.ScsTubeFittings
+        //            .Where(p => p.FittingType == ScsTubeFittingTypeEnum.OTHER)
+        //            .ToList();
+        //        var errors = products.Where(p => !string.IsNullOrEmpty(p.DbOtherName))
+        //        .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.DbOtherName)}:\"{p.DbOtherName}\"")
+        //        .ToList();
+        //        if (errors.Count > 0) {
+
+        //            FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+        //               errors);
+        //        }
+        //    }
+        //}
+        [ReportRule(@"Для элементов ""Трубы"" должен быть внесен тип трубы.",
+         7, 401)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsPipe))]
+        public void Rule_07_401() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsPipes
+                     .Where(p => p.TubeType == null)
+                     .ToList();
+                var errors = products
+                 .Select(p => (p.Series, p.Code))
+                 .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для элементов ""Трубы"" должны быть внесен габариты: Внутренний диаметр InternalDiameter и Внешний диаметр ExternalDiameter.",
+         7, 402)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsPipe))]
+        public void Rule_07_402() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsPipes
+                     .Select(p => new { p.Code, p.Series, p.InternalDiameter, p.ExternalDiameter })
+                     .ToList();
+                var errors = products
+                 .Where(p => p.InternalDiameter == null | p.ExternalDiameter == null || (p.InternalDiameter < 1 | p.ExternalDiameter < 1))
+                 .Select(p => (p.Series, p.Code, (p.InternalDiameter, p.ExternalDiameter)))
+                 .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для элементов ""Трубы"" внутри серии должно быть одно сочетание габаритов: Внутренний диаметр InternalDiameter и Внешний диаметр ExternalDiameter.",
+         7, 403)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsPipe))]
+        public void Rule_07_403() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsPipes
+                     .Select(p => new { p.Code, p.Series, p.InternalDiameter, p.ExternalDiameter })
+                     .ToList();
+                var errors = products
+                    .GroupBy(p => p.Series)
+                    .SelectMany(s => s.GroupBy(gr => (gr.ExternalDiameter, gr.InternalDiameter))
+                                      .Where(gr => gr.Count() > 1))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors.SelectMany(gr => (gr.Select(el => (el.Code, el.Series, gr.Key)))));
+                }
+            }
+        }
+        [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" должен быть внесен Тип элемента FittingType.",
+         7, 410)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
-        public void Rule_07_046() {
+        public void Rule_07_410() {
             //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
             using (var context = connector.Connect()) {
                 var products = context.ScsTubeFittings
-                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.OTHER)
+                    .Where(p => p.FittingType == null)
                     .ToList();
-                var errors = products.Where(p => !string.IsNullOrEmpty(p.DbOtherName))
-                 .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.DbOtherName)}:\"{p.DbOtherName}\"")
-                 .ToList();
+                var errors = products
+                   .Select(p => (p.Series, p.Code))
+                   .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1141,17 +1213,18 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        [ReportRule(@"Для элементов ""Аксессуары лотков"" должно быть внесено значение AccessoryType (Тип элемента).",
-         7, 47)]
-        [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcAccessoryUnit))]
-        public void Rule_07_047() {
+        [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" с типом элемента ""Другой"" должно быть внесено значение  Тип элемента DbOtherName.",
+         7, 411)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
+        public void Rule_07_411() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
             using (var context = connector.Connect()) {
                 var products = context.ScsTubeFittings
-                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.OTHER)
+                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.OTHER & p.DbOtherName == null)
                     .ToList();
-                var errors = products.Where(p => !string.IsNullOrEmpty(p.DbOtherName))
-                .Select(p => $"({p.Series}\\{p.Code}  {nameof(p.DbOtherName)}:\"{p.DbOtherName}\"")
-                .ToList();
+                var errors = products
+                  .Select(p => (p.Series, p.Code))
+                  .ToList();
                 if (errors.Count > 0) {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1159,8 +1232,439 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-
-
+        [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" с типом элемента ""Угол"" должно быть внесено значение Диаметр Diameter.",
+         7, 412)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
+        public void Rule_07_412() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.ScsTubeFittings
+                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.ANGLE & (p.Diameter == null | p.Diameter <= 0))
+                    .ToList();
+                var errors = products
+                    .Select(p => (p.Series, p.Code, p.Diameter))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" с типом элемента ""Т-переход"" должны быть внесены значения Диаметр основной ветки DiameterMainBranch и Диаметр отходящей ветки DiameterOutBranch.",
+         7, 413)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
+        public void Rule_07_413() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.ScsTubeFittings
+                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.TRIPLE & (p.DiameterMainBranch == null | p.DiameterMainBranch <= 0 | p.DiameterOutBranch == null | p.DiameterOutBranch <= 0))
+                    .ToList();
+                var errors = products
+                    .Select(p => (p.Series, p.Code, (p.DiameterMainBranch, p.DiameterOutBranch)))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" с типом элемента ""Х-переход"" должны быть внесены значения Диаметр первой ветки Diameter1Branch и Диаметр второй ветки Diameter2Branch.",
+         7, 414)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
+        public void Rule_07_414() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.ScsTubeFittings
+                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.CROSS & (p.Diameter1Branch == null | p.Diameter1Branch <= 0 | p.Diameter2Branch == null | p.Diameter2Branch <= 0))
+                    .ToList();
+                var errors = products
+                    .Select(p => (p.Series, p.Code, (p.Diameter1Branch, p.Diameter2Branch)))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" с типом элемента ""Угол"" внутри серии значения параметра Диаметр Diameter не должны повторяться.",
+         7, 415)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
+        public void Rule_07_415() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.ScsTubeFittings
+                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.ANGLE)
+                    .Select(p => new { p.Series, p.Code, p.Diameter })
+                    .ToList();
+                var errors = products
+                    .GroupBy(p => p.Series)
+                    .SelectMany(s => s.GroupBy(gr => gr.Diameter)
+                                      .Where(gr => gr.Count() > 1))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors.SelectMany(gr => (gr.Select(el => (el.Code, el.Series, gr.Key)))));
+                }
+            }
+        }
+        [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" с типом элемента ""Т-переход"" внутри серии должно быть не более одного сочетания параметров Диаметр основной ветки DiameterMainBranch и Диаметр отходящей ветки DiameterOutBranch.",
+         7, 416)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
+        public void Rule_07_416() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.ScsTubeFittings
+                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.TRIPLE)
+                    .Select(p => new { p.Code, p.Series, p.DiameterMainBranch, p.DiameterOutBranch })
+                    .ToList();
+                var errors = products
+                    .GroupBy(p => p.Series)
+                    .SelectMany(s => s.GroupBy(gr => (gr.DiameterMainBranch, gr.DiameterOutBranch))
+                                      .Where(gr => gr.Count() > 1))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors.SelectMany(gr => (gr.Select(el => (el.Code, el.Series, gr.Key)))));
+                }
+            }
+        }
+        [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" с типом элемента ""Х-переход"" внутри серии должно быть не более одного сочетания параметров Диаметр первой ветки Diameter1Branch и Диаметр второй ветки Diameter2Branch.",
+         7, 417)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
+        public void Rule_07_417() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.ScsTubeFittings
+                    .Where(p => p.FittingType == ScsTubeFittingTypeEnum.CROSS)
+                    .Select(p => new { p.Code, p.Series, p.Diameter1Branch, p.Diameter2Branch })
+                    .ToList();
+                var errors = products
+                    .GroupBy(p => p.Series)
+                    .SelectMany(s => s.GroupBy(gr => (gr.Diameter1Branch, gr.Diameter2Branch))
+                                      .Where(gr => gr.Count() > 1))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors.SelectMany(gr => (gr.Select(el => (el.Code, el.Series, gr.Key)))));
+                }
+            }
+        }
+        [ReportRule(@"Для элементов ""Короб"" должны быть внесены значения Длина сегмента,м. SegLength, Высота короба, мм. CabelHeight, Глубина короба, мм. CabelDepth.",
+         7, 430)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsCabelCanal))]
+        public void Rule_07_430() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsCabelCanals
+                    .Select(p => new { p.Code, p.Series, p.SegLength, p.CabelHeight, p.CabelDepth })
+                    .ToList();
+                var errors = products
+                    .Where(p => p.SegLength == null || p.CabelHeight == null || p.CabelDepth == null || p.SegLength <= 0 || p.CabelHeight <= 0 || p.CabelDepth <= 0)
+                    .Select(p => (p.Series, p.Code, (p.SegLength, p.CabelHeight, p.CabelDepth)))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для соединительных элементов короба типа ""Угол"", ""Заглушка"", ""Соединение на стык""  должны быть внесены значения Высота [короба], мм. Height, Глубина [короба], мм. Depth.",
+        7, 431)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsCableFitting))]
+        public void Rule_07_431() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsCableFittings
+                    .Where(p => p.FittingType == ScsCableFittingTypeEnum.PLAIN_ANGLE |
+                        p.FittingType == ScsCableFittingTypeEnum.INSIDE_ANGLE |
+                        p.FittingType == ScsCableFittingTypeEnum.OUTSIDE_ANGLE |
+                        p.FittingType == ScsCableFittingTypeEnum.CORK |
+                        p.FittingType == ScsCableFittingTypeEnum.JOINT)
+                    .Select(p => new { p.Code, p.Series, p.Height, p.Depth })
+                    .ToList();
+                var errors = products
+                    .Where(p => p.Height == null || p.Depth == null || p.Height <= 0 || p.Depth <= 0)
+                    .Select(p => (p.Series, p.Code, (p.Height, p.Depth)))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для соединительных элементов короба типа ""Т-переход"" должны быть внесены параметры Габариты основной ветки (Высота HeightMainBranch, Глубина WidthMainBranch) и Габариты отходящей ветки (Высота HeightOutBranch, Глубина WidthOutBranch).",
+        7, 432)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsCableFitting))]
+        public void Rule_07_432() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsCableFittings
+                    .Where(p => p.FittingType == ScsCableFittingTypeEnum.TRIPLE)
+                    .Select(p => new { p.Code, p.Series, p.HeightMainBranch, p.WidthMainBranch, p.HeightOutBranch, p.WidthOutBranch })
+                    .ToList();
+                var errors = products
+                    .Where(p => p.HeightMainBranch == null || p.WidthMainBranch == null || p.HeightOutBranch == null || p.WidthOutBranch == null || p.HeightMainBranch <= 0 || p.WidthMainBranch <= 0 || p.HeightOutBranch <= 0 || p.WidthOutBranch <= 0)
+                    .Select(p => (p.Series, p.Code, (p.HeightMainBranch, p.WidthMainBranch, p.HeightOutBranch, p.WidthOutBranch)))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для соединительных элементов короба с типом элемента ""Другой"" должно быть внесено значение  Тип элемента DbOtherName.",
+         7, 433)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsCableFitting))]
+        public void Rule_07_433() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.ScsCableFittings
+                    .Where(p => p.FittingType == ScsCableFittingTypeEnum.OTHER & p.DbOtherName == null)
+                    .Select(p => new { p.Code, p.Series })
+                    .ToList();
+                var errors = products
+                  .Select(p => (p.Series, p.Code))
+                  .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для соединительных элементов короба значение параметра ""Серия"" должно совпадать со значением параметра ""Серия"" соответствующих прямых секций короба.",
+         7, 434)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsCableFitting))]
+        public void Rule_07_434() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.ScsCableFittings
+                    .Where(p => p.FittingType == ScsCableFittingTypeEnum.OTHER & p.DbOtherName == null)
+                    .Select(p => p.Series)
+                     .ToList();
+                var errors = products
+                    .Distinct()
+                    .Where(s => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series,s))))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для соединительных элементов короба типа ""Угол"", ""Заглушка"", ""Соединение на стык"" должен быть внесен короб с совпадающими значениями Высота Height, Глубина Depth.",
+        7, 435)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsCableFitting))]
+        public void Rule_07_435() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsCableFittings
+                    .Where(p => p.FittingType == ScsCableFittingTypeEnum.PLAIN_ANGLE |
+                        p.FittingType == ScsCableFittingTypeEnum.INSIDE_ANGLE |
+                        p.FittingType == ScsCableFittingTypeEnum.OUTSIDE_ANGLE |
+                        p.FittingType == ScsCableFittingTypeEnum.CORK |
+                        p.FittingType == ScsCableFittingTypeEnum.JOINT)
+                    .Where(p => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, p.Series) & p.Height == cc.CabelHeight & p.Depth == cc.CabelDepth)))
+                    .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth })
+                    .ToList();
+                var errors = products
+                    .Select(p => (p.Series, p.Code, p.FittingType, (p.Height, p.Depth)))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для соединительных элементов короба типа ""Т-переход"" должен быть внесен короб с совпадающими значениями Габариты основной ветки (Высота HeightMainBranch, Глубина WidthMainBranch).",
+        7, 436)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsCableFitting))]
+        public void Rule_07_436() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsCableFittings
+                    .Where(p => p.FittingType == ScsCableFittingTypeEnum.TRIPLE)
+                    .Where(p => !(context.ScsCabelCanals
+                        .Any(cc => DbFunctions.Like(cc.Series, p.Series) &
+                                p.HeightMainBranch == cc.CabelHeight & p.WidthMainBranch == cc.CabelDepth)))
+                    .Select(p => new { p.Code, p.Series, p.HeightMainBranch, p.WidthMainBranch })
+                    .ToList();
+                var errors = products
+                    .Select(p => (p.Series, p.Code, (p.HeightMainBranch, p.WidthMainBranch)))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для соединительных элементов короба типа ""Т-переход"" должен быть внесен короб с совпадающими значениями Габариты отходящей ветки (Высота HeightOutBranch, Глубина WidthOutBranch).",
+        7, 437)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsCableFitting))]
+        public void Rule_07_437() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsCableFittings
+                    .Where(p => p.FittingType == ScsCableFittingTypeEnum.TRIPLE)
+                    .Where(p => !(context.ScsCabelCanals
+                        .Any(cc => DbFunctions.Like(cc.Series, p.Series) & p.HeightOutBranch == cc.CabelHeight & p.WidthOutBranch == cc.CabelDepth)))
+                    .Select(p => new { p.Code, p.Series, p.HeightOutBranch, p.WidthOutBranch })
+                    .ToList();
+                var errors = products
+                    .Select(p => (p.Series, p.Code, (p.HeightOutBranch, p.WidthOutBranch)))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для соединительных элементов короба типа ""Угол"", ""Заглушка"", ""Соединение на стык"" внутри серии должно быть не более одного сочетания параметров Высота Height, Глубина Depth.",
+        7, 438)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsCableFitting))]
+        public void Rule_07_438() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsCableFittings
+                    .Where(p => p.FittingType == ScsCableFittingTypeEnum.PLAIN_ANGLE |
+                        p.FittingType == ScsCableFittingTypeEnum.INSIDE_ANGLE |
+                        p.FittingType == ScsCableFittingTypeEnum.OUTSIDE_ANGLE |
+                        p.FittingType == ScsCableFittingTypeEnum.CORK |
+                        p.FittingType == ScsCableFittingTypeEnum.JOINT)
+                    .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth })
+                    .ToList();
+                var errors = products
+                    .GroupBy(p => (p.Series, p.FittingType))
+                    .SelectMany(s => s.GroupBy(gr => (gr.Height, gr.Depth)).Where(gr => gr.Count() > 1))
+                    .SelectMany(p => p.Select(grEl => (grEl.Code, grEl.Series, grEl.FittingType, (grEl.Height, grEl.Depth))))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для соединительных элементов короба типа ""Т-переход"" внутри серии должно быть не более одного сочетания параметров Габариты основной ветки (Высота HeightMainBranch, Глубина WidthMainBranch) и Габариты отходящей ветки (Высота HeightOutBranch, Глубина WidthOutBranch).",
+        7, 439)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsCableFitting))]
+        public void Rule_07_439() {
+            using (var context = connector.Connect()) {
+                var products = context.ScsCableFittings
+                    .Where(p => p.FittingType == ScsCableFittingTypeEnum.TRIPLE)
+                    .Select(p => new { p.Code, p.Series, p.HeightMainBranch, p.WidthMainBranch, p.HeightOutBranch, p.WidthOutBranch })
+                    .ToList();
+                var errors = products
+                    .GroupBy(p => (p.Series))
+                    .SelectMany(s => s.GroupBy(p => (p.HeightMainBranch, p.WidthMainBranch, p.HeightOutBranch, p.WidthOutBranch)).Where(gr => gr.Count() > 1))
+                    .SelectMany(p => p.Select(grEl => (grEl.Code, grEl.Series, (grEl.HeightMainBranch, grEl.WidthMainBranch, grEl.HeightOutBranch, grEl.WidthOutBranch))))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для перегородок коробов должны быть внесены параметры Высота Height и Длина перегородки Length.",
+        7, 440)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbCableCanalPartition))]
+        public void Rule_07_440() {
+            using (var context = connector.Connect()) {
+                var products = context.DbCableCanalPartitions
+                    .Select(p => new { p.Code, p.Series, p.Height, p.Length })
+                    .Where(p => p.Height == null || p.Length == null || p.Height <= 0 || p.Length <= 0)
+                    .ToList();
+                var errors = products
+                    .Select(p => (p.Series, p.Code, (p.Height, p.Length)))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для перегородок коробов значение параметра ""Серия"" должно совпадать со значением параметра ""Серия"" соответствующих прямых секций короба.",
+         7, 441)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbCableCanalPartition))]
+        public void Rule_07_441() {
+            //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
+            using (var context = connector.Connect()) {
+                var products = context.DbCableCanalPartitions
+                    .Select(p => p.Series)
+                    .ToList();
+                var errors = products
+                    .Distinct()
+                    .Where(s => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, s))))
+                  .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для перегородки короба высотой Height должен быть внесен короб с соответствующим значением Глубина Depth.",
+        7, 442)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DbCableCanalPartition))]
+        public void Rule_07_442() {
+            using (var context = connector.Connect()) {
+                var products = context.DbCableCanalPartitions
+                    .Select(p => new { p.Code, p.Series, p.Height })
+                    .Where(p => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, p.Series) & p.Height == cc.CabelDepth)))
+                    .ToList();
+                var errors = products
+                    .Select(p => (p.Series, p.Code, p.Height))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для крышек коробов должны быть внесены параметры Ширина крышки CoverWidth и Длина крышки CoverLength.",
+                7, 443)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DcCableCanalCover))]
+        public void Rule_07_443() {
+            using (var context = connector.Connect()) {
+                var products = context.DcCableCanalCovers
+                    .Select(p => new { p.Code, p.Series, p.CoverWidth, p.CoverLength })
+                    .Where(p => p.CoverWidth == null || p.CoverLength == null || p.CoverWidth <= 0 || p.CoverLength <= 0)
+                    .ToList();
+                var errors = products
+                    .Select(p => (p.Series, p.Code, (p.CoverWidth, p.CoverLength)))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для крышек коробов значение параметра ""Серия"" должно совпадать со значением параметра ""Серия"" соответствующих прямых секций короба.",
+         7, 444)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DcCableCanalCover))]
+        public void Rule_07_444() {
+            using (var context = connector.Connect()) {
+                var products = context.DcCableCanalCovers
+                    .Select(p => p.Series)
+                    .ToList();
+                var errors = products
+                    .Distinct()
+                    .Where(s => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, s))))
+                  .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
+        [ReportRule(@"Для крышки короба шириной CoverWidth должен быть внесен короб с соответствующим значением высота CabelHeight.",
+        7, 445)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(DcCableCanalCover))]
+        public void Rule_07_445() {
+            using (var context = connector.Connect()) {
+                var products = context.DcCableCanalCovers
+                    .Select(p => new { p.Code, p.Series, p.CoverWidth })
+                    .Where(p => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, p.Series) & p.CoverWidth == cc.CabelHeight)))
+                    .ToList();
+                var errors = products
+                    .Select(p => (p.Series, p.Code, p.CoverWidth))
+                    .ToList();
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+                       errors);
+                }
+            }
+        }
 
     }
 }
