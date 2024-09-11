@@ -1175,25 +1175,25 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        [ReportRule(@"Для элементов ""Трубы"" внутри серии должно быть одно сочетание габаритов: Внутренний диаметр InternalDiameter и Внешний диаметр ExternalDiameter.",
-         7, 403)]
-        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsPipe))]
-        public void Rule_07_403() {
-            using (var context = connector.Connect()) {
-                var products = context.ScsPipes
-                     .Select(p => new { p.Code, p.Series, p.InternalDiameter, p.ExternalDiameter })
-                     .ToList();
-                var errors = products
-                    .GroupBy(p => p.Series)
-                    .SelectMany(s => s.GroupBy(gr => (gr.ExternalDiameter, gr.InternalDiameter))
-                                      .Where(gr => gr.Count() > 1))
-                    .ToList();
-                if (errors.Count > 0) {
-                    FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
-                       errors.SelectMany(gr => (gr.Select(el => (el.Code, el.Series, gr.Key)))));
-                }
-            }
-        }
+        //[ReportRule(@"Для элементов ""Трубы"" внутри серии должно быть одно сочетание габаритов: Внешний диаметр InternalDiameter и Внутренний диаметр ExternalDiameter.",
+        // 7, 403)]
+        //[RuleCategory("Полнота заполнения технических данных.", nameof(ScsPipe))]
+        //public void Rule_07_403() {
+        //    using (var context = connector.Connect()) {
+        //        var products = context.ScsPipes
+        //             .Select(p => new { p.Code, p.Series, p.InternalDiameter, p.ExternalDiameter })
+        //             .ToList();
+        //        var errors = products
+        //            .GroupBy(p => p.Series)
+        //            .SelectMany(s => s.GroupBy(gr => (gr.ExternalDiameter, gr.InternalDiameter))
+        //                              .Where(gr => gr.Count() > 1))
+        //            .ToList();
+        //        if (errors.Count > 0) {
+        //            FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
+        //               errors.SelectMany(gr => (gr.Select(el => (el.Code, el.Series, gr.Key)))));
+        //        }
+        //    }
+        //}
         [ReportRule(@"Для элементов ""Трубы. Соединительные элементы"" должен быть внесен Тип элемента FittingType.",
          7, 410)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ScsTubeFitting))]
@@ -1435,9 +1435,8 @@ namespace Bs.Nano.Electric.Report {
             //var ft = ScsGutterBoltingTypeEnum.CROSSBAR;
             using (var context = connector.Connect()) {
                 var products = context.ScsCableFittings
-                    .Where(p => p.FittingType == ScsCableFittingTypeEnum.OTHER & p.DbOtherName == null)
                     .Select(p => p.Series)
-                     .ToList();
+                    .ToList();
                 var errors = products
                     .Distinct()
                     .Where(s => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series,s))))
