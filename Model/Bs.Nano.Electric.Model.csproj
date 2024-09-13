@@ -13,7 +13,7 @@
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>
 	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);DBNE85;DBNE201;DBNE23_1;InitDbContextEnums</DefineConstants>
+		<DefineConstants>$(DefineConstants);DBNE85;InitDbContextEnums</DefineConstants>
 	</PropertyGroup>
 
 
