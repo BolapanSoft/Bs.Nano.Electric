@@ -13,7 +13,7 @@ namespace Nano.Electric {
         public bool IsEnabled { get; set; }
         public bool IsUse { get; set; }
         public int Number { get; set; }
-        public ScsGutterBolting Profile { get; set; }
+        public ScsGutterBolting? Profile { get; set; }
         public int ProfileCount { get; set; }
         //[Property(Text = WireCommonLocalizationDictionary.СерияНесущегоЭлемента, Category = PlatformLocalizationDictionary.Parameters, TypeConverter = typeof(DbSeriesValueListConverter<DbScsGutterBolting, KnotPlainSeriaFilter>))]
         /// <summary>
