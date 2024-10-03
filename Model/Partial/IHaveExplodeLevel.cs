@@ -25,4 +25,5 @@ namespace Nano.Electric {
     public interface IHaveDbGraphicRef {
         public int? DbGraphicRef { get; set; }
     }
+   
 }

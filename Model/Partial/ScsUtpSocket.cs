@@ -7,7 +7,7 @@ namespace Nano.Electric {
 #if InitDbContextEnums
         public ScsCableSystemType? CableSystemType { get; set; }
         public ScsUtpSocketTypeEnum? UtpSocketType { get; set; }
-        public int? PortType { get; set; }
+        public ScsPortType? PortType { get; set; }
 #endif
 
     }

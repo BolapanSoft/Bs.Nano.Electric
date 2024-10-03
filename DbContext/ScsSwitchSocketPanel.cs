@@ -12,6 +12,7 @@ namespace Nano.Electric
 #if !InitDbContextEnums
         public int? CableSystemType { get; set; }
         public string BlockName { get; set; }
+        public int? PortType { get; set; }
 #endif
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -56,7 +57,7 @@ namespace Nano.Electric
 
         public bool? InImport { get; set; }
 
-        public int? PortType { get; set; }
+       
 
 
         public int? DbGraphicRef { get; set; }

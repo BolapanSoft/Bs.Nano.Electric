@@ -5,8 +5,8 @@ using Nano.Electric.Enums;
 namespace Nano.Electric {
     public partial class ScsPatchCord {
 #if InitDbContextEnums
-       public CordTypeEnum? EnvType { get; set; }
-
+        public CordTypeEnum? EnvType { get; set; }
+        public ScsCableSystemType? CableSystemType { get; set; }
 #endif
     }
 }

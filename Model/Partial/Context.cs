@@ -62,10 +62,23 @@ namespace Nano.Electric {
                 .HasOptional(p => p.CableSystemType)
                 .WithMany()
                 .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ScsSwitchUtpPanel>()
+                .HasOptional(p => p.CableSystemType)
+                .WithMany()
+                .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ScsCord>()
+                .HasOptional(p => p.CableSystemType)
+                .WithMany()
+                .Map(m => m.MapKey("CableSystemType"));
             modelBuilder.Entity<ScsUtpSocket>()
                 .HasOptional(p => p.CableSystemType)
                 .WithMany()
                 .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ScsPatchCord>()
+                .HasOptional(p => p.CableSystemType)
+                .WithMany()
+                .Map(m => m.MapKey("CableSystemType"));
+
             modelBuilder.Entity<ElWire>()
                 .HasOptional(p => p.wireMark)
                 .WithMany()
@@ -74,6 +87,27 @@ namespace Nano.Electric {
                 .HasOptional(l => l.Lamp)
                 .WithMany()
                 .Map(m => m.MapKey("Lamp"));
+            modelBuilder.Entity<ScsUtpSocket>()
+                .HasOptional(l => l.PortType)
+                .WithMany()
+                .Map(m => m.MapKey("PortType"));
+            modelBuilder.Entity<ScsSwitchSocketPanel>()
+                .HasOptional(l => l.PortType)
+                .WithMany()
+                .Map(m => m.MapKey("PortType"));
+            modelBuilder.Entity<ScsSwitchUtpPanel>()
+                .HasOptional(l => l.PortType)
+                .WithMany()
+                .Map(m => m.MapKey("PortType"));
+            modelBuilder.Entity<ScsCommutatorPanel>()
+                .HasOptional(l => l.PortTypeIn)
+                .WithMany()
+                .Map(m => m.MapKey("PortTypeIn"));
+            modelBuilder.Entity<ScsCommutatorPanel>()
+                .HasOptional(l => l.PortTypeOut)
+                .WithMany()
+                .Map(m => m.MapKey("PortTypeOut"));
+            
 #endif
             //modelBuilder.Entity<DbLtKiTable>()
             //    .Property(p => p.CurveDb)

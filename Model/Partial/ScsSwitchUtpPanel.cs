@@ -12,6 +12,9 @@ namespace Nano.Electric {
         public string BackBlockName { get; set; }
         public string BlockFileName { get; set; } = "19-PANELS.dwg";
         public string BackBlockFileName { get; set; } = "19-PANELS.dwg";
+        public ScsCableSystemType? CableSystemType { get; set; }
+        public ScsPortType? PortType { get; set; }
+
 #endif
         [MaxLength(-1)]
         public string KitStructure { get => GetKitStructureAsXML(this); set {; } }

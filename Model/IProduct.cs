@@ -12,7 +12,7 @@ namespace Nano.Electric {
         int? DbImageRef { get; set; }
 
     }
-    public interface IHaveScsCableSystemTypeRef {
+    public interface IHaveCableSystemTypeRef {
         string Code { get; }
         //int Id { get; set; }
         ScsCableSystemType? CableSystemType { get; set; }
@@ -30,14 +30,14 @@ namespace Nano.Electric {
     public partial class DbLtKiTable : IHaveId { }
     public partial class ExplodeSafeLevel : IHaveId { }
     public partial class ScsPortType : IHaveId { }
-    public partial class ElWire : IProduct, IHaveScsCableSystemTypeRef, IHaveImageRef { }
+    public partial class ElWire : IProduct, IHaveCableSystemTypeRef, IHaveImageRef { }
     public partial class ElWireConductMaterial : IHaveId { }
     public partial class ElWireIsolationMaterial : IHaveId { }
     public partial class ScsCableSystemType : IHaveId { }
     public partial class ScsGutterCanal : IProduct, IHaveImageRef { }
     public partial class ScsCabelCanal : IProduct, IHaveImageRef { }
     public partial class ScsCableFitting : IProduct, IHaveImageRef { }
-    public partial class ScsPatchCord : IProduct, IHaveImageRef { }
+    public partial class ScsPatchCord : IProduct, IHaveCableSystemTypeRef, IHaveImageRef { }
     public partial class ScsPipe : IProduct, IHaveImageRef { }
     public partial class ScsTubeFitting : IProduct, IHaveImageRef { }
     public partial class DbScsGutterCover : IProduct, IHaveImageRef { }
@@ -86,18 +86,18 @@ namespace Nano.Electric {
 
     public partial class ScsPanelUtilityUnit : IProduct, IHaveImageRef { }
     public partial class ScsShellUtility : IProduct, IHaveImageRef { }
-    public partial class ScsSwitchSocketPanel : IProduct, IHaveScsCableSystemTypeRef, IHaveImageRef, IHaveDbGraphicRef { }
+    public partial class ScsSwitchSocketPanel : IProduct, IHaveCableSystemTypeRef, IHaveImageRef, IHaveDbGraphicRef { }
     public partial class ScsOrganaizerPanel : IProduct, IHaveImageRef, IHaveDbGraphicRef { }
-    public partial class ScsSwitchUtpPanel : IProduct, IHaveImageRef, IHaveDbGraphicRef { }
+    public partial class ScsSwitchUtpPanel : IProduct, IHaveCableSystemTypeRef, IHaveImageRef, IHaveDbGraphicRef { }
     public partial class ScsShellDistr : IProduct, IHaveImageRef, IHaveDbGraphicRef { }
-    public partial class ScsUtpSocket : IProduct, IHaveScsCableSystemTypeRef, IHaveImageRef { }
+    public partial class ScsUtpSocket : IProduct, IHaveCableSystemTypeRef, IHaveImageRef { }
     public partial class ScsCommutatorPanel : IProduct, IHaveImageRef, IHaveDbGraphicRef { }
     public partial class ScsHatchUtilityUnit : IProduct, IHaveImageRef{ }
     public partial class ScsServiceColumnUtilityUnit : IProduct, IHaveImageRef{ }
     public partial class ScsHatch : IProduct, IHaveImageRef, IHaveDbGraphicRef { }
     public partial class ScsServiceColumn : IProduct, IHaveImageRef, IHaveDbGraphicRef { }
+    public partial class ScsCord : IProduct, IHaveCableSystemTypeRef, IHaveImageRef { }
     /*
-    public partial class __ : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class __ : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class __ : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class __ : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }

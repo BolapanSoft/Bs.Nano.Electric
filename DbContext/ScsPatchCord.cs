@@ -1,22 +1,20 @@
-namespace Nano.Electric
-{
+namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     [Table("ScsPatchCord")]
-    public partial class ScsPatchCord
-    {
+    public partial class ScsPatchCord {
 #if !InitDbContextEnums
-       public int? EnvType { get; set; }
-
+        public int? EnvType { get; set; }
+        public int? CableSystemType { get; set; }
 #endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
- 
+
         public double? DbLength { get; set; }
 
         public int? CordCordCount { get; set; }
@@ -57,6 +55,6 @@ namespace Nano.Electric
 
         public int? SecondPort { get; set; }
 
-        public int? CableSystemType { get; set; }
+
     }
 }

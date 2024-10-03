@@ -3,6 +3,8 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
+using Cadwise.OpenCascade.Interop;
 //using Cadwise.OpenCascade.Interop;
 using Nano.Electric;
 
@@ -16,6 +18,7 @@ namespace Bs.Nano.Electric.Interop {
         private bool disposedValue;
 
         public Service(string cadwisePath) {
+            cadwisePath = "C:\\Program Files (x86)\\Nanosoft\\nanoCAD BIM Электро. Редактор БД 23.1";
             if (cadwisePath is not null) {
                 string localPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var _path = System.IO.Path.Combine(localPath, cadwisePath);
@@ -54,12 +57,24 @@ namespace Bs.Nano.Electric.Interop {
             }
             Cadwise.OpenCascade.Interop.StepImporterService service = lzStepImporterService.Value;
             string codeBase = typeof(Cadwise.OpenCascade.Interop.StepImporterService).Assembly.CodeBase;
-            Cadwise.Graphic.Interfaces.IGraphicView dbGraphicView = service.Import(file);
+            Cadwise.Graphic.Interfaces.IGraphicView dbGraphicView = LoadStep(file, service);
             Cadwise.Graphic.Db.DbGraphic dbGraphic = new();
             dbGraphic.GraphicView = dbGraphicView;
             dbGraphic.SaveChanges();
             return dbGraphic;
         }
+        [HandleProcessCorruptedStateExceptions]
+        private static Cadwise.Graphic.Interfaces.IGraphicView LoadStep(string file, StepImporterService service) {
+            Cadwise.Graphic.Interfaces.IGraphicView grView;
+            try {
+                grView = service.Import(file);
+            }
+            catch (Exception ex) {
+                throw new TargetInvocationException($"При импорте файла {file} возникла ошибка.", ex);
+            }
+            return grView;
+        }
+
         private Cadwise.OpenCascade.Interop.StepImporterService GetStepImporter() {
             string ocDLL = System.IO.Path.Combine(cadwisePath, OpenCascadeInteropDll);
             if (!System.IO.File.Exists(ocDLL)) {
@@ -92,5 +107,4 @@ namespace Bs.Nano.Electric.Interop {
             GC.SuppressFinalize(this);
         }
     }
-
 }

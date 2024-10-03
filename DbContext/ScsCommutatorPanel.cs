@@ -12,7 +12,9 @@ namespace Nano.Electric
 #if !InitDbContextEnums
         // Сохранить в поле KitStructure
         public string BlockName { get; set; }
-       
+        public int? PortTypeIn { get; set; }
+
+        public int? PortTypeOut { get; set; }    
 #endif
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
@@ -62,9 +64,6 @@ namespace Nano.Electric
         public int? DbGraphicRef { get; set; }
 
         public int? DbImageRef { get; set; }
-
-        public int? PortTypeIn { get; set; }
-
-        public int? PortTypeOut { get; set; }
+    
     }
 }

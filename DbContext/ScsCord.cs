@@ -1,5 +1,6 @@
 namespace Nano.Electric
 {
+    using Nano.Electric.Enums;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -46,12 +47,16 @@ namespace Nano.Electric
 
         public int? DbImageRef { get; set; }
 
-        public int? CableSystemType { get; set; }
 
         public double? Resistance { get; set; }
 
         public bool? InImport { get; set; }
 
         public string Url { get; set; }
+#if InitDbContextEnums
+        public ScsCableSystemType? CableSystemType { get; set; }
+#else
+        public int? CableSystemType { get; set; }
+#endif
     }
 }
