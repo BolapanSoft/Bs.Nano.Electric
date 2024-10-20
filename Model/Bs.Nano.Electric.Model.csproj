@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>1.23.1</VersionPrefix>
+		<VersionPrefix>1.24.1</VersionPrefix>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>9.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>Nano.Electric</RootNamespace>
 		<BaseOutputPath>..\bin\</BaseOutputPath>
-		<VersionSuffix>039</VersionSuffix>
+		<VersionSuffix>040</VersionSuffix>
 		<Version>$(VersionPrefix).$(VersionSuffix)</Version>
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>

@@ -6,17 +6,17 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-        // Полный перечень разделов:
-        // Правила раздела 1 Трансформаторы, реакторы и УКРМ.
-        // Правила раздела 2 Распределительные устройства.
-        // Правила раздела 3 Коммутационные аппараты.
-        // Правила раздела 4 Приборы контроля и учета.
-        // Правила раздела 5 Электроприемники.
-        // Правила раздела 6 Кабельно-проводниковая продукция.
-        // Правила раздела 7 Кабеленесущие системы.
-        // Правила раздела 8 Комплектации.
-        // Правила раздела 9 Параметры исполнения.
-        // Правила раздела 10 Материалы и комплектации.
+// Полный перечень разделов:
+// Правила раздела 1 Трансформаторы, реакторы и УКРМ.
+// Правила раздела 2 Распределительные устройства.
+// Правила раздела 3 Коммутационные аппараты.
+// Правила раздела 4 Приборы контроля и учета.
+// Правила раздела 5 Электроприемники.
+// Правила раздела 6 Электроустановочные изделия.
+// Правила раздела 7 Кабеленесущие системы.
+// Правила раздела 8 Кабельно-проводниковая продукция.
+// Правила раздела 9 Параметры исполнения.
+// Правила раздела 10 Материалы и комплектации.
 
 namespace Bs.Nano.Electric.Report {
     public partial class Checker {
@@ -192,8 +192,43 @@ CableLeadIn Подвод кабеля",
                 }
             }
         }
+        [ReportRule(@"Для шкафа должна быть назначена графика",
+                    2, 112)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElBoard))]
+        public void Rule_02_112() {
+            using (var context = connector.Connect()) {
+                var products = context.ElBoards
+                   .Select(p => new { p.Code, p.Series, p.DbGraphicRef })
+                   .ToList();
+                var errors = products
+                    .Where(p => !(p.DbGraphicRef.HasValue & p.DbGraphicRef>0))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не назначена графика для {errors.Count} шкафов.",
+                        errors.Select(p => (p.Series, p.Code)));
+                }
+            }
+        }
         #endregion
-
+        #region 300 Ящики
+        [ReportRule(@"Для элементов ""Ящики"" должна быть назначена графика",
+                    2, 312)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElBox))]
+        public void Rule_02_312() {
+            using (var context = connector.Connect()) {
+                var products = context.ElBoxes
+                   .Select(p => new { p.Code, p.Series, p.DbGraphicRef })
+                   .ToList();
+                var errors = products
+                    .Where(p => !(p.DbGraphicRef.HasValue & p.DbGraphicRef > 0))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не назначена графика {errors.Count} элементов \"Ящики\".",
+                        errors.Select(p => (p.Series, p.Code)));
+                }
+            }
+        }
+        #endregion
 
         #region 400 Ящики с трансформатором
         [ReportRule(@"Для элемента таблицы ""Ящик с трансформатором"" должны быть заполнены технические данные:
@@ -255,7 +290,24 @@ DbDepth Глубина, мм",
                         errors.Select(p => (p.Series, p.Code, (p.CableLeadIn?.GetDescription()))));
                 }
             }
-        } 
+        }
+        [ReportRule(@"Для элементов ""Ящики с трансформатором"" должна быть назначена графика",
+            2, 412)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElShieldingUnit))]
+        public void Rule_02_412() {
+            using (var context = connector.Connect()) {
+                var products = context.ElShieldingUnits
+                   .Select(p => new { p.Code, p.Series, p.DbGraphicRef })
+                   .ToList();
+                var errors = products
+                    .Where(p => !(p.DbGraphicRef.HasValue & p.DbGraphicRef > 0))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не назначена графика {errors.Count} элементов \"Ящики с трансформатором\".",
+                        errors.Select(p => (p.Series, p.Code)));
+                }
+            }
+        }
         #endregion
     }
 }

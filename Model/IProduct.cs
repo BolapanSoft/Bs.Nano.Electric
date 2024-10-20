@@ -53,29 +53,29 @@ namespace Nano.Electric {
     public partial class ElBoard : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElBox : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
     public partial class ElShieldingUnit : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElAutomat : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElSafeDevice : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElKnifeSwitch : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElUzo : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElStarter : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElOvervoltageSuppressor : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElFrequenceTransformer : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElCasing : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
+    public partial class ElAutomat : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElSafeDevice : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElKnifeSwitch : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElUzo : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElStarter : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElOvervoltageSuppressor : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElFrequenceTransformer : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElCasing : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElFiderUtility : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
     public partial class ElBoardUtility : IProduct, IHaveImageRef { }
-    public partial class ElBlock : IProduct, IHaveImageRef { }
-    public partial class ElPushButtonStation : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElControlDevice : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElCurrentTransformer : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElCounter : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElVoltmeter : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElAmperemeter : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
+    public partial class ElBlock : IProduct, IHaveImageRef, IHaveDbGraphicRef { }
+    public partial class ElPushButtonStation : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElControlDevice : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElCurrentTransformer : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElCounter : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElVoltmeter : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElAmperemeter : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElLighting : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElLamp : IProduct, IHaveImageRef { }
     public partial class ElLightUtility : IProduct, IHaveImageRef { }
-    public partial class ElDbEngine : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElDbHeater : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElDbComplex : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
+    public partial class ElDbEngine : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElDbHeater : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
+    public partial class ElDbComplex : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class DbElSwitch : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class DbElCSwitch : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class DbElSocket : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }

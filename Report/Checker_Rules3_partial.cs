@@ -14,12 +14,11 @@ using System.Threading.Tasks;
 // Правила раздела 3 Коммутационные аппараты.
 // Правила раздела 4 Приборы контроля и учета.
 // Правила раздела 5 Электроприемники.
-// Правила раздела 6 Кабельно-проводниковая продукция.
+// Правила раздела 6 Электроустановочные изделия.
 // Правила раздела 7 Кабеленесущие системы.
-// Правила раздела 8 Комплектации.
+// Правила раздела 8 Кабельно-проводниковая продукция.
 // Правила раздела 9 Параметры исполнения.
 // Правила раздела 10 Материалы и комплектации.
-
 namespace Bs.Nano.Electric.Report {
     public partial class Checker {
         // Правила раздела 3 Коммутационные аппараты.
@@ -560,7 +559,23 @@ ActiveResistance	InductiveResistance
                 }
             }
         }
-        
+        [ReportRule(@"Для элементов ""Коммутационные аппараты\Автоматические выключатели"" должна быть назначена графика",
+                            3, 112)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
+        public void Rule_03_162() {
+            using (var context = connector.Connect()) {
+                var products = context.ElAutomats
+                   .Select(p => new { p.Code, p.Series, p.DbGraphicRef })
+                   .ToList();
+                var errors = products
+                    .Where(p => !(p.DbGraphicRef.HasValue & p.DbGraphicRef > 0))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не назначена графика {errors.Count} элементов \"Коммутационные аппараты\\Автоматические выключатели\".",
+                        errors.Select(p => (p.Series, p.Code)));
+                }
+            }
+        }
         #endregion
 
         #region 200 Предохранители

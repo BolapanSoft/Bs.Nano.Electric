@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 // Правила раздела 3 Коммутационные аппараты.
 // Правила раздела 4 Приборы контроля и учета.
 // Правила раздела 5 Электроприемники.
-// Правила раздела 6 Кабельно-проводниковая продукция.
+// Правила раздела 6 Электроустановочные изделия.
 // Правила раздела 7 Кабеленесущие системы.
-// Правила раздела 8 Комплектации.
+// Правила раздела 8 Кабельно-проводниковая продукция.
 // Правила раздела 9 Параметры исполнения.
 // Правила раздела 10 Материалы и комплектации.
 namespace Bs.Nano.Electric.Report {
@@ -25,6 +25,48 @@ namespace Bs.Nano.Electric.Report {
         // 5.400 Светильники
         // 5.500 Лампы
         // 5.600 Доп. оборудование светильников
+
+        #region 100 Асинхронные двигатели
+        [ReportRule(@"Для элементов ""Асинхронные двигатели"" должна быть назначена графика",
+                    5, 112)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElDbEngine))]
+        public void Rule_05_112() {
+            using (var context = connector.Connect()) {
+                var products = context.ElDbEngines
+                   .Select(p => new { p.Code, p.Series, p.DbGraphicRef })
+                   .ToList();
+                var errors = products
+                    .Where(p => !(p.DbGraphicRef.HasValue & p.DbGraphicRef > 0))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не назначена графика {errors.Count} элементов \"Асинхронные двигатели\".",
+                        errors.Select(p => (p.Series, p.Code)));
+                }
+            }
+        }
+        #endregion
+
+        #region 300 Комплексные электроприемники
+        [ReportRule(@"Для элементов ""Комплексные электроприемники"" должна быть назначена графика",
+                    5, 312)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElDbComplex))]
+        public void Rule_05_312() {
+            using (var context = connector.Connect()) {
+                var products = context.ElDbComplexes
+                   .Select(p => new { p.Code, p.Series, p.DbGraphicRef })
+                   .ToList();
+                var errors = products
+                    .Where(p => !(p.DbGraphicRef.HasValue & p.DbGraphicRef > 0))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не назначена графика {errors.Count} элементов \"Комплексные электроприемники\".",
+                        errors.Select(p => (p.Series, p.Code)));
+                }
+            }
+        }
+        #endregion
+
+        #region 400 Светильники
         [ReportRule(@"Для светильников со съемной лампой должен быть указан тип используемой лампы с тем же самым цоколем.",
                     5, 401)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ElLighting))]
@@ -45,6 +87,24 @@ namespace Bs.Nano.Electric.Report {
             }
 
         }
+        [ReportRule(@"Для элементов ""Светильники"" должна быть назначена графика",
+                    5, 412)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElLighting))]
+        public void Rule_05_412() {
+            using (var context = connector.Connect()) {
+                var products = context.ElLightings
+                   .Select(p => new { p.Code, p.Series, p.DbGraphicRef })
+                   .ToList();
+                var errors = products
+                    .Where(p => !(p.DbGraphicRef.HasValue & p.DbGraphicRef > 0))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не назначена графика {errors.Count} элементов \"Светильники\".",
+                        errors.Select(p => (p.Series, p.Code)));
+                }
+            }
+        }
+        #endregion
         [ReportRule(@"В таблице ""Лампы"" под индексом id=0 должен быть внесен пустой элемент.",
                     5, 500)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ElLamp))]
