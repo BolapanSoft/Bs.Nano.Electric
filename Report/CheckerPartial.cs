@@ -265,7 +265,7 @@ namespace Bs.Nano.Electric.Report {
         private static (bool isHaveMaterial, IEnumerable<Material> values) GetMaterialValues(INanocadDBConnector connector, string tableName) {
             List<Material> values = new();
             bool allRight = false;
-            if (!(IsCorrectTableName(tableName) )) {
+            if (!(IsCorrectTableName(tableName))) {
                 return (allRight, Array.Empty<Material>());
             }
             try {
@@ -281,17 +281,27 @@ namespace Bs.Nano.Electric.Report {
             }
             return (allRight, values);
         }
+
+        protected static IEnumerable<IProduct> GetProducts(Context context, string tableName) {
+            if (!(IsCorrectTableName(tableName))) {
+                throw new ArgumentException($"Строка \"{tableName}\" нея является допустимым именем таблицы.", nameof(tableName));
+            }
+            string strQuery = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer] FROM [{tableName}]";
+            var query = context.Database.SqlQuery<NtProduct>(strQuery);
+            var l = query.AsEnumerable();
+            return l;
+        }
         private static IEnumerable<(string code, string uri)> GetUriValues(Context context, string tableName) {
             List<(string code, string uri)> values = new();
             if (!(IsCorrectTableName(tableName))) {
                 return Array.Empty<(string code, string uri)>();
             }
             try {
-                    string strQuery = $"SELECT [Code], [Uri] FROM [{tableName}]";
-                    var query = context.Database.SqlQuery<(string code, string uri)>(strQuery);
-                    values = query.ToList();
+                string strQuery = $"SELECT [Code], [Uri] FROM [{tableName}]";
+                var query = context.Database.SqlQuery<(string code, string uri)>(strQuery);
+                values = query.ToList();
                 return values;
-                
+
             }
             catch (Exception ex) {
                 return Array.Empty<(string code, string uri)>();

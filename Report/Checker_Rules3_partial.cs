@@ -43,8 +43,8 @@ NominalCurrent	DbPoleCountEnum	VoltageType	MaxCommutation
                 var errors = context.ElAutomats
                     .Select(p => new { p.Code, p.Series, p.NominalCurrent, p.DbPoleCountEnum, p.VoltageType, p.MaxCommutation })
                     .ToList()
-                    .Where(p => !((p.NominalCurrent.HasValue & p.DbPoleCountEnum.HasValue & p.VoltageType.HasValue & p.MaxCommutation.HasValue ) &&
-                                (p.NominalCurrent > 0 & p.DbPoleCountEnum > 0 & IsDefined(p.VoltageType!.Value) & p.MaxCommutation > 0 )))
+                    .Where(p => !((p.NominalCurrent.HasValue & p.DbPoleCountEnum.HasValue & p.VoltageType.HasValue & p.MaxCommutation.HasValue) &&
+                                (p.NominalCurrent > 0 & p.DbPoleCountEnum > 0 & IsDefined(p.VoltageType!.Value) & p.MaxCommutation > 0)))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
@@ -136,16 +136,17 @@ IsHeatR	IsElMagR	IsElectronicR	HasUzo
             }
 
         }
-        [ReportRule(@"Для автоматических выключателей должны быть заполнен технические данные: DynResistance	Электродинамическая стойкость при 380/220В Icm, кА",
+        [ReportRule(@"Для автоматических выключателей, если заполнен параметр MaxCommutation ""Предельная коммутационная способность при 380/220В Ics, кА"", то должен быть заполнен параметр DynResistance ""Электродинамическая стойкость при 380/220В Icm, кА"".",
             3, 106)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
         public void Rule_03_106() {
             using (var context = connector.Connect()) {
                 var errors = context.ElAutomats
+                    .Where(p => p.MaxCommutation > 0)
                     .Select(p => new { p.Code, p.Series, p.DynResistance })
                     .ToList()
                     .Where(p => !((p.DynResistance.HasValue) &&
-                                ( p.DynResistance > 0)))
+                                (p.DynResistance > 0)))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
@@ -154,8 +155,61 @@ IsHeatR	IsElMagR	IsElectronicR	HasUzo
             }
 
         }
-
-        [ReportRule(@"Для автоматических выключателей с креплением на монтажную рейку должен быть заполнен параметр: RailMountTypeFlagged Тип монтажной рейки",
+        [ReportRule(@"Для автоматических выключателей значение электродинамической стойкости DynResistance должно быть больше, либо равно значению предельной коммутационной способности MaxCommutation",
+            3, 107)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
+        public void Rule_03_107() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElAutomats
+                    .Where(p => p.MaxCommutation > 0)
+                    .Select(p => new { p.Code, p.Series, p.DynResistance, p.MaxCommutation })
+                    .ToList()
+                    .Where(p => !((p.DynResistance.HasValue) &&
+                                (p.DynResistance >= p.MaxCommutation)))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.MaxCommutation, p.DynResistance))));
+                }
+            }
+        }
+        [ReportRule(@"Для автоматических выключателей, если напряжение указано как 660/380 или 380/220; 660/380, то обязательно должны быть заполнены параметры DynResistance660 ""Предельная коммутационная способность при 660/380В Ics, кА"" и MaxCommutation660 ""Электродинамическая стойкость при 660/380В Icm, кА"".",
+            3, 108)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
+        public void Rule_03_108() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElAutomats
+                    .Where(p => p.VoltageType == RatedNetVoltageType.Voltage660380 | p.VoltageType == (RatedNetVoltageType.Voltage660380 & RatedNetVoltageType.Voltage380220))
+                    .Select(p => new { p.Code, p.Series, p.DynResistance660, p.MaxCommutation660 })
+                    .ToList()
+                    .Where(p => !(p.DynResistance660.HasValue && p.DynResistance660 > 0 &&
+                                  p.MaxCommutation660.HasValue && p.MaxCommutation660>0))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DynResistance660, p.MaxCommutation660))));
+                }
+            }
+        }
+         [ReportRule(@"Для автоматических выключателей значение электродинамической стойкости DynResistance660 должно быть больше, либо равно значению предельной коммутационной способности MaxCommutation660",
+            3, 109)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
+        public void Rule_03_109() {
+            using (var context = connector.Connect()) {
+                var errors = context.ElAutomats
+                    .Where(p => p.MaxCommutation660 > 0)
+                    .Select(p => new { p.Code, p.Series, p.DynResistance660, p.MaxCommutation660 })
+                    .ToList()
+                    .Where(p => !((p.DynResistance660.HasValue) &&
+                                (p.DynResistance660 >= p.MaxCommutation660)))
+                    .ToList();
+                if (errors.Any()) {
+                    FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
+                        errors.Select(p => (p.Series, p.Code, (p.DynResistance660, p.MaxCommutation660 ))));
+                }
+            }
+        }
+       [ReportRule(@"Для автоматических выключателей с креплением на монтажную рейку должен быть заполнен параметр: RailMountTypeFlagged Тип монтажной рейки",
                     3, 110)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
         public void Rule_03_110() {
@@ -359,7 +413,7 @@ CurrentChoice	IsMultiplicityOfCurrentForTmTime    KzInstantCurrentChoice
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, 
+                        errors.Select(p => (p.Series, p.Code,
                             (p.CurrentChoice.HasValue ? GetDescription(p.CurrentChoice.Value) : string.Empty,
                             Convert(p.IsMultiplicityOfCurrentForTmTime),
                             p.KzInstantCurrentChoice.HasValue ? GetDescription(p.KzInstantCurrentChoice.Value) : string.Empty))));
@@ -400,8 +454,8 @@ KzIiScale	UnlinkTimeElectronicScale
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, 
-                                (TryParseAsDouble(p.KzIiScale, out _).Value, 
+                        errors.Select(p => (p.Series, p.Code,
+                                (TryParseAsDouble(p.KzIiScale, out _).Value,
                                 TryParseAsDouble(p.UnlinkTimeElectronicScale, out _).Value))));
                 }
             }
@@ -465,7 +519,8 @@ KzKiScale	UnlinkTimeElectronicScale
         [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
         public void Rule_03_123() {
             bool isCorrectList(string strValues) {
-                if (string.IsNullOrWhiteSpace(strValues)) return false;
+                if (string.IsNullOrWhiteSpace(strValues))
+                    return false;
                 var values = strValues.Split('/');
                 foreach (var item in values) {
                     if (!double.TryParse(item, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("Ru-ru"), out _))
@@ -476,9 +531,9 @@ KzKiScale	UnlinkTimeElectronicScale
             using (var context = connector.Connect()) {
                 var errors = context.ElAutomats
                     .Where(p => (p.IsElMagR == true | p.IsElectronicR == true) & p.CurrentChoice == ElCurrentChoiseEnum.BY_MULTIPLICITY)
-                    .Select(p => new { p.Code, p.Series, p.MultiplScale})
+                    .Select(p => new { p.Code, p.Series, p.MultiplScale })
                     .ToList()
-                    .Where(p => !isCorrectList(p.MultiplScale) )
+                    .Where(p => !isCorrectList(p.MultiplScale))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
@@ -498,14 +553,14 @@ ActiveResistance	InductiveResistance
         public void Rule_03_150() {
             using (var context = connector.Connect()) {
                 var errors = context.ElAutomats
-                    .Select(p => new { p.Code, p.Series, p.ActiveResistance, p.InductiveResistance})
+                    .Select(p => new { p.Code, p.Series, p.ActiveResistance, p.InductiveResistance })
                     .ToList()
-                    .Where(p => !((p.ActiveResistance.HasValue & p.InductiveResistance.HasValue ) &&
-                                (p.ActiveResistance > 0 & p.InductiveResistance > 0 )))
+                    .Where(p => !((p.ActiveResistance.HasValue & p.InductiveResistance.HasValue) &&
+                                (p.ActiveResistance > 0 & p.InductiveResistance > 0)))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.ActiveResistance,      p.InductiveResistance))));
+                        errors.Select(p => (p.Series, p.Code, (p.ActiveResistance, p.InductiveResistance))));
                 }
             }
         }
@@ -515,20 +570,23 @@ ActiveResistance	InductiveResistance
         public void Rule_03_151() {
             using (var context = connector.Connect()) {
                 var products = context.ElAutomats
-                    .Select(p => new { p.Code,p.Purpose, p.Series, p.ActiveResistance})
+                    .Select(p => new { p.Code, p.Purpose, p.Series, p.ActiveResistance })
                     .Where(p => ((p.ActiveResistance.HasValue) &&
-                                (p.ActiveResistance > 0 )))
+                                (p.ActiveResistance > 0)))
                     .ToList()
-                    .GroupBy(p=>new { p.Purpose, p.Series })
-                    .Select(gr=>new {gr.Key.Purpose, gr.Key.Series, 
-                                    ActiveResistanceMean= gr.Select(val=>val.ActiveResistance).Where(val=>val>0 & val<1500).Average(),
-                                    Products=gr})
+                    .GroupBy(p => new { p.Purpose, p.Series })
+                    .Select(gr => new {
+                        gr.Key.Purpose,
+                        gr.Key.Series,
+                        ActiveResistanceMean = gr.Select(val => val.ActiveResistance).Where(val => val > 0 & val < 1500).Average(),
+                        Products = gr
+                    })
                     .ToList();
                 var errors = products
                     .SelectMany(gr => gr.Products
-                        .Where(p => p.ActiveResistance > gr.ActiveResistanceMean * 2.2 )
+                        .Where(p => p.ActiveResistance > gr.ActiveResistanceMean * 2.2)
                         .Select(pr => (gr.Purpose, gr.Series, pr.Code, (pr.ActiveResistance))))
-                    .ToList(); 
+                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не выполняется для {errors.Count} элементов.", errors);
                 }
@@ -540,20 +598,23 @@ ActiveResistance	InductiveResistance
         public void Rule_03_152() {
             using (var context = connector.Connect()) {
                 var products = context.ElAutomats
-                    .Select(p => new { p.Code,p.Purpose, p.Series, p.InductiveResistance})
+                    .Select(p => new { p.Code, p.Purpose, p.Series, p.InductiveResistance })
                     .Where(p => ((p.InductiveResistance.HasValue) &&
-                                (p.InductiveResistance > 0 )))
+                                (p.InductiveResistance > 0)))
                     .ToList()
-                    .GroupBy(p=>new { p.Purpose, p.Series })
-                    .Select(gr=>new {gr.Key.Purpose, gr.Key.Series, 
-                                    InductiveResistanceMean= gr.Select(val=>val.InductiveResistance).Where(val=>val>0 & val<1500).Average(),
-                                    Products=gr})
+                    .GroupBy(p => new { p.Purpose, p.Series })
+                    .Select(gr => new {
+                        gr.Key.Purpose,
+                        gr.Key.Series,
+                        InductiveResistanceMean = gr.Select(val => val.InductiveResistance).Where(val => val > 0 & val < 1500).Average(),
+                        Products = gr
+                    })
                     .ToList();
                 var errors = products
                     .SelectMany(gr => gr.Products
-                        .Where(p => p.InductiveResistance > gr.InductiveResistanceMean * 2.2 )
+                        .Where(p => p.InductiveResistance > gr.InductiveResistanceMean * 2.2)
                         .Select(pr => (gr.Purpose, gr.Series, pr.Code, (pr.InductiveResistance))))
-                    .ToList(); 
+                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не выполняется для {errors.Count} элементов.", errors);
                 }
@@ -589,14 +650,14 @@ Voltage	NominalCurrent	DbPoleCountEnum	CurrentScale	MaxCommutation
                 var errors = context.ElSafeDevices
                     .Select(p => new { p.Code, p.Series, p.Voltage, p.DbPoleCountEnum, p.NominalCurrent, p.MaxCommutation, p.CurrentScale })
                    .ToList()
-                    .Where(p => !((p.Voltage.HasValue & p.NominalCurrent.HasValue &  p.MaxCommutation.HasValue) &&
+                    .Where(p => !((p.Voltage.HasValue & p.NominalCurrent.HasValue & p.MaxCommutation.HasValue) &&
                                 (p.Voltage > 0 & p.NominalCurrent > 0 & p.DbPoleCountEnum > 0 & p.MaxCommutation > 0) &&
                                 (TryParseAsInt(p.CurrentScale, out int cs).IsSuccess & cs > 0) &&
                                 p.DbPoleCountEnum.HasValue && IsDefined(p.DbPoleCountEnum.Value)))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.NominalCurrent, 
+                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.NominalCurrent,
                                 p.DbPoleCountEnum.HasValue ? GetDescription(p.DbPoleCountEnum.Value) : string.Empty,
                                 TryParseAsInt(p.CurrentScale, out _).Value, p.MaxCommutation))));
                 }
@@ -629,7 +690,7 @@ Height	Width	Depth
             using (var context = connector.Connect()) {
                 var errors = context.ElSafeDevices
                     .Select(p => new { p.Code, p.Series, p.MountType })
-                   .ToList()  
+                   .ToList()
                    .Where(p => !((p.MountType.HasValue) &&
                                 IsDefined(p.MountType.Value)))
                    .ToList();
@@ -673,14 +734,14 @@ Voltage	NominalCurrent	Poles	MaxDynCurrent
                 var errors = context.ElKnifeSwitches
                     .Select(p => new { p.Code, p.Series, p.Voltage, p.Poles, p.NominalCurrent, p.MaxDynCurrent })
                    .ToList()
-                    .Where(p => !((p.Voltage.HasValue & p.NominalCurrent.HasValue &  p.MaxDynCurrent.HasValue) &&
+                    .Where(p => !((p.Voltage.HasValue & p.NominalCurrent.HasValue & p.MaxDynCurrent.HasValue) &&
                                 (p.Voltage > 0 & p.NominalCurrent > 0 & p.MaxDynCurrent > 0) &&
                                 p.Poles.HasValue && IsDefined(p.Poles.Value)))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.NominalCurrent, 
-                                    p.Poles.HasValue ? GetDescription(p.Poles.Value) : string.Empty, 
+                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.NominalCurrent,
+                                    p.Poles.HasValue ? GetDescription(p.Poles.Value) : string.Empty,
                                     p.MaxDynCurrent))));
                 }
             }
@@ -730,7 +791,7 @@ DbHeight	DbWidth	DbDepth    DbIsModule
         public void Rule_03_304() {
             using (var context = connector.Connect()) {
                 var errors = context.ElKnifeSwitches
-                  
+
                     .Select(p => new { p.Code, p.Series, p.MountType })
                    .ToList()
                    .Where(p => !((p.MountType.HasValue) &&
@@ -806,15 +867,15 @@ DbVoltage	DbNominalCur	CurrentScaleUzo	DbPoleCountEnum
                 var errors = context.ElUzoes
                     .Select(p => new { p.Code, p.Series, p.DbVoltage, p.DbPoleCountEnum, p.DbNominalCur, p.CurrentScaleUzo })
                    .ToList()
-                  .Where(p => !((p.DbVoltage.HasValue &  p.DbNominalCur.HasValue) &&
-                                (p.DbVoltage > 0 &  p.DbNominalCur > 0) &&
+                  .Where(p => !((p.DbVoltage.HasValue & p.DbNominalCur.HasValue) &&
+                                (p.DbVoltage > 0 & p.DbNominalCur > 0) &&
                                 p.DbPoleCountEnum.HasValue && IsDefined(p.DbPoleCountEnum.Value) &&
                                 (TryParseAsDouble(p.CurrentScaleUzo, out double value).IsSuccess &&
                                 IsCorrectCurrentScaleUzo(value))))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.DbVoltage, p.DbNominalCur, convert(p.CurrentScaleUzo), 
+                        errors.Select(p => (p.Series, p.Code, (p.DbVoltage, p.DbNominalCur, convert(p.CurrentScaleUzo),
                         p.DbPoleCountEnum.HasValue ? GetDescription(p.DbPoleCountEnum.Value) : string.Empty))));
                 }
             }
@@ -922,17 +983,17 @@ Voltage	NominalCurrent	DbPoleCountEnum	CoilControlVoltage
         public void Rule_03_501() {
             using (var context = connector.Connect()) {
                 var errors = context.ElStarters
-                  
+
                     .Select(p => new { p.Code, p.Series, p.Voltage, p.NominalCurrent, p.DbPoleCountEnum, p.CoilControlVoltage })
                    .ToList()
-                   .Where(p => !((p.NominalCurrent.HasValue &  p.Voltage.HasValue & p.CoilControlVoltage.HasValue) &&
+                   .Where(p => !((p.NominalCurrent.HasValue & p.Voltage.HasValue & p.CoilControlVoltage.HasValue) &&
                                 (p.NominalCurrent > 0 & p.CoilControlVoltage > 0) &&
                                 p.DbPoleCountEnum.HasValue && IsDefined(p.DbPoleCountEnum.Value)))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
                         errors.Select(p => (p.Series, p.Code, (p.Voltage, p.NominalCurrent,
-                        p.DbPoleCountEnum.HasValue ? GetDescription(p.DbPoleCountEnum.Value) : string.Empty, 
+                        p.DbPoleCountEnum.HasValue ? GetDescription(p.DbPoleCountEnum.Value) : string.Empty,
                         p.CoilControlVoltage))));
                 }
             }
@@ -980,7 +1041,7 @@ DbHeight	DbWidth	DbDepth   DbIsModule
         public void Rule_03_504() {
             using (var context = connector.Connect()) {
                 var errors = context.ElStarters
-                  
+
                     .Select(p => new { p.Code, p.Series, p.MountType })
                    .ToList()
                    .Where(p => !(p.MountType.HasValue &&
@@ -999,7 +1060,7 @@ DbHeight	DbWidth	DbDepth   DbIsModule
         public void Rule_03_505() {
             using (var context = connector.Connect()) {
                 var errors = context.ElStarters
-                  
+
                     .Select(p => new { p.Code, p.Series, p.DbDeviceType })
                    .ToList()
                    .Where(p => !(p.DbDeviceType.HasValue && IsDefined(p.DbDeviceType.Value)))
@@ -1057,7 +1118,7 @@ DbHeight	DbWidth	DbDepth   DbIsModule
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.DbDeviceType.HasValue?GetDescription(p.DbDeviceType.Value):string.Empty))));
+                        errors.Select(p => (p.Series, p.Code, (p.DbDeviceType.HasValue ? GetDescription(p.DbDeviceType.Value) : string.Empty))));
                 }
             }
         }
@@ -1069,18 +1130,18 @@ DbStarterType	LowBoundFaultCurrent	HightBoundFaultCurrent	ContactNOCount	Contact
         public void Rule_03_513() {
             using (var context = connector.Connect()) {
                 var errors = context.ElStarters
-                    .Where(p=>p.DbDeviceType==ElDeviceTypeEnum.STARTER)
+                    .Where(p => p.DbDeviceType == ElDeviceTypeEnum.STARTER)
                     .Select(p => new { p.Code, p.Series, p.DbStarterType, p.LowBoundFaultCurrent, p.HightBoundFaultCurrent, p.ContactNOCount, p.ContactNZCount })
                     .ToList()
                     .Where(p => !(p.DbStarterType.HasValue && IsDefined(p.DbStarterType.Value) &&
                                 p.LowBoundFaultCurrent.HasValue && p.LowBoundFaultCurrent > 0 &&
                                 p.HightBoundFaultCurrent.HasValue && p.HightBoundFaultCurrent > 0 &&
-                                TryParseAsInt(p.ContactNOCount, out var intValue).IsSuccess && intValue >=0 &&
+                                TryParseAsInt(p.ContactNOCount, out var intValue).IsSuccess && intValue >= 0 &&
                                 TryParseAsInt(p.ContactNZCount, out var intValue1).IsSuccess && intValue1 >= 0))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.DbStarterType.HasValue?GetDescription(p.DbStarterType.Value):string.Empty,
+                        errors.Select(p => (p.Series, p.Code, (p.DbStarterType.HasValue ? GetDescription(p.DbStarterType.Value) : string.Empty,
                                 p.LowBoundFaultCurrent,
                                 p.HightBoundFaultCurrent,
                                 TryParseAsInt(p.ContactNOCount, out _).Value,
@@ -1096,16 +1157,16 @@ DbStarterType	ContactNOCount	ContactNZCount
         public void Rule_03_514() {
             using (var context = connector.Connect()) {
                 var errors = context.ElStarters
-                    .Where(p=>p.DbDeviceType==ElDeviceTypeEnum.CONTACTOR)
+                    .Where(p => p.DbDeviceType == ElDeviceTypeEnum.CONTACTOR)
                     .Select(p => new { p.Code, p.Series, p.DbStarterType, p.ContactNOCount, p.ContactNZCount })
                     .ToList()
                     .Where(p => !(p.DbStarterType.HasValue && IsDefined(p.DbStarterType.Value) &&
-                                TryParseAsInt(p.ContactNOCount, out var intValue).IsSuccess && intValue >=0 &&
+                                TryParseAsInt(p.ContactNOCount, out var intValue).IsSuccess && intValue >= 0 &&
                                 TryParseAsInt(p.ContactNZCount, out var intValue1).IsSuccess && intValue1 >= 0))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.DbStarterType.HasValue?GetDescription(p.DbStarterType.Value):string.Empty,
+                        errors.Select(p => (p.Series, p.Code, (p.DbStarterType.HasValue ? GetDescription(p.DbStarterType.Value) : string.Empty,
                                 TryParseAsInt(p.ContactNOCount, out _).Value,
                                 TryParseAsInt(p.ContactNZCount, out _).Value))));
                 }
@@ -1117,14 +1178,14 @@ DbStarterType	ContactNOCount	ContactNZCount
         public void Rule_03_515() {
             using (var context = connector.Connect()) {
                 var errors = context.ElStarters
-                    .Where(p=>p.DbDeviceType==ElDeviceTypeEnum.RELAY)
-                    .Select(p => new { p.Code, p.Series, p.CurrentRelayType})
+                    .Where(p => p.DbDeviceType == ElDeviceTypeEnum.RELAY)
+                    .Select(p => new { p.Code, p.Series, p.CurrentRelayType })
                     .ToList()
                     .Where(p => string.IsNullOrEmpty(p.CurrentRelayType))
                     .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code,(string.Empty))));
+                        errors.Select(p => (p.Series, p.Code, (string.Empty))));
                 }
             }
         }
@@ -1139,15 +1200,15 @@ Voltage	MaxVoltage	DischargeCurrent	MaxDischargeCurrent	PoleCount
             using (var context = connector.Connect()) {
                 var errors = context.ElOvervoltageSuppressors
 
-                    .Select(p => new { p.Code, p.Series, p.Voltage,p.MaxVoltage, p.DischargeCurrent, p.MaxDischargeCurrent, p.PoleCount })
+                    .Select(p => new { p.Code, p.Series, p.Voltage, p.MaxVoltage, p.DischargeCurrent, p.MaxDischargeCurrent, p.PoleCount })
                    .ToList()
-                   .Where(p => !((p.Voltage.HasValue & p.MaxVoltage.HasValue & p.DischargeCurrent.HasValue& p.MaxDischargeCurrent.HasValue) &&
+                   .Where(p => !((p.Voltage.HasValue & p.MaxVoltage.HasValue & p.DischargeCurrent.HasValue & p.MaxDischargeCurrent.HasValue) &&
                                 (p.Voltage > 0 & p.MaxVoltage > 0 & p.DischargeCurrent > 0 & p.MaxDischargeCurrent > 0) &&
                                 p.PoleCount.HasValue && IsDefined(p.PoleCount.Value)))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.MaxVoltage,p.DischargeCurrent, p.MaxDischargeCurrent,
+                        errors.Select(p => (p.Series, p.Code, (p.Voltage, p.MaxVoltage, p.DischargeCurrent, p.MaxDischargeCurrent,
                         p.PoleCount.HasValue ? GetDescription(p.PoleCount.Value) : string.Empty))));
                 }
             }
@@ -1276,7 +1337,7 @@ MountType	DbIsModule	DimensionType
         public void Rule_03_702() {
             using (var context = connector.Connect()) {
                 var errors = context.ElFiderUtilities
-                    .Where(p=>p.InstallationType==ElInstallationType.InsideShell)
+                    .Where(p => p.InstallationType == ElInstallationType.InsideShell)
                     .Select(p => new { p.Code, p.Series, p.MountType, p.DbIsModule, p.DimensionType })
                    .ToList()
                    .Where(p => !(p.MountType.HasValue && IsDefined(p.MountType.Value) &&
@@ -1337,7 +1398,7 @@ Height	Width	Depth
             using (var context = connector.Connect()) {
                 var errors = context.ElFiderUtilities
                     .Where(p => p.InstallationType == ElInstallationType.InsideShell & p.DimensionType == ElDimensionType.Parallelepiped)
-                    .Where(p => !((p.Height.HasValue & p.Width.HasValue & p.Depth.HasValue ) &&
+                    .Where(p => !((p.Height.HasValue & p.Width.HasValue & p.Depth.HasValue) &&
                                 (p.Height > 0 & p.Width > 0 & p.Depth > 0)))
                     .Select(p => new { p.Code, p.Series, p.Height, p.Width, p.Depth })
                    .ToList();
@@ -1356,7 +1417,7 @@ Diameter	Depth
             using (var context = connector.Connect()) {
                 var errors = context.ElFiderUtilities
                     .Where(p => p.InstallationType == ElInstallationType.InsideShell & p.DimensionType == ElDimensionType.Cylinder)
-                    .Where(p => !((p.Diameter.HasValue & p.Depth.HasValue ) &&
+                    .Where(p => !((p.Diameter.HasValue & p.Depth.HasValue) &&
                                 (p.Diameter > 0 & p.Depth > 0)))
                     .Select(p => new { p.Code, p.Series, p.Diameter, p.Depth })
                    .ToList();

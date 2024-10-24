@@ -30,9 +30,9 @@ namespace Nano.Electric
 
         public int? BranchVersion { get; set; }
 #endif
-#if DBNE201
+//#if DBNE201
 
-        public string AppliedConverters { get; set; } 
-#endif
+//        public string AppliedConverters { get; set; } 
+//#endif
     }
 }

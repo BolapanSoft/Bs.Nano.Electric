@@ -12,7 +12,8 @@ namespace Nano.Electric {
         public KiCurveType CurveType { get; set; }
         private XDocument _curveDb;
 
-        [Column(nameof(CurveDb), TypeName = "ntext")]
+        //[Column(nameof(CurveDb), TypeName = "ntext")]
+        [Column(nameof(CurveDb))]
         [MaxLength(-1)] // Недокументированное значение. Однако, отключает проверку на длину строки.
         public string CurveDbString {
             get { return _curveDb?.ToString()??string.Empty; }

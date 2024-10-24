@@ -14,6 +14,14 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Bs.Nano.Electric.Report {
+    public class NtProduct : IProduct {
+        public string Code {get;set;}
+
+        public int? DbImageRef { get; set; }
+        public string Name { get; set; }
+        public string Manufacturer { get; set; }
+        public int Id { get; set; }
+    }
     /// <summary>
     /// Реализует правила контроля полноты заполнения БДИ.
     /// </summary>

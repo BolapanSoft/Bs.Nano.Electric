@@ -95,6 +95,7 @@ namespace Nano.Electric {
         public virtual DbSet<ElStarter> ElStarters { get; set; }
         public virtual DbSet<ElTransformer> ElTransformers { get; set; }
         public virtual DbSet<ElUzo> ElUzoes { get; set; }
+        public virtual DbSet<DbElUzdp> DbElUzdpes { get; set; }
         public virtual DbSet<ElVoltmeter> ElVoltmeters { get; set; }
         public virtual DbSet<ElWire> ElWires { get; set; }
         public virtual DbSet<ElWireConductMaterial> ElWireConductMaterials { get; set; }

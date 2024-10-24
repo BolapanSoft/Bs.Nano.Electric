@@ -159,6 +159,8 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Коммутационные аппараты\\УЗО")]
     public partial class ElUzo { }
 
+    [DefaultLocalizeValue("Коммутационные аппараты\\УЗДП")]
+    public partial class DbElUzdp { }
     [DefaultLocalizeValue("Коммутационные аппараты\\Пускатели, контакторы и реле")]
     public partial class ElStarter { }
 

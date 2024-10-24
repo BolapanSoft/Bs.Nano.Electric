@@ -23,7 +23,8 @@ namespace Nano.Electric {
         }
 
         partial void InitializeModel(DbModelBuilder modelBuilder) {
-            modelBuilder.Conventions.Add(new NanoCadPropertiesConvention());
+            
+           // modelBuilder.Conventions.Add(new NanoCadPropertiesConvention());
 
             modelBuilder.Entity<CaeMaterialUtility>()
                 .Property(t => t.MeashureUnits)
