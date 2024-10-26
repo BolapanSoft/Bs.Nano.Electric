@@ -20,7 +20,7 @@ namespace Bs.Nano.Electric.Report {
         public int? DbImageRef { get; set; }
         public string Name { get; set; }
         public string Manufacturer { get; set; }
-        public int Id { get; set; }
+        public int Id { get; set; } = 0;
     }
     /// <summary>
     /// Реализует правила контроля полноты заполнения БДИ.
