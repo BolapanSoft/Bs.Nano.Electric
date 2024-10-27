@@ -286,9 +286,9 @@ namespace Bs.Nano.Electric.Report {
             if (!(IsCorrectTableName(tableName))) {
                 throw new ArgumentException($"Строка \"{tableName}\" нея является допустимым именем таблицы.", nameof(tableName));
             }
-            string strQuery = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer] FROM [{tableName}]";
+            string strQuery = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer], [Id] FROM [{tableName}]";
             var query = context.Database.SqlQuery<NtProduct>(strQuery);
-            var l = query.AsEnumerable();
+            var l = query.ToList();
             return l;
         }
         private static IEnumerable<(string code, string uri)> GetUriValues(Context context, string tableName) {

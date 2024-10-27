@@ -20,7 +20,7 @@ namespace Bs.Nano.Electric.Report {
         public int? DbImageRef { get; set; }
         public string Name { get; set; }
         public string Manufacturer { get; set; }
-        public int Id { get; set; } = 0;
+        public int Id { get; set; }
     }
     /// <summary>
     /// Реализует правила контроля полноты заполнения БДИ.
@@ -133,7 +133,6 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-
         [ReportRule(@"Отчет по таблицам БДИ.", 0, 0), RuleCategory("Отчет по базе изделий.")]
         public void ProductCategories() {
             string TopSerieLevel(string series) {
