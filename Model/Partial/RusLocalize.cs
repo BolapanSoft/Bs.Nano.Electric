@@ -59,7 +59,7 @@ namespace Nano.Electric {
     public partial class ScsTubeFitting { }
 
     [DefaultLocalizeValue("Трубы\\Конфигурации соединительных элементов")]
-    public partial class DbScsTubeSeriaConfigiration { }
+    public partial class DbScsTubeSeriesConfiguration { }
 
     [DefaultLocalizeValue("Конфигурации КНС\\Конфигурации трасс труб")]
     public partial class DbTbMountSystem { }

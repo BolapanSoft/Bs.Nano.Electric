@@ -7,7 +7,7 @@ namespace Nano.Electric
     
 
     [Table("DbScsTubeSeriaConfigiration")]
-    public partial class DbScsTubeSeriaConfigiration
+    public partial class DbScsTubeSeriesConfiguration
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
