@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
 using System.Data.Entity;
+using System.Data.SqlServerCe;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -23,8 +24,14 @@ namespace Nano.Electric {
         }
 
         partial void InitializeModel(DbModelBuilder modelBuilder) {
-            
-           // modelBuilder.Conventions.Add(new NanoCadPropertiesConvention());
+            // Получение строки подключения
+            var connectionString = this.Database.Connection.ConnectionString;
+            // Получение имени провайдера
+            var providerName = this.Database.Connection.GetType().Name;
+            if (this.Database.Connection.GetType()==typeof(SqlCeConnection)) {
+                // Сконфигурировать маппинг string=> "ntext"
+                modelBuilder.Conventions.Add(new NanoCadPropertiesConvention()); 
+            }
 
             modelBuilder.Entity<CaeMaterialUtility>()
                 .Property(t => t.MeashureUnits)
