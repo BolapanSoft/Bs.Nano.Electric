@@ -12,7 +12,9 @@ namespace Nano.Electric
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] 
         public int Id { get; set; }
-
+        /// <summary>
+        /// Количество перегородок.
+        /// </summary>
         public double? PartitionCount { get; set; }
 
         public string DbName { get; set; }

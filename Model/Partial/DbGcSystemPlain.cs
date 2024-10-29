@@ -2,13 +2,6 @@
 
 using Nano.Electric.Enums;
 
-/* Unmerged change from project 'Iek.MakeModelStudioCS'
-Before:
-using System.Collections.Generic;
-After:
-using System;
-using System.Collections.Generic;
-*/
 using System;
 using System.Collections.Generic;
 using System.Linq;

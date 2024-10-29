@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Data.SqlServerCe;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -47,6 +48,9 @@ namespace Bs.Nano.Electric.Report {
         public static bool IsRepresentNumber(string word) {
             // Match the word that represent a number 
             return Regex.IsMatch(word, @"\p{N}+([,.]\p{N}+)*");
+        }
+        public static bool IsDoubleValuesList(string input) {
+            return input.Split('/').All(v => TryParseAsDouble(v, out double value).IsSuccess && value > 0);
         }
         /// <summary>
         /// Проверяет что переданное значение входит в множество возможных значений перечисления.
@@ -346,6 +350,35 @@ namespace Bs.Nano.Electric.Report {
 
             return true;
         }
+        private static bool IsCorrectCurrentScaleUzo(double value) {
+            if (((double)((int)value)) == value &&
+                 value >= 1.0 && value <= 300.0
+                 ) {
+                return true;
+            }
+            return false;
+        }
+        private static (bool IsSuccess, string Value) TryParseAsInt(string str, out int intValue) {
+            if (string.IsNullOrEmpty(str)) {
+                intValue = 0;
+                return (false, string.Empty);
+            }
+            bool isSuccess = int.TryParse(str, NumberStyles.None, CultureInfo.GetCultureInfo("Ru-ru"), out intValue);
+            string value = isSuccess ? str : $"Значение \"{str}\" не соответствует целому числу.";
+            return (isSuccess, value);
+        }
 
+        private static (bool IsSuccess, string Value) TryParseAsDouble(string str, out double dValue) {
+            if (string.IsNullOrEmpty(str)) {
+                dValue = double.NaN;
+                return (false, string.Empty);
+            }
+            bool isSuccess = double.TryParse(str, NumberStyles.Number, CultureInfo.GetCultureInfo("Ru-ru"), out dValue);
+            string value = isSuccess ? str : $"Значение \"{str}\" не соответствует шаблону \"0,##\"";
+            return (isSuccess, value);
+        }
+        private static string Convert(bool? v) {
+            return v.HasValue ? (v == true ? "Да" : "Нет") : string.Empty;
+        }
     }
 }

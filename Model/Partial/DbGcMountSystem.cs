@@ -5,7 +5,7 @@ using System.Xml.Serialization;
 
 namespace Nano.Electric {
     /// <summary>
-    /// Конфигурация трасс лотков
+    /// Конфигурация трасс лотков.
     /// </summary>
     public partial class DbGcMountSystem : KitElement, IXmlSerializable/*, IProduct*/, IHaveId {
         [NotMapped]

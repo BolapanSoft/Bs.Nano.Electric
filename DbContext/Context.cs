@@ -49,7 +49,7 @@ namespace Nano.Electric {
         //public virtual DbSet<DbScsPhoneCrossUtilitySet> DbScsPhoneCrossUtilitySets { get; set; }
         //public virtual DbSet<DbScsServiceColumnUtilitySet> DbScsServiceColumnUtilitySets { get; set; }
         public virtual DbSet<DbScsShellUtilitySet> DbScsShellUtilitySets { get; set; }
-        public virtual DbSet<DbScsTubeSeriaConfigiration> DbScsTubeSeriaConfigirations { get; set; }
+        public virtual DbSet<DbScsTubeSeriesConfiguration> DbScsTubeSeriesConfigurations { get; set; }
         public virtual DbSet<DbTbMountSystem> DbTbMountSystems { get; set; }
         public virtual DbSet<DcCableCanalCover> DcCableCanalCovers { get; set; }
         public virtual DbSet<DSInformation> DSInformations { get; set; }
