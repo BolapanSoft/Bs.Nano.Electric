@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>1.8.5</VersionPrefix>
+		<VersionPrefix>1.24.1</VersionPrefix>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>9.0</LangVersion>
 		<Nullable>enable</Nullable>
@@ -13,7 +13,7 @@
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>
 	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);DBNE85;InitDbContextEnums</DefineConstants>
+		<DefineConstants>$(DefineConstants);DBNE85;DBNE201;DBNE23;DBNE23_1;InitDbContextEnums</DefineConstants>
 	</PropertyGroup>
 
 
