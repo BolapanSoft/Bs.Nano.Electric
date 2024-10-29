@@ -253,13 +253,11 @@ IsHeatR	IsElMagR	IsElectronicR	HasUzo
                     .Where(p => p.IsHeatR == true)
                     .Select(p => new { p.Code, p.Series, p.CurrentScale })
                    .ToList()
-                   .Where(p => !(
-                                TryParseAsDouble(p.CurrentScale, out double scale).IsSuccess
-                                && scale > 0))
+                   .Where(p => !IsDoubleValuesList(p.CurrentScale))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (TryParseAsDouble(p.CurrentScale, out _).Value))));
+                        errors.Select(p => (p.Series, p.Code, p.CurrentScale)));
                 }
             }
         }
@@ -294,7 +292,8 @@ MultiplScale	MinSensivity	MaxSensivity	UnlinkTimeScale
                     .Where(p => !(!string.IsNullOrEmpty(p.MultiplScale) &
                                 (p.MinSensivity.HasValue && p.MinSensivity > 0) &
                                 (p.MaxSensivity.HasValue && p.MaxSensivity > 0) &
-                                (TryParseAsDouble(p.UnlinkTimeScale, out double value).IsSuccess && value > 0)))
+                                IsDoubleValuesList(p.UnlinkTimeScale)
+                                ))
 
                    .ToList();
                 if (errors.Any()) {
@@ -318,20 +317,21 @@ CurrReleaseScale	MinSensivity	MaxSensivity	UnlinkTimeScale
                     .Select(p => new { p.Code, p.Series, p.CurrReleaseScale, p.MinSensivity, p.MaxSensivity, p.UnlinkTimeScale })
                     .ToList()
                     .Where(p => !(
-                                (TryParseAsDouble(p.CurrReleaseScale, out double valueCurrent).IsSuccess && valueCurrent > 0) &
+                                IsDoubleValuesList(p.CurrReleaseScale) &
                                 (p.MinSensivity.HasValue && p.MinSensivity > 0) &
                                 (p.MaxSensivity.HasValue && p.MaxSensivity > 0) &
-                                (TryParseAsDouble(p.UnlinkTimeScale, out double value).IsSuccess && value > 0)))
+                                IsDoubleValuesList(p.UnlinkTimeScale)
+                                ))
 
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
                         errors.Select(p => (p.Series, p.Code,
-                                                (TryParseAsDouble(p.CurrReleaseScale, out _).Value,
+                                                p.CurrReleaseScale,
                                                 p.MinSensivity,
                                                 p.MaxSensivity,
-                                                TryParseAsDouble(p.UnlinkTimeScale, out _).Value))
-                        ));
+                                                p.UnlinkTimeScale
+                        )));
                     ;
                 }
             }
@@ -349,12 +349,11 @@ AutomatCharReleaseType	AutomatReleaseMinCoef	AutomatReleaseMaxCoef	UnlinkTimeSca
                     .Select(p => new { p.Code, p.Series, p.AutomatCharReleaseType, p.AutomatReleaseMinCoef, p.AutomatReleaseMaxCoef, p.UnlinkTimeScale })
                     .ToList()
                     .Where(p => !(
-                                (!string.IsNullOrEmpty(p.AutomatCharReleaseType) &
+                                !string.IsNullOrEmpty(p.AutomatCharReleaseType) &
                                 (p.AutomatReleaseMinCoef.HasValue && p.AutomatReleaseMinCoef > 0) &
                                 (p.AutomatReleaseMaxCoef.HasValue && p.AutomatReleaseMaxCoef > 0) &
-                                (TryParseAsDouble(p.UnlinkTimeScale, out double value).IsSuccess && value > 0))
-                                )
-                           )
+                                IsDoubleValuesList(p.UnlinkTimeScale)
+                                ))
 
                    .ToList();
                 if (errors.Any()) {
@@ -363,9 +362,9 @@ AutomatCharReleaseType	AutomatReleaseMinCoef	AutomatReleaseMaxCoef	UnlinkTimeSca
                                             p.AutomatCharReleaseType,
                                             p.AutomatReleaseMinCoef,
                                             p.AutomatReleaseMaxCoef,
-                                            TryParseAsDouble(p.UnlinkTimeScale, out _).Value)
+                                            p.UnlinkTimeScale
                                             )
-                        ));
+                        )));
                     ;
                 }
             }
@@ -382,10 +381,8 @@ CurrentScale	TimeReleaseIr	TimeOeReleaseIr
                     .Select(p => new { p.Code, p.Series, p.CurrentScale, p.TimeReleaseIr, p.TimeOeReleaseIr })
                    .ToList()
                    .Where(p => !(
-                                (TryParseAsDouble(p.CurrentScale, out var value).IsSuccess
-                                    && value > 0) &
-                                (TryParseAsDouble(p.TimeReleaseIr, out var valueTRI).IsSuccess
-                                    && valueTRI > 0) &
+                                IsDoubleValuesList(p.CurrentScale) &
+                                IsDoubleValuesList(p.TimeReleaseIr) &
                                 (p.TimeOeReleaseIr.HasValue && p.TimeOeReleaseIr > 0)
                                 ))
                    .ToList();
@@ -449,14 +446,14 @@ KzIiScale	UnlinkTimeElectronicScale
                     .Where(p => p.IsElectronicR == true & p.KzInstantCurrentChoice == ElInstantKzCurrentChoiseEnum.BY_CURRENT)
                     .Select(p => new { p.Code, p.Series, p.KzIiScale, p.UnlinkTimeElectronicScale })
                    .ToList()
-                   .Where(p => !(TryParseAsDouble(p.KzIiScale, out double value).IsSuccess && value > 0 &&
-                                   TryParseAsDouble(p.UnlinkTimeElectronicScale, out value).IsSuccess && value > 0))
+                   .Where(p => !(IsDoubleValuesList(p.KzIiScale) &&
+                                   IsDoubleValuesList(p.UnlinkTimeElectronicScale)))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
                         errors.Select(p => (p.Series, p.Code,
-                                (TryParseAsDouble(p.KzIiScale, out _).Value,
-                                TryParseAsDouble(p.UnlinkTimeElectronicScale, out _).Value))));
+                                (p.KzIiScale,
+                                p.UnlinkTimeElectronicScale))));
                 }
             }
         }
@@ -471,12 +468,12 @@ KzKiScale	UnlinkTimeElectronicScale
                     .Where(p => p.IsElectronicR == true & p.KzInstantCurrentChoice == ElInstantKzCurrentChoiseEnum.BY_MULTIPLICITY)
                     .Select(p => new { p.Code, p.Series, p.KzKiScale, p.UnlinkTimeElectronicScale })
                    .ToList()
-                   .Where(p => !(TryParseAsDouble(p.KzKiScale, out double value).IsSuccess && value > 0 &&
-                                   TryParseAsDouble(p.UnlinkTimeElectronicScale, out value).IsSuccess && value > 0))
+                   .Where(p => !(IsDoubleValuesList(p.KzKiScale) &&
+                                   IsDoubleValuesList(p.UnlinkTimeElectronicScale)))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
-                        errors.Select(p => (p.Series, p.Code, (TryParseAsDouble(p.KzKiScale, out _).Value, TryParseAsDouble(p.UnlinkTimeElectronicScale, out _).Value))));
+                        errors.Select(p => (p.Series, p.Code, (p.KzKiScale, p.UnlinkTimeElectronicScale))));
                 }
             }
         }
@@ -518,22 +515,22 @@ KzKiScale	UnlinkTimeElectronicScale
                     3, 123)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(ElAutomat))]
         public void Rule_03_123() {
-            bool isCorrectList(string strValues) {
-                if (string.IsNullOrWhiteSpace(strValues))
-                    return false;
-                var values = strValues.Split('/');
-                foreach (var item in values) {
-                    if (!double.TryParse(item, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("Ru-ru"), out _))
-                        return false;
-                }
-                return true;
-            }
+            //bool isCorrectList(string strValues) {
+            //    if (string.IsNullOrWhiteSpace(strValues))
+            //        return false;
+            //    var values = strValues.Split('/');
+            //    foreach (var item in values) {
+            //        if (!double.TryParse(item, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("Ru-ru"), out _))
+            //            return false;
+            //    }
+            //    return true;
+            //}
             using (var context = connector.Connect()) {
                 var errors = context.ElAutomats
                     .Where(p => (p.IsElMagR == true | p.IsElectronicR == true) & p.CurrentChoice == ElCurrentChoiseEnum.BY_MULTIPLICITY)
                     .Select(p => new { p.Code, p.Series, p.MultiplScale })
                     .ToList()
-                    .Where(p => !isCorrectList(p.MultiplScale))
+                    .Where(p => !IsDoubleValuesList(p.MultiplScale))
                    .ToList();
                 if (errors.Any()) {
                     FailRuleTest($"Не заполнены параметры для {errors.Count} элементов.",
@@ -1428,36 +1425,7 @@ Diameter	Depth
             }
         }
         #endregion
-        private static bool IsCorrectCurrentScaleUzo(double value) {
-            if (((double)((int)value)) == value &&
-                 value >= 1.0 && value <= 300.0
-                 ) {
-                return true;
-            }
-            return false;
-        }
-        private (bool IsSuccess, string Value) TryParseAsInt(string str, out int intValue) {
-            if (string.IsNullOrEmpty(str)) {
-                intValue = 0;
-                return (false, string.Empty);
-            }
-            bool isSuccess = int.TryParse(str, NumberStyles.None, CultureInfo.GetCultureInfo("Ru-ru"), out intValue);
-            string value = isSuccess ? str : $"Значение \"{str}\" не соответствует целому числу.";
-            return (isSuccess, value);
-        }
-
-        private (bool IsSuccess, string Value) TryParseAsDouble(string str, out double dValue) {
-            if (string.IsNullOrEmpty(str)) {
-                dValue = double.NaN;
-                return (false, string.Empty);
-            }
-            bool isSuccess = double.TryParse(str, NumberStyles.Number, CultureInfo.GetCultureInfo("Ru-ru"), out dValue);
-            string value = isSuccess ? str : $"Значение \"{str}\" не соответствует шаблону \"0,##\"";
-            return (isSuccess, value);
-        }
-        private string Convert(bool? v) {
-            return v.HasValue ? (v == true ? "Да" : "Нет") : string.Empty;
-        }
+        
 
     }
 }

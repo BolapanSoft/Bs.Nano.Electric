@@ -7,8 +7,7 @@ namespace Nano.Electric {
     /// Конфигурация трасс коробов.
     /// </summary>
     public partial class DbCcMountSystem : KitElement, IXmlSerializable/*, IProduct*/, IHaveId {
-        public DbCcMountSystem()
-        {
+        public DbCcMountSystem() {
             plain = new DbCcMsMount();
             Children.Add(plain);
         }
@@ -20,13 +19,29 @@ namespace Nano.Electric {
         public string Manufacturer { get => string.Empty; set {; } }
         private readonly DbCcMsMount plain;
         [NotMapped]
-        public DbCcMsMount DbCcMsMountPlain => plain;
+        public DbCcMsMount MountPlain => plain;
         protected override void WriteProperties(XmlWriter writer) {
             ;
         }
-        //protected override void WriteChildren(XmlWriter writer) {
-        //    foreach (var child in this.GetChilds<DbGcSystemPlain>()) {
-        //        child.WriteXml(writer);
-        //    }
-        //}
+    }
+    /// <summary>
+    /// Конфигурация трасс труб.
+    /// </summary>
+    public partial class DbTbMountSystem : KitElement, IXmlSerializable/*, IProduct*/, IHaveId {
+        public DbTbMountSystem() {
+            plain = new DbTbMsMount();
+            Children.Add(plain);
+        }
+        [NotMapped]
+        public string Code => DbName;
+        [NotMapped]
+        public string Name { get => DbNaming; set => DbNaming = value; }
+        [NotMapped]
+        public string Manufacturer { get => string.Empty; set {; } }
+        private readonly DbTbMsMount plain;
+        [NotMapped]
+        public DbTbMsMount MountPlain => plain;
+        protected override void WriteProperties(XmlWriter writer) {
+            ;
+        }
     }}
