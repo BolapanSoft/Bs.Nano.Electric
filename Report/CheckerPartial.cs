@@ -27,6 +27,20 @@ namespace Bs.Nano.Electric.Report {
             public string Code { get; set; }
             public string Mass { get; set; }
         }
+        private static Lazy<(MethodInfo mi, RuleCategoryAttribute[] ruleCategories)[]> lzAllRules = new(() => {
+            var rules = typeof(Checker).GetMethods(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public)
+            .Select(mi => (mi, mi.GetCustomAttributes<RuleCategoryAttribute>().ToArray()))
+            .OrderBy(m => GetPriority(m.mi))
+            .ToArray();
+            return rules;
+        });
+        public static IEnumerable<MethodInfo> GetTests(string testCategory, string[] tables) {
+            return lzAllRules.Value
+            .Where(m => m.ruleCategories
+                .Any(a => a.TestCategories.Contains(testCategory) && a.TestCategories.Any(tc => tables.Contains(tc))))
+            .Select(m => m.mi)
+            ;
+        }
         public static string[] SplitToWords(string value) {
             // Split the string into words based on letters and digits from any language
             var matches = Regex.Matches(value, @"(?>[\p{L}\p{N}]+([,.]\p{N}+)*)");
@@ -51,6 +65,46 @@ namespace Bs.Nano.Electric.Report {
         }
         public static bool IsDoubleValuesList(string input) {
             return input.Split('/').All(v => TryParseAsDouble(v, out double value).IsSuccess && value > 0);
+        }
+        protected static void ReportErrors(ILogger logger, AggregateException ex, bool isTruncateReport) {
+            //ReportErrors(logger, (Exception)ex);
+            foreach (Exception item in ex.InnerExceptions) {
+                ReportErrors(logger, item, isTruncateReport);
+            }
+        }
+        protected static void ReportErrors(ILogger logger, Exception ex, bool isTruncateReport) {
+            if (ex is null) { return; }
+            if (ex is AggregateException aggrEx) {
+                ReportErrors(logger, aggrEx, isTruncateReport);
+                return;
+            }
+
+            logger.LogWarning(ex.Message);
+            if (ex is RuleTestException rtEx) {
+                if (ex.Data.Count > 0) {
+                    logger.LogInformation("Содержание ex.Data:");
+                    var data = ex.Data;
+                    int i = 0;
+                    foreach (var key in data.Keys) {
+                        logger.LogInformation($"{key} = {data[key]}");
+                        if (i++ > 50 & isTruncateReport) { break; }
+                    }
+                    if (i > 50 & isTruncateReport) {
+                        logger.LogInformation("... усечено...");
+                    }
+                }
+            }
+            else {
+#if DEBUG
+                logger.LogInformation("Call stack:");
+                logger.LogInformation(ex.StackTrace);
+#endif
+            }
+            ReportErrors(logger, ex.InnerException, isTruncateReport);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int GetPriority(MethodInfo mi) {
+            return mi.GetCustomAttribute<PriorityAttribute>()?.Priority ?? 0;
         }
         /// <summary>
         /// Проверяет что переданное значение входит в множество возможных значений перечисления.
