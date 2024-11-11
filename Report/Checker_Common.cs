@@ -12,6 +12,8 @@ using System.Data.SqlServerCe;
 using System.ComponentModel;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System.Reflection;
+using System.Runtime.ConstrainedExecution;
 
 namespace Bs.Nano.Electric.Report {
     public class NtProduct : IProduct {
@@ -37,6 +39,57 @@ namespace Bs.Nano.Electric.Report {
             this.logger = logger;
             this.connector = connector;
         }
+        public void TestDatabase(string[] categories, string[] tables, bool isTruncateReport) {
+
+           
+            foreach (var category in categories) {
+                try {
+                    var tests = GetTests(category, tables).ToList();
+                    if (tests.Count > 0) {
+                        logger.LogInformation($"\nПроверка {tests.Count} правил категории \"{category}\".");
+                        var checker = new Checker(logger, connector);
+                        int count = 0;
+                        foreach (MethodInfo test in tests) {
+                            ReportRuleAttribute rule = test.GetReportRule();
+                            try {
+                                var miParameters = test.GetParameters();
+                                if (miParameters.Length == 0) {
+                                    test.Invoke(checker, null);
+                                    logger.LogInformation($"Проверка правила {rule} завершена без ошибок.");
+                                    count++;
+                                }
+                                else
+                                    throw new NotImplementedException("Допускается вызов только методов без параметров.");
+                            }
+                            catch (AggregateException ex) {
+                                logger.LogWarning($"Не пройдено правило проверки {rule}", ex.InnerException);
+                                ReportErrors(logger, ex, isTruncateReport);
+                            }
+                            catch (TargetInvocationException tiEx) {
+                                logger.LogWarning($"Не пройдено правило проверки {rule}");
+                                ReportErrors(logger, tiEx.InnerException, isTruncateReport);
+
+                            }
+                            catch (Exception ex) {
+                                logger.LogWarning($"Не пройдено правило проверки {rule}");
+                                ReportErrors(logger, ex, isTruncateReport);
+                            }
+                        }
+                        logger.LogInformation($"Завершена проверка правил категории \"{category}\".\n————————————————————————————————————————————————————————————————————————");
+                    }
+                    //foreach (System.Reflection.MethodInfo testItem in tests) {
+                    //    ReportRuleAttribute rule = testItem.GetReportRule();
+                    //    logger.LogInformation($"  {rule.ListIndex} \"{(string.IsNullOrEmpty(rule.DisplayName)?testItem.Name:rule.DisplayName)}\"");
+                    //}
+
+                }
+                catch (Exception ex) {
+                    logger.LogError($"При проверке правил из категории\"{category}\" возникла ошибка.");
+                    ReportErrors(logger, ex, isTruncateReport);
+                }
+            }
+        }
+
         public void TestDatabase() {
             using (var context = connector.Connect()) {
                 TotalTablesCount();

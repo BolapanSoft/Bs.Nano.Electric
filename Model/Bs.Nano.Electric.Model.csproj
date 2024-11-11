@@ -8,13 +8,20 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>Nano.Electric</RootNamespace>
 		<BaseOutputPath>..\bin\</BaseOutputPath>
-		<VersionSuffix>047</VersionSuffix>
+		<VersionSuffix>049</VersionSuffix>
 		<Version>$(VersionPrefix).$(VersionSuffix)</Version>
+		<Copyright>Bolapansoft</Copyright>
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);DBNE85;DBNE201;DBNE23;DBNE23_1;InitDbContextEnums</DefineConstants>
 	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="EntityFramework.SqlServerCompact" Version="6.4.4" />
+		<PackageReference Include="System.Data.SQLite.EF6" Version="1.0.119" />
+		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+		<PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+	</ItemGroup>
 
 
 	<ItemGroup>
@@ -143,12 +150,6 @@
 		<Compile Include="..\DbContext\ScsSwitchUtpPanel.cs" Link="RefPartial\ScsSwitchUtpPanel.cs" />
 		<Compile Include="..\DbContext\ScsUtpSocket.cs" Link="RefPartial\ScsUtpSocket.cs" />
 		<Compile Include="..\DbContext\ScsWorkPlaceDbKit.cs" Link="RefPartial\ScsWorkPlaceDbKit.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="EntityFramework.SqlServerCompact" Version="6.4.4" />
-		<PackageReference Include="System.Data.SQLite.EF6" Version="1.0.119" />
-		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

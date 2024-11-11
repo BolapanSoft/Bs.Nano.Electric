@@ -174,6 +174,7 @@ namespace Nano.Electric {
             }
             return results;
         }
+        [Obsolete("Вместо bool TrySetProperty следует использовать void SetProperty, контролируя возможные исключения.")]
         public bool TrySetProperty<Tdest, Tprop>(Tdest product, string propName, Tprop sourceValue) where Tdest : class {
             var propertyInfo = product.GetType().GetProperty(propName);
             if (propertyInfo == null || !propertyInfo.CanWrite) {
@@ -185,6 +186,23 @@ namespace Nano.Electric {
             try {
                 propertyInfo.SetValue(product, sourceValue, BindingFlags.Public, FieldBinder.Instance, null, CultureInfo.GetCultureInfo("Ru-ru"));
                 return true;
+            }
+            catch (Exception ex) {
+                throw new InvalidOperationException($"Операция не выполнена. Значение \"{sourceValue}\" свойства {propName} не удается привести к типу {propertyInfo.PropertyType}.", ex);
+            }
+        }
+        public void SetProperty<Tdest, Tprop>(Tdest product, string propName, Tprop sourceValue) where Tdest : class {
+            var productType = product.GetType();
+            var propertyInfo = productType.GetProperty(propName);
+            if (propertyInfo == null) { throw new ArgumentException($"Свойство {propName} не найдено в типе {productType.Name}."); }
+            if(!propertyInfo.CanWrite) {
+                throw new ArgumentException($"Свойство {propName} не в типе {productType.Name} не доступно для записи.");
+            }
+            if (propertyInfo.GetCustomAttribute<KeyAttribute>() != null) {
+                throw new InvalidOperationException($"Операция не разрешена. Свойство {propName} является частью ключа.");
+            }
+            try {
+                propertyInfo.SetValue(product, sourceValue, BindingFlags.Public, FieldBinder.Instance, null, CultureInfo.GetCultureInfo("Ru-ru"));
             }
             catch (Exception ex) {
                 throw new InvalidOperationException($"Операция не выполнена. Значение \"{sourceValue}\" свойства {propName} не удается привести к типу {propertyInfo.PropertyType}.", ex);
