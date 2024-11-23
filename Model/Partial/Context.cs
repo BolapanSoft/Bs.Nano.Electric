@@ -8,6 +8,8 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
 using System.Data.Entity;
+using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Data.SqlServerCe;
 using System.Globalization;
 using System.IO;
@@ -17,6 +19,10 @@ using System.Runtime.Remoting.Contexts;
 
 namespace Nano.Electric {
     public partial class Context {
+        // Helper class to map PRAGMA table_info result
+        private class TableColumn {
+            public string Name { get; set; } // Maps to the column name from PRAGMA
+        }
         private static Dictionary<string, string[]> propertiesCache = new Dictionary<string, string[]>();
         private static readonly Dictionary<Type, string> knownLocalizeValues = new Dictionary<Type, string>();
         public Context(DbConnection existingConnection, bool contextOwnsConnection) : base(existingConnection, contextOwnsConnection) {
@@ -286,6 +292,44 @@ namespace Nano.Electric {
             //var data = image;
             this.DbImages.Add(dbImg);
             return dbImg;
+        }
+        public bool IsHaveColumns(string tableName, params string[] columns) {
+            if (Database.Connection is SQLiteConnection) {
+                try {
+                    // Get table schema using PRAGMA
+                    string pragmaQuery = $"PRAGMA table_info({tableName});";
+                    var tableSchema = Database.SqlQuery<TableColumn>(pragmaQuery).ToList();
+
+                    // Extract column names from schema
+                    var columnNames = tableSchema.Select(col => col.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                    // Check if all required columns exist in the schema
+                    return columns.All(column => columnNames.Contains(column));
+                }
+                catch (Exception ex) {
+                    // Log the exception if necessary
+                    return false;
+                }
+            }
+            else if (Database.Connection is SqlCeConnection) {
+                try {
+                    // Query INFORMATION_SCHEMA.COLUMNS to get the column names for the table
+                    string query = @" SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @tableName";
+                    // Execute query and retrieve column names
+                    var columnNames = Database
+                        .SqlQuery<string>(query, new SqlParameter("@tableName", tableName))
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    // Check if all specified columns exist in the table
+                    return columns.All(column => columnNames.Contains(column));
+                }
+                catch (Exception ex) {
+                    // Log the exception if necessary
+                    return false;
+                }
+            }
+            else {
+                throw new NotImplementedException($"Не реализовано для типа подключения {Database.Connection.GetType().Name}");
+            }
         }
 
     }

@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Entity;
+using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Data.SqlServerCe;
 using System.Globalization;
 using System.Linq;
@@ -15,6 +17,7 @@ using System.Text.RegularExpressions;
 
 namespace Bs.Nano.Electric.Report {
     public partial class Checker {
+        private record struct UrlElement(string Code, string Url);
         private struct Product : IProduct {
             public string Code { get; set; }
 
@@ -355,11 +358,25 @@ namespace Bs.Nano.Electric.Report {
                 return Array.Empty<(string code, string uri)>();
             }
             try {
-                string strQuery = $"SELECT [Code], [Uri] FROM [{tableName}]";
-                var query = context.Database.SqlQuery<(string code, string uri)>(strQuery);
-                values = query.ToList();
-                return values;
-
+                var tableSchemaQuery = context.Database;
+                if (context.Database.Connection is SQLiteConnection) {
+                    var isHaveUrl = context.IsHaveColumns(tableName, "Code", "Url");
+                    if(isHaveUrl ) {
+                        string strQuery = $"SELECT [Code], [Url] FROM [{tableName}]";
+                        var query = context.Database.SqlQuery<UrlElement>(strQuery);
+                        values = query.Select(el=>(el.Code, el.Url)).ToList();
+                        return values;
+                    }
+                    else {
+                        return Array.Empty<(string code, string uri)>();
+                    }
+                }
+                else {
+                    string strQuery = $"SELECT [Code], [Url] FROM [{tableName}]";
+                    var query = context.Database.SqlQuery<(string code, string uri)>(strQuery);
+                    values = query.ToList();
+                    return values;
+                }
             }
             catch (Exception ex) {
                 return Array.Empty<(string code, string uri)>();
