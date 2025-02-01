@@ -173,6 +173,7 @@ namespace Bs.Nano.Electric.Report {
         [ReportRule(@"Известные таблицы БДИ.", 0, 0), RuleCategory("Краткий отчет по базе изделий.", "AllTables")]
         public void TotalKnownTablesCount() {
             using (Context context = connector.Connect()) {
+                int totalCount = 0;
                 var tables = context.GetKnownTables();
                 foreach (var tableProperty in tables) {
                     (object property, string tableDescription, Type entityType, int count) = tableProperty;
@@ -180,10 +181,11 @@ namespace Bs.Nano.Electric.Report {
                         tableDescription = entityType.Name.Split('.').Last();
                     }
                     if (count > 0) {
+                        totalCount += count;
                         logger.LogInformation($"Таблица \"{tableDescription}\": {count} элементов.");
                     }
-
                 }
+                logger.LogInformation($"Всего элементов в БДИ: {totalCount}.");
             }
         }
         [ReportRule(@"Отчет по таблицам БДИ.", 0, 0), RuleCategory("Отчет по базе изделий.")]
