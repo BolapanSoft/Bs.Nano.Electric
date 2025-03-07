@@ -2,7 +2,6 @@
 
 using Nano.Electric.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity;
 
 namespace Nano.Electric {
     public partial class ElLighting : IProduct, IHaveExplodeLevel {
