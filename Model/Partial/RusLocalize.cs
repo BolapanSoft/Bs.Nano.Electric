@@ -5,39 +5,64 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Nano.Electric {
+    /// <summary>
+    /// Лотки\\Секции прямые\\Лотки
+    /// </summary>
     [DefaultLocalizeValue("Лотки\\Секции прямые\\Лотки")]
     public partial class ScsGutterCanal { }
-
+    /// <summary>
+    /// Лотки\\Секции прямые\\Крышки
+    /// </summary>
     [DefaultLocalizeValue("Лотки\\Секции прямые\\Крышки")]
     public partial class DbScsGutterCover { }
-
+    /// <summary>
+    /// Лотки\\Секции прямые\\Перегородки
+    /// </summary>
     [DefaultLocalizeValue("Лотки\\Секции прямые\\Перегородки")]
     public partial class DbScsGutterPartition { }
-
+    /// <summary>
+    /// Лотки\\Секции соединительные\\Лотки
+    /// </summary>
     [DefaultLocalizeValue("Лотки\\Секции соединительные\\Лотки")]
     public partial class ScsGcFitting { }
-
+    /// <summary>
+    /// Лотки\\Секции соединительные\\Крышки
+    /// </summary>
     [DefaultLocalizeValue("Лотки\\Секции соединительные\\Крышки")]
     public partial class DbScsGcCoverUnit { }
-
+    /// <summary>
+    /// Лотки\\Аксессуары лотков
+    /// </summary>
     [DefaultLocalizeValue("Лотки\\Аксессуары лотков")]
     public partial class DbScsGcAccessoryUnit { }
-
+    /// <summary>
+    /// Крепления лотков\\Элементы крепления
+    /// </summary>
     [DefaultLocalizeValue("Крепления лотков\\Элементы крепления")]
     public partial class ScsGutterBolting { }
-
+    /// <summary>
+    /// Крепления лотков\\Аксессуары крепления
+    /// </summary>
     [DefaultLocalizeValue("Крепления лотков\\Аксессуары крепления")]
     public partial class DbScsGcBoltingAccessoryUnit { }
-
+    /// <summary>
+    /// Крепления лотков\\Конфигурации узлов крепления
+    /// </summary>
     [DefaultLocalizeValue("Крепления лотков\\Конфигурации узлов крепления")]
     public partial class DbScsGutterUtilitySet { }
-
+    /// <summary>
+    /// Лотки\\Конфигурации соединительных элементов
+    /// </summary>
     [DefaultLocalizeValue("Лотки\\Конфигурации соединительных элементов")]
     public partial class DbScsGcSeriaConfigiration { }
-
+    /// <summary>
+    /// Материалы и комплектация\\Материалы
+    /// </summary>
     [DefaultLocalizeValue("Материалы и комплектация\\Материалы")]
     public partial class CaeMaterialUtility { }
-
+    /// <summary>
+    /// Конфигурации КНС\\Конфигурации трасс лотков
+    /// </summary>
     [DefaultLocalizeValue("Конфигурации КНС\\Конфигурации трасс лотков")]
     public partial class DbGcMountSystem { }
 
@@ -66,7 +91,9 @@ namespace Nano.Electric {
 
     [DefaultLocalizeValue("Конфигурации КНС\\Конфигурации трасс настенных коробов")]
     public partial class DbCcMountSystem { }
-
+    /// <summary>
+    /// Материалы и комплектация\\Комплектации материалов
+    /// </summary>
     [DefaultLocalizeValue("Материалы и комплектация\\Комплектации материалов")]
     public partial class DbCaeMaterialUtilitySet { }
 
