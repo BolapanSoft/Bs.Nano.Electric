@@ -1,23 +1,25 @@
-﻿using Bs.XML.SpreadSheet;
+﻿using Bs.Nano.Electric.Model;
+using Bs.XML.SpreadSheet;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Extensions.Logging;
 using Nano.Electric;
 using Nano.Electric.Enums;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using Bs.Nano.Electric.Model;
+using System.ComponentModel;
 using System.Data.Entity;
 using System.Data.SqlServerCe;
-using System.ComponentModel;
-using DocumentFormat.OpenXml.Wordprocessing;
-using DocumentFormat.OpenXml.Spreadsheet;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.ConstrainedExecution;
+using System.Text;
 
 namespace Bs.Nano.Electric.Report {
     public class NtProduct : IProduct {
-        public string Code {get;set;}
+        public string Code { get; set; }
 
         public int? DbImageRef { get; set; }
         public string Name { get; set; }
@@ -42,7 +44,7 @@ namespace Bs.Nano.Electric.Report {
         }
         public void TestDatabase(string[] categories, string[] tables, bool isTruncateReport) {
 
-           
+
             foreach (var category in categories) {
                 try {
                     var tests = GetTests(category, tables).ToList();
@@ -118,7 +120,8 @@ namespace Bs.Nano.Electric.Report {
                         else {
                             logger.LogError(item.Message);
                         }
-                    };
+                    }
+                    ;
                     ;
                 }
             }
@@ -193,24 +196,35 @@ namespace Bs.Nano.Electric.Report {
         public void AllKnownTables() {
             using (Context context = connector.Connect()) {
                 var connectString = context.Database.Connection.ConnectionString;
-                logger.LogInformation($"Состав БДИ \"{connectString}\"");
+                var csvFile = $"Состав БДИ {DateTime.Now.ToString("yyyy.MM.dd")}.csv";
+                csvFile = Path.Combine(Directory.GetCurrentDirectory(), csvFile);
                 var tables = context.GetKnownTables();
-                logger.LogInformation($"Code;Name;SpecDescription");
-                logger.LogInformation($"Код оборудования, изделия, материала;Наименование (Тип);Описание в спецификации");
-                foreach (var tableProperty in tables) {
-                    (object property, string tableDescription, Type entityType, int count) = tableProperty;
-                    if (string.IsNullOrEmpty(tableDescription)) {
-                        tableDescription = entityType.Name.Split('.').Last();
-                    }
-                    if (count > 0) {
-                        var tableName = Context.GetDatabaseTableName(entityType);
-                        var products = GetProducts(context, tableName);
-                        logger.LogInformation($"Таблица \"{tableDescription}\": {count} элементов.");
-                        foreach (var product in products) {
-                            logger.LogInformation($"{product.Code};{product.Name};{product.SpecDescription}");
+                using (var csv = new StreamWriter(csvFile, false, new UTF8Encoding(false))) {
+                    try {
+                        csv.WriteLine($"Code;Name;SpecDescription");
+                        csv.WriteLine($"Код оборудования, изделия, материала;Наименование (Тип);Описание в спецификации");
+                        foreach (var tableProperty in tables) {
+                            (object property, string tableDescription, Type entityType, int count) = tableProperty;
+                            if (typeof(IProduct).IsAssignableFrom(entityType)) {
+                                if (string.IsNullOrEmpty(tableDescription)) {
+                                    tableDescription = entityType.Name.Split('.').Last();
+                                }
+                                if (count > 0) {
+                                    var tableName = Context.GetDatabaseTableName(entityType);
+                                    var products = GetProducts(context, tableName);
+                                    csv.WriteLine($"Таблица \"{tableDescription}\": {count} элементов.");
+                                    foreach (var product in products) {
+                                        csv.WriteLine($"{product.Code};{product.Name};{product.SpecDescription}");
+                                    }
+                                }
+                            }
+
                         }
                     }
-
+                    finally {
+                        csv.Close();
+                        logger.LogInformation($"Состав БДИ \"{connectString}\" экспортирован в файл \"{csvFile}\"");
+                    }
                 }
             }
         }

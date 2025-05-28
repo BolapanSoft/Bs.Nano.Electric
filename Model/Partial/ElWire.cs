@@ -9,6 +9,7 @@ namespace Nano.Electric {
         string IProduct.Name { get => wireName; set { wireName = value; } }
         string IProduct.Manufacturer { get => mfrId; set { mfrId = value; } }
         int IHaveId.Id { get => Id; set { Id = value; } }
+        string IProduct.SpecDescription { get => string.Empty; set { } }
 #if InitDbContextEnums
         public ElWireThreadType? ThreadType { get; set; }
         public ElWireShapeEnum? ThreadCondShape { get; set; }
