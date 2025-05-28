@@ -1,19 +1,14 @@
 ﻿// Ignore Spelling: Tdest Tsource Tprop dest Tret
 
-using Nano.Electric;
+using Microsoft.Extensions.Caching.Memory;
 using System;
-using System.CodeDom;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Entity.Core.Mapping;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Caching;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Web;
 
 namespace Nano.Electric {
     public static class EnumConverter<TEnum> where TEnum : Enum {
@@ -115,69 +110,53 @@ namespace Nano.Electric {
         }
     }
     internal static class ReflectionHelper {
-        private static MemoryCache memoryCache = new MemoryCache("ReflectionHelper");
+        private static readonly MemoryCache memoryCache = new MemoryCache(new MemoryCacheOptions());
         /// <summary>
-        /// Для типа <typeparamref name="Type"/> формирует перечень публичных свойств типа <typeparamref name="Tret"/>
+        /// Формирует перечень публичных свойств типа <typeparamref name="Tret"/> для типа <typeparamref name="T"/>
         /// </summary>
-        /// <typeparam name="Tret"></typeparam>
-        /// <param name="type"></param>
-        /// <returns></returns>
         public static List<(string PropertyName, Func<T, Tret> Getter)> GetPropertiesWithGetters<T, Tret>() {
-            var cacheKey = $"GetPropertiesWithGetters_{typeof(T).Name}_{typeof(Tret).Name}";
-            if (memoryCache.Contains(cacheKey)) {
-                return (memoryCache[cacheKey] as List<(string PropertyName, Func<T, Tret> Getter)>) ?? throw new Exception($"Invalid cache key {cacheKey}");
+            var cacheKey = $"GetPropertiesWithGetters_{typeof(T).FullName}_{typeof(Tret).FullName}";
+
+            if (memoryCache.TryGetValue(cacheKey, out List<(string PropertyName, Func<T, Tret> Getter)> properties)) {
+                return properties ?? throw new Exception($"Invalid cache key {cacheKey}");
             }
-            var properties = new List<(string PropertyName, Func<T, Tret> Getter)>();
+
+            properties = new List<(string PropertyName, Func<T, Tret> Getter)>();
             var type = typeof(T);
-            // Get all properties declared in the given type and its base types
             var allProperties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
 
             foreach (var property in allProperties) {
                 if (property.PropertyType == typeof(Tret)) {
-                    // Create a getter function for the property
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-#pragma warning disable CS8603 // Possible null reference return.
-                    Func<T, Tret> getter = (o) => (Tret)property.GetValue(o);
-#pragma warning restore CS8603 // Possible null reference return.
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-
-                    // Add the property name and getter to the list
+                    var getter = (Func<T, Tret>)Delegate.CreateDelegate(typeof(Func<T, Tret>), property.GetGetMethod());
                     properties.Add((property.Name, getter));
                 }
             }
-            memoryCache.Add(cacheKey, properties, DateTimeOffset.Now.AddDays(5));
+
+            memoryCache.Set(cacheKey, properties, TimeSpan.FromDays(5));
             return properties;
         }
         /// <summary>
-        /// Для типа <typeparamref name="T"/> формирует перечень публичных свойств типа <typeparamref name="Tprop"/>, для которых возможна запись.
+        /// Формирует перечень публичных свойств типа <typeparamref name="Tprop"/>, для которых возможна запись, для типа <typeparamref name="T"/>
         /// </summary>
-        /// <typeparam name="Tprop"></typeparam>
-        /// <param name="type"></param>
-        /// <returns></returns>
         public static List<(string PropertyName, Action<T, Tprop> Setter)> GetPropertiesWithSetters<T, Tprop>() {
-            var cacheKey = $"GetPropertiesWithSetters_{typeof(T).Name}_{typeof(Tprop).Name}";
-            if (memoryCache.Contains(cacheKey)) {
-                return (memoryCache[cacheKey] as List<(string PropertyName, Action<T, Tprop> Setter)>) ?? throw new Exception($"Invalid cache key {cacheKey}");
+            var cacheKey = $"GetPropertiesWithSetters_{typeof(T).FullName}_{typeof(Tprop).FullName}";
+
+            if (memoryCache.TryGetValue(cacheKey, out List<(string PropertyName, Action<T, Tprop> Setter)> properties)) {
+                return properties ?? throw new Exception($"Invalid cache key {cacheKey}");
             }
-            var properties = new List<(string PropertyName, Action<T, Tprop> Setter)>();
+
+            properties = new List<(string PropertyName, Action<T, Tprop> Setter)>();
             var type = typeof(T);
-            // Get all properties declared in the given type and its base types
             var allProperties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
 
             foreach (var property in allProperties) {
                 if (property.PropertyType == typeof(Tprop) && property.CanWrite) {
-                    // Create a getter function for the property
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-#pragma warning disable CS8603 // Possible null reference return.
-                    Action<T, Tprop> setter = (o, val) => property.SetValue(o, val);
-#pragma warning restore CS8603 // Possible null reference return.
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
-
-                    // Add the property name and getter to the list
+                    var setter = (Action<T, Tprop>)Delegate.CreateDelegate(typeof(Action<T, Tprop>), property.GetSetMethod());
                     properties.Add((property.Name, setter));
                 }
             }
-            memoryCache.Add(cacheKey, properties, DateTimeOffset.Now.AddDays(5));
+
+            memoryCache.Set(cacheKey, properties, TimeSpan.FromDays(5));
             return properties;
         }
 

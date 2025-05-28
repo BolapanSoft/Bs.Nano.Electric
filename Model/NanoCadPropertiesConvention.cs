@@ -1,4 +1,5 @@
-﻿using System.Data.Entity.ModelConfiguration.Conventions;
+﻿#if NETFRAMEWORK
+using System.Data.Entity.ModelConfiguration.Conventions;
 
 namespace Nano.Electric {
     public class NanoCadPropertiesConvention : Convention {
@@ -11,4 +12,5 @@ namespace Nano.Electric {
             //});
         }
     }
-}
+} 
+#endif
