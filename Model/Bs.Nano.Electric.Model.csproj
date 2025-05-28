@@ -16,11 +16,9 @@
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);DBNE85;DBNE201;DBNE23;DBNE23_1;InitDbContextEnums</DefineConstants>
 	</PropertyGroup>
-	<ItemGroup>
+	<!--<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
-	</ItemGroup>
-	<ItemGroup>
-	</ItemGroup>
+	</ItemGroup>-->
 	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
 		<PackageReference Include="EntityFramework.SqlServerCompact" Version="6.4.4" />
 		<PackageReference Include="System.Data.SQLite.EF6" Version="1.0.119" />
@@ -165,6 +163,10 @@
 	<ItemGroup>
 		<Folder Include="Cadwise\" />
 		<Folder Include="RefPartial\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
 	</ItemGroup>
 
 
