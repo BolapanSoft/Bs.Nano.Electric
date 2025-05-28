@@ -23,6 +23,7 @@ namespace Bs.Nano.Electric.Report {
         public string Name { get; set; }
         public string Manufacturer { get; set; }
         public int Id { get; set; }
+        public string SpecDescription { get; set; }
     }
     /// <summary>
     /// Реализует правила контроля полноты заполнения БДИ.
@@ -173,6 +174,7 @@ namespace Bs.Nano.Electric.Report {
         [ReportRule(@"Известные таблицы БДИ.", 0, 0), RuleCategory("Краткий отчет по базе изделий.", "AllTables")]
         public void TotalKnownTablesCount() {
             using (Context context = connector.Connect()) {
+                int totalCount = 0;
                 var tables = context.GetKnownTables();
                 foreach (var tableProperty in tables) {
                     (object property, string tableDescription, Type entityType, int count) = tableProperty;
@@ -180,23 +182,33 @@ namespace Bs.Nano.Electric.Report {
                         tableDescription = entityType.Name.Split('.').Last();
                     }
                     if (count > 0) {
+                        totalCount += count;
                         logger.LogInformation($"Таблица \"{tableDescription}\": {count} элементов.");
                     }
-
                 }
+                logger.LogInformation($"Всего элементов в БДИ: {totalCount}.");
             }
         }
         [ReportRule(@"Состав БДИ.", 0, 100), RuleCategory("Состав БДИ.", "AllTables")]
         public void AllKnownTables() {
             using (Context context = connector.Connect()) {
+                var connectString = context.Database.Connection.ConnectionString;
+                logger.LogInformation($"Состав БДИ \"{connectString}\"");
                 var tables = context.GetKnownTables();
+                logger.LogInformation($"Code;Name;SpecDescription");
+                logger.LogInformation($"Код оборудования, изделия, материала;Наименование (Тип);Описание в спецификации");
                 foreach (var tableProperty in tables) {
                     (object property, string tableDescription, Type entityType, int count) = tableProperty;
                     if (string.IsNullOrEmpty(tableDescription)) {
                         tableDescription = entityType.Name.Split('.').Last();
                     }
                     if (count > 0) {
+                        var tableName = Context.GetDatabaseTableName(entityType);
+                        var products = GetProducts(context, tableName);
                         logger.LogInformation($"Таблица \"{tableDescription}\": {count} элементов.");
+                        foreach (var product in products) {
+                            logger.LogInformation($"{product.Code};{product.Name};{product.SpecDescription}");
+                        }
                     }
 
                 }

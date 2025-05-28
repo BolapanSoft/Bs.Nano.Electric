@@ -609,7 +609,7 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
-        public const string sRule016 = @"Для элементов ""Крышка угловая горизонтальная"" должна быть внесена ширина элемента";
+        //public const string sRule016 = @"Для элементов ""Крышка угловая горизонтальная"" должна быть внесена ширина элемента";
         [ReportRule(@"Для элементов ""Крышка угловая горизонтальная"" должна быть внесена ширина элемента.",
          7, 25)]
         [RuleCategory("Полнота заполнения технических данных.", nameof(DbScsGcCoverUnit))]
@@ -992,6 +992,34 @@ namespace Bs.Nano.Electric.Report {
 
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
+                }
+            }
+        }
+        /// <summary>
+        /// Внутри серии элементов "Консоль" должно быть не более одного сочетания параметров [ширина элемента]
+        /// </summary>
+        [ReportRule("Внутри серии элементов \"Консоль\" должно быть не более одного сочетания параметров [ширина элемента Length].",
+         7, 46)]
+        [RuleCategory("Полнота заполнения технических данных.", nameof(ScsGutterBolting))]
+        public void Rule_07_046() {
+            var ft = ScsGutterBoltingTypeEnum.CONSOLE;
+            using (var context = connector.Connect()) {
+                var products = context.ScsGutterBoltings
+                        .Where(p => p.CanalBoltingType == ft)
+                        .Select(p => new { p.Code, p.Series, p.Name, p.Length })
+                        .ToArray()
+                        .GroupBy(p => p.Series, p => (p.Name, p.Length));
+                LinkedList<object> errors = new();
+                foreach (var p in products) {
+                    HashSet<double?> values = new();
+                    var errorValues = p.Where(item => !values.Add(item.Length));
+                    foreach (var error in errorValues) {
+                        errors.AddLast((p.Key, error));
+                    }
+                }
+                if (errors.Count > 0) {
+                    FailRuleTest($"Тест не пройден для {errors.Count} серий.",
+                        errors);
                 }
             }
         }

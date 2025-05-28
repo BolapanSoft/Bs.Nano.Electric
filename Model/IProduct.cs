@@ -24,6 +24,7 @@ namespace Nano.Electric {
         int? DbImageRef { get; set; }
         string Name { get; set; }
         string Manufacturer { get; set; }
+        string SpecDescription { get; set; }
     }
     public partial class SafeDegree : IHaveId { }
     public partial class ClimateTable : IHaveId { }
@@ -98,7 +99,7 @@ namespace Nano.Electric {
     public partial class ScsServiceColumnUtilityUnit : IProduct, IHaveImageRef { }
     public partial class ScsHatch : IProduct, IHaveImageRef, IHaveDbGraphicRef { }
     public partial class ScsServiceColumn : IProduct, IHaveImageRef, IHaveDbGraphicRef { }
-    public partial class ScsCord : IProduct, IHaveCableSystemTypeRef, IHaveImageRef { }
+    public partial class ScsCord : IHaveId, IHaveCableSystemTypeRef, IHaveImageRef { }
     public partial class DbScsTubeSeriesConfiguration : IHaveId { }
     /*
     public partial class __ : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
