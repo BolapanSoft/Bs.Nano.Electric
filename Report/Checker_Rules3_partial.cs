@@ -31,7 +31,7 @@ namespace Bs.Nano.Electric.Report {
             }
 
         }
-        #region 100 Автоматические выключчатели
+        #region 100 Автоматические выключатели
 
         [ReportRule(@"Для автоматических выключателей должны быть заполнены технические данные:
 NominalCurrent	DbPoleCountEnum	VoltageType	MaxCommutation

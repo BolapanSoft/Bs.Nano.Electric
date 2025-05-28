@@ -186,6 +186,22 @@ namespace Bs.Nano.Electric.Report {
                 }
             }
         }
+        [ReportRule(@"Состав БДИ.", 0, 100), RuleCategory("Состав БДИ.", "AllTables")]
+        public void AllKnownTables() {
+            using (Context context = connector.Connect()) {
+                var tables = context.GetKnownTables();
+                foreach (var tableProperty in tables) {
+                    (object property, string tableDescription, Type entityType, int count) = tableProperty;
+                    if (string.IsNullOrEmpty(tableDescription)) {
+                        tableDescription = entityType.Name.Split('.').Last();
+                    }
+                    if (count > 0) {
+                        logger.LogInformation($"Таблица \"{tableDescription}\": {count} элементов.");
+                    }
+
+                }
+            }
+        }
         [ReportRule(@"Отчет по таблицам БДИ.", 0, 0), RuleCategory("Отчет по базе изделий.")]
         public void ProductCategories() {
             string TopSerieLevel(string series) {
