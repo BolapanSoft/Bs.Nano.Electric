@@ -157,7 +157,13 @@ namespace Nano.Electric {
             return value;
         }
         public DbImage CreateImage(string? imgName, string category, byte[] image) {
-            DbImage dbImg = this.DbImages.Create();
+            //DbImage dbImg = this.DbImages.Create();
+            var dbImg = new DbImage {
+                Text = imgName ?? string.Empty,
+                Category = category,
+                Image = image
+            };
+            //this.DbImages.Add(dbImg);
             int id = 1;
             if (this.DbImages.Local.Any()) {
                 id = Math.Max(id, this.DbImages.Local.Max(img => img.Id) + 1);
@@ -166,10 +172,9 @@ namespace Nano.Electric {
                 id = Math.Max(this.DbImages.Max(img => img.Id) + 1, id);
             }
             dbImg.Id = id;
-            dbImg.Text = imgName ?? string.Empty;
-            dbImg.Category = category;
-            dbImg.Image = image;
-            //var data = image;
+            //dbImg.Text = imgName ?? string.Empty;
+            //dbImg.Category = category;
+            //dbImg.Image = image;
             this.DbImages.Add(dbImg);
             return dbImg;
         }
