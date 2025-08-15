@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Version>1.1.18</Version>
+		<Version>1.2.19</Version>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net48</TargetFramework>
+		<TargetFrameworks>net48; net8.0</TargetFrameworks>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<LangVersion>10.0</LangVersion>
 		<Nullable>enable</Nullable>

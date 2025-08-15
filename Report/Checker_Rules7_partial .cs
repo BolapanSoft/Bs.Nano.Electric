@@ -2,7 +2,11 @@
 using Nano.Electric.Enums;
 using System;
 using System.Collections.Generic;
+#if NETFRAMEWORK
 using System.Data.Entity;
+#else
+using Microsoft.EntityFrameworkCore;
+#endif
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -813,7 +817,8 @@ namespace Bs.Nano.Electric.Report {
 
                 bool isMatch = !(GutterType.HasValue & !string.IsNullOrWhiteSpace(Series));
                 return isMatch ? code : null;
-            };
+            }
+            ;
 
             using (var context = connector.Connect()) {
                 var errors = new LinkedList<string>();
@@ -929,7 +934,8 @@ namespace Bs.Nano.Electric.Report {
                                     && Depth.HasValue && Depth.Value >= 1.0;
                 return isAllRight;
 
-            };
+            }
+            ;
             var ft = ScsGutterFittingTypeEnum.CORK;
             using (var context = connector.Connect()) {
                 var products = context.ScsGcFittings
@@ -1467,7 +1473,13 @@ namespace Bs.Nano.Electric.Report {
                     .ToList();
                 var errors = products
                     .Distinct()
-                    .Where(s => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series,s))))
+#if NETFRAMEWORK
+                    .Where(s => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, s))))
+#else
+
+                    .Where(s => !(context.ScsCabelCanals.Any(cc => EF.Functions.Like(cc.Series, s))))
+
+#endif
                     .ToList();
                 if (errors.Count > 0) {
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
@@ -1486,7 +1498,11 @@ namespace Bs.Nano.Electric.Report {
                         p.FittingType == ScsCableFittingTypeEnum.OUTSIDE_ANGLE |
                         p.FittingType == ScsCableFittingTypeEnum.CORK |
                         p.FittingType == ScsCableFittingTypeEnum.JOINT)
-                    .Where(p => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, p.Series) & p.Height == cc.CabelHeight & p.Depth == cc.CabelDepth)))
+#if NETFRAMEWORK
+                            .Where(p => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, p.Series) & p.Height == cc.CabelHeight & p.Depth == cc.CabelDepth)))
+#else
+                    .Where(p => !(context.ScsCabelCanals.Any(cc => EF.Functions.Like(cc.Series, p.Series) & p.Height == cc.CabelHeight & p.Depth == cc.CabelDepth)))
+#endif   
                     .Select(p => new { p.Code, p.Series, p.FittingType, p.Height, p.Depth })
                     .ToList();
                 var errors = products
@@ -1505,9 +1521,16 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsCableFittings
                     .Where(p => p.FittingType == ScsCableFittingTypeEnum.TRIPLE)
-                    .Where(p => !(context.ScsCabelCanals
+#if NETFRAMEWORK
+                            .Where(p => !(context.ScsCabelCanals
                         .Any(cc => DbFunctions.Like(cc.Series, p.Series) &
                                 p.HeightMainBranch == cc.CabelHeight & p.WidthMainBranch == cc.CabelDepth)))
+#else
+                    .Where(p => !(context.ScsCabelCanals
+                        .Any(cc => EF.Functions.Like(cc.Series, p.Series) &
+                                p.HeightMainBranch == cc.CabelHeight & p.WidthMainBranch == cc.CabelDepth)))
+#endif
+
                     .Select(p => new { p.Code, p.Series, p.HeightMainBranch, p.WidthMainBranch })
                     .ToList();
                 var errors = products
@@ -1526,9 +1549,15 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.ScsCableFittings
                     .Where(p => p.FittingType == ScsCableFittingTypeEnum.TRIPLE)
-                    .Where(p => !(context.ScsCabelCanals
+#if NETFRAMEWORK
+                            .Where(p => !(context.ScsCabelCanals
                         .Any(cc => DbFunctions.Like(cc.Series, p.Series) & p.HeightOutBranch == cc.CabelHeight & p.WidthOutBranch == cc.CabelDepth)))
-                    .Select(p => new { p.Code, p.Series, p.HeightOutBranch, p.WidthOutBranch })
+#else
+                        .Where(p => !(context.ScsCabelCanals
+                        .Any(cc => EF.Functions.Like(cc.Series, p.Series) & p.HeightOutBranch == cc.CabelHeight & p.WidthOutBranch == cc.CabelDepth)))
+
+#endif                    
+                        .Select(p => new { p.Code, p.Series, p.HeightOutBranch, p.WidthOutBranch })
                     .ToList();
                 var errors = products
                     .Select(p => (p.Series, p.Code, (p.HeightOutBranch, p.WidthOutBranch)))
@@ -1612,8 +1641,13 @@ namespace Bs.Nano.Electric.Report {
                     .ToList();
                 var errors = products
                     .Distinct()
+#if NETFRAMEWORK
                     .Where(s => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, s))))
-                  .ToList();
+#else
+                    .Where(s => !(context.ScsCabelCanals.Any(cc => EF.Functions.Like(cc.Series, s))))
+
+#endif
+                     .ToList();
                 if (errors.Count > 0) {
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
@@ -1627,7 +1661,12 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.DbCableCanalPartitions
                     .Select(p => new { p.Code, p.Series, p.Height })
+#if NETFRAMEWORK
                     .Where(p => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, p.Series) & p.Height == cc.CabelDepth)))
+#else
+                    .Where(p => !(context.ScsCabelCanals.Any(cc => EF.Functions.Like(cc.Series, p.Series) & p.Height == cc.CabelDepth)))
+
+#endif                  
                     .ToList();
                 var errors = products
                     .Select(p => (p.Series, p.Code, p.Height))
@@ -1666,8 +1705,13 @@ namespace Bs.Nano.Electric.Report {
                     .ToList();
                 var errors = products
                     .Distinct()
+#if NETFRAMEWORK
                     .Where(s => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, s))))
-                  .ToList();
+#else
+                    .Where(s => !(context.ScsCabelCanals.Any(cc => EF.Functions.Like(cc.Series, s))))
+
+#endif
+                    .ToList();
                 if (errors.Count > 0) {
                     FailRuleTest($"Тест не пройден для {errors.Count} элементов.",
                        errors);
@@ -1681,7 +1725,12 @@ namespace Bs.Nano.Electric.Report {
             using (var context = connector.Connect()) {
                 var products = context.DcCableCanalCovers
                     .Select(p => new { p.Code, p.Series, p.CoverWidth })
+#if NETFRAMEWORK
                     .Where(p => !(context.ScsCabelCanals.Any(cc => DbFunctions.Like(cc.Series, p.Series) & p.CoverWidth == cc.CabelHeight)))
+#else
+                    .Where(p => !(context.ScsCabelCanals.Any(cc => EF.Functions.Like(cc.Series, p.Series) & p.CoverWidth == cc.CabelHeight)))
+
+#endif
                     .ToList();
                 var errors = products
                     .Select(p => (p.Series, p.Code, p.CoverWidth))

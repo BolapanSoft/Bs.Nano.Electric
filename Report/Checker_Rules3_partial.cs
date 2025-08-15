@@ -3,7 +3,11 @@ using Nano.Electric;
 using Nano.Electric.Enums;
 using System;
 using System.Collections.Generic;
+#if NETFRAMEWORK
 using System.Data.Entity;
+#else
+using Microsoft.EntityFrameworkCore;
+#endif
 using System.Globalization;
 using System.Linq;
 using System.Text;

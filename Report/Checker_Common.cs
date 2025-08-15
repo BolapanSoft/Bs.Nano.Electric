@@ -8,8 +8,12 @@ using Nano.Electric.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+#if NETFRAMEWORK
 using System.Data.Entity;
-using System.Data.SqlServerCe;
+using System.Data.SqlServerCe; 
+#else
+using Microsoft.EntityFrameworkCore;
+#endif
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -131,8 +135,13 @@ namespace Bs.Nano.Electric.Report {
             using (Context context = connector.Connect()) {
                 int allProductsCount = 0;
                 {
+#if NETFRAMEWORK
                     logger.LogInformation($"Отчет по БДИ \"{context.Database.Connection.Database}\"");
+#else
+                    logger.LogInformation($"Отчет по БДИ \"{context.Database.GetDbConnection().Database}\"");
 
+
+#endif
                     var productCount = context.ScsGutterCanals.Count();
                     allProductsCount += productCount;
                     logger.LogInformation($"Таблица \"{Resources.ImageCategory["ScsGutterCanal"]}\": {productCount} элементов.");
@@ -195,7 +204,6 @@ namespace Bs.Nano.Electric.Report {
         [ReportRule(@"Состав БДИ.", 0, 100), RuleCategory("Состав БДИ.", "AllTables")]
         public void AllKnownTables() {
             using (Context context = connector.Connect()) {
-                var connectString = context.Database.Connection.ConnectionString;
                 var csvFile = $"Состав БДИ {DateTime.Now.ToString("yyyy.MM.dd")}.csv";
                 csvFile = Path.Combine(Directory.GetCurrentDirectory(), csvFile);
                 var tables = context.GetKnownTables();
@@ -222,6 +230,12 @@ namespace Bs.Nano.Electric.Report {
                         }
                     }
                     finally {
+#if NETFRAMEWORK
+                        var connectString = context.Database.Connection.ConnectionString;
+#else
+                        var connectString = context.Database.GetConnectionString();
+
+#endif           
                         csv.Close();
                         logger.LogInformation($"Состав БДИ \"{connectString}\" экспортирован в файл \"{csvFile}\"");
                     }
@@ -239,7 +253,7 @@ namespace Bs.Nano.Electric.Report {
 
             using (Context context = connector.Connect()) {
                 int allProductsCount = 0;
-                var dbName = context.Database.Connection.Database;
+                //var dbName = context.Database.Connection.Database;
                 {
                     var productCount = context.ScsGutterCanals.Count();
                     allProductsCount += productCount;
@@ -442,6 +456,7 @@ namespace Bs.Nano.Electric.Report {
                         var tableName = Context.GetDatabaseTableName(tableDef.EntityType);
                         if (count > 0) {
                             try {
+#if NETFRAMEWORK
                                 foreach (object? entity in dbSet.AsNoTracking()) {
                                     IHaveImageRef product = (IHaveImageRef)entity;
                                     if (!(
@@ -451,6 +466,16 @@ namespace Bs.Nano.Electric.Report {
                                         errors.Enqueue((tableDescription, ((IProduct)entity).Code, ((IProduct)entity).Name));
                                     }
                                 }
+#else
+                                var entities = (IQueryable<IHaveImageRef>)dbSet;
+                                foreach (var entity in entities.AsNoTracking()) {
+                                    var productWithImage = (IHaveImageRef)entity;
+                                    if (!(productWithImage.DbImageRef.HasValue && productWithImage.DbImageRef > 0)) {
+                                        var product = (IProduct)entity;
+                                        errors.Enqueue((tableDescription, product.Code, product.Name));
+                                    }
+                                }
+#endif
                             }
                             catch (Exception ex) {
                                 logger.LogWarning(ex, "При загрузке таблицы \"{}\" произошла ошибка.", tableName);

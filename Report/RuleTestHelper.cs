@@ -1,16 +1,17 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Microsoft.Extensions.Logging;
+﻿// Ignore Spelling: queryable
+
 using Nano.Electric;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
+#if NETFRAMEWORK
 using System.Data.Entity;
+#else
+using Microsoft.EntityFrameworkCore;
+# endif
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace Bs.Nano.Electric.Report {
     public static class Assert {
@@ -24,7 +25,6 @@ namespace Bs.Nano.Electric.Report {
                 HandleFail(message);
             }
         }
-
         internal static void HandleFail(string message) {
             throw new RuleTestException(message);
         }
@@ -256,10 +256,22 @@ namespace Bs.Nano.Electric.Report {
         public static IEnumerable<MethodInfo> GetTests<T>(this string testCategory) where T : class {
             int getPriority(MethodInfo mi) {
                 return mi.GetCustomAttribute<PriorityAttribute>()?.Priority ?? 0;
-            };
+            }
+            ;
             return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public)
             .Where(m => m.GetCustomAttributes<RuleCategoryAttribute>()
                 .Any(a => a.TestCategories.Contains(testCategory)))
+            .OrderBy(mi => getPriority(mi));
+
+        }
+        public static IEnumerable<MethodInfo> GetTests<T>(this string testCategory, string[] tables) where T : class {
+            int getPriority(MethodInfo mi) {
+                return mi.GetCustomAttribute<PriorityAttribute>()?.Priority ?? 0;
+            }
+            ;
+            return typeof(T).GetMethods(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public)
+            .Where(m => m.GetCustomAttributes<RuleCategoryAttribute>()
+                .Any(a => a.TestCategories.Contains(testCategory) && a.TestCategories.Any(tc => tables.Contains(tc))))
             .OrderBy(mi => getPriority(mi));
 
         }
@@ -271,25 +283,27 @@ namespace Bs.Nano.Electric.Report {
                 .FirstOrDefault(m => m.Name == "Count" && m.GetParameters().Length == 1)
                 ?.MakeGenericMethod(queryable.ElementType);
 
-            if (countProperty != null) {
-                return (int)countProperty.Invoke(null, new object[] { queryable });
+            if (countProperty is not null) {
+                object? result = countProperty.Invoke(null, new object[] { queryable });
+                return result is null ? 0 : (int)result;
             }
 
             return 0;
         }
         public static IEnumerable<(object property, string tableDescription, Type EntityType, int count)> GetKnownTables(this DbContext source) {
             var dbSetProperties = source.GetType().GetProperties()
-        .Where(p => p.PropertyType.IsGenericType &&
+                .Where(p => p.PropertyType.IsGenericType &&
                     p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>) &&
                     p.PropertyType.GetGenericArguments().Length > 0);
 
             foreach (PropertyInfo propInfo in dbSetProperties) {
                 Type propType = propInfo.PropertyType.GetGenericArguments()[0];
                 string tableDescription = Context.GetDefaultLocalizeValue(propType);
-                object dbSetInstance = propInfo.GetValue(source); // Get the instance of the DbSet<T> property
+                object? dbSetInstance = propInfo.GetValue(source); // Get the instance of the DbSet<T> property
+                if (dbSetInstance is null) { continue; }
                 int count = 0;
                 try {
-                   count= GetCount((IQueryable)dbSetInstance);
+                    count = GetCount((IQueryable)dbSetInstance);
                 }
                 catch {
                     continue;

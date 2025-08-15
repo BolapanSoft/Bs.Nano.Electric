@@ -56,11 +56,19 @@ namespace Bs.Nano.Electric.Model {
         };
 
         private static (string ConnectionString, DbProvider Provider) CreateConnectionString(string fileName) {
+#if NETFRAMEWORK
             return fileName.ToLower() switch {
-                var name when name.EndsWith(".sdf") => ($"Data Source=\"{fileName}\";Max Database Size=2560", DbProvider.SqlServerCompact),
-                var name when name.EndsWith(".db") => ($"Data Source=\"{fileName}\";Version=3;", DbProvider.SQLite),
+                var name when name.EndsWith(".sdf", StringComparison.OrdinalIgnoreCase) => ($"Data Source=\"{fileName}\";Max Database Size=2560", DbProvider.SqlServerCompact),
+                var name when name.EndsWith(".db", StringComparison.OrdinalIgnoreCase) => ($"Data Source=\"{fileName}\";Version=3;", DbProvider.SQLite),
                 _ => throw new ArgumentOutOfRangeException(nameof(fileName), $"Файл \"{fileName}\" должен иметь расширение .sdf или .db")
-            };
+            }; 
+#else
+            return fileName.ToLower() switch {
+                //var name when name.EndsWith(".sdf") => ($"Data Source=\"{fileName}\";Max Database Size=2560", DbProvider.SqlServerCompact),
+                var name when name.EndsWith(".db", StringComparison.OrdinalIgnoreCase) => ($"Data Source=\"{fileName}\"", DbProvider.SQLite),
+                _ => throw new ArgumentOutOfRangeException(nameof(fileName), $"Файл \"{fileName}\" должен иметь расширение .db")
+            }; 
+#endif
         }
 
         private DbConnection CreateSQLiteConnection() =>
