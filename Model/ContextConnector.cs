@@ -46,7 +46,7 @@ namespace Bs.Nano.Electric.Model {
         }
 
         public NanoCadContext Connect() => new NanoCadContext(GetConnection(), contextOwnsConnection: true);
-
+        public string ConnectionString => connectionString;
         public DbConnection GetConnection() => provider switch {
 #if NETFRAMEWORK
             DbProvider.SqlServerCompact => new SqlCeConnection(connectionString),
@@ -70,7 +70,31 @@ namespace Bs.Nano.Electric.Model {
             }; 
 #endif
         }
+        public static string? GetDbName(DbConnection connection) {
+            if (connection == null)
+                throw new ArgumentNullException(nameof(connection));
 
+            var builder = new DbConnectionStringBuilder {
+                ConnectionString = connection.ConnectionString
+            };
+
+            // Для SqlClient → Initial Catalog, для SQLite → Data Source
+            if (builder.TryGetValue("Initial Catalog", out var sqlName))
+                return sqlName?.ToString();
+            if (builder.TryGetValue("Data Source", out var fileName))
+                try {
+                    return Path.GetFileName(fileName.ToString());
+                }
+                catch {
+                    return fileName.ToString();
+                }
+
+            if (builder.TryGetValue("Database", out var dbName))
+                return dbName?.ToString();
+
+
+            return connection.Database; // fallback
+        }
         private DbConnection CreateSQLiteConnection() =>
 #if NETFRAMEWORK
             new SQLiteConnection(connectionString);
