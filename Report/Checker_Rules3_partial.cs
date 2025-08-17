@@ -3,7 +3,11 @@ using Nano.Electric;
 using Nano.Electric.Enums;
 using System;
 using System.Collections.Generic;
+#if NETFRAMEWORK
 using System.Data.Entity;
+#else
+using Microsoft.EntityFrameworkCore;
+#endif
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -31,7 +35,7 @@ namespace Bs.Nano.Electric.Report {
             }
 
         }
-        #region 100 Автоматические выключчатели
+        #region 100 Автоматические выключатели
 
         [ReportRule(@"Для автоматических выключателей должны быть заполнены технические данные:
 NominalCurrent	DbPoleCountEnum	VoltageType	MaxCommutation

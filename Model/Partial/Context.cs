@@ -7,142 +7,29 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Common;
-using System.Data.Entity;
-using System.Data.SqlClient;
-using System.Data.SQLite;
-using System.Data.SqlServerCe;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting.Contexts;
+#if NETFRAMEWORK
+using System.Data.Entity;
+using System.Data.SQLite;
+using System.Data.SqlClient;
+using System.Data.SqlServerCe;
+#else
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+
+#endif
 
 namespace Nano.Electric {
     public partial class Context {
-        // Helper class to map PRAGMA table_info result
         private class TableColumn {
-            public string Name { get; set; } // Maps to the column name from PRAGMA
+            public string Name { get; set; }
         }
+
         private static Dictionary<string, string[]> propertiesCache = new Dictionary<string, string[]>();
         private static readonly Dictionary<Type, string> knownLocalizeValues = new Dictionary<Type, string>();
-        public Context(DbConnection existingConnection, bool contextOwnsConnection) : base(existingConnection, contextOwnsConnection) {
-
-        }
-
-        partial void InitializeModel(DbModelBuilder modelBuilder) {
-            // Получение строки подключения
-            var connectionString = this.Database.Connection.ConnectionString;
-            // Получение имени провайдера
-            var providerName = this.Database.Connection.GetType().Name;
-            if (this.Database.Connection.GetType()==typeof(SqlCeConnection)) {
-                // Сконфигурировать маппинг string=> "ntext"
-                modelBuilder.Conventions.Add(new NanoCadPropertiesConvention()); 
-            }
-
-            modelBuilder.Entity<CaeMaterialUtility>()
-                .Property(t => t.MeashureUnits)
-                .HasColumnName("MeashureUnits");
-#if ExportToEplan
-#else
-            modelBuilder.Entity<DbGcMountSystem>()
-                .HasOptional(p => p.StandGutterUtilitySet)
-                .WithMany()
-                .HasForeignKey(ms => ms.Stand);
-            modelBuilder.Ignore<DbGcKnotStand>();
-            modelBuilder.Ignore<DbGcKnotPlain>();
-            modelBuilder.Ignore<DbGcKnotLevel>();
-            modelBuilder.Ignore<DbGcSystemPlain>();
-#endif
-#if InitDbContextEnums
-            modelBuilder.Entity<DbLtKiTable>()
-               .HasKey(e => e.Id);
-            modelBuilder.Entity<ElLighting>()
-                .HasOptional(p => p.DbLtKiTable)
-                .WithMany()
-                .Map(m => m.MapKey("KiTable"));
-            modelBuilder.Entity<ElWireMark>()
-                .HasOptional(p => p.IsolationMaterial)
-                .WithMany()
-                .Map(m => m.MapKey("isolationMaterialId"));
-            modelBuilder.Entity<ElWireMark>()
-                .HasOptional(p => p.Material)
-                .WithMany()
-                .Map(m => m.MapKey("materialId"));
-            modelBuilder.Entity<ElWire>()
-                .HasOptional(p => p.CableSystemType)
-                .WithMany()
-                .Map(m => m.MapKey("CableSystemType"));
-            modelBuilder.Entity<ScsSwitchSocketPanel>()
-                .HasOptional(p => p.CableSystemType)
-                .WithMany()
-                .Map(m => m.MapKey("CableSystemType"));
-            modelBuilder.Entity<ScsSwitchUtpPanel>()
-                .HasOptional(p => p.CableSystemType)
-                .WithMany()
-                .Map(m => m.MapKey("CableSystemType"));
-            modelBuilder.Entity<ScsCord>()
-                .HasOptional(p => p.CableSystemType)
-                .WithMany()
-                .Map(m => m.MapKey("CableSystemType"));
-            modelBuilder.Entity<ScsUtpSocket>()
-                .HasOptional(p => p.CableSystemType)
-                .WithMany()
-                .Map(m => m.MapKey("CableSystemType"));
-            modelBuilder.Entity<ScsPatchCord>()
-                .HasOptional(p => p.CableSystemType)
-                .WithMany()
-                .Map(m => m.MapKey("CableSystemType"));
-
-            modelBuilder.Entity<ElWire>()
-                .HasOptional(p => p.wireMark)
-                .WithMany()
-                .Map(m => m.MapKey("wireMark"));
-            modelBuilder.Entity<ElLighting>()
-                .HasOptional(l => l.Lamp)
-                .WithMany()
-                .Map(m => m.MapKey("Lamp"));
-            modelBuilder.Entity<ScsUtpSocket>()
-                .HasOptional(l => l.PortType)
-                .WithMany()
-                .Map(m => m.MapKey("PortType"));
-            modelBuilder.Entity<ScsSwitchSocketPanel>()
-                .HasOptional(l => l.PortType)
-                .WithMany()
-                .Map(m => m.MapKey("PortType"));
-            modelBuilder.Entity<ScsSwitchUtpPanel>()
-                .HasOptional(l => l.PortType)
-                .WithMany()
-                .Map(m => m.MapKey("PortType"));
-            modelBuilder.Entity<ScsCommutatorPanel>()
-                .HasOptional(l => l.PortTypeIn)
-                .WithMany()
-                .Map(m => m.MapKey("PortTypeIn"));
-            modelBuilder.Entity<ScsCommutatorPanel>()
-                .HasOptional(l => l.PortTypeOut)
-                .WithMany()
-                .Map(m => m.MapKey("PortTypeOut"));
-            
-#endif
-            //modelBuilder.Entity<DbLtKiTable>()
-            //    .Property(p => p.CurveDb)
-            //    .HasColumnType("ntext");
-            //modelBuilder.Entity<DbScsGutterUtilitySet>()
-            //    .Property(p=>p.LevelType)
-            //    .HasColumnName("LevelType")
-            //    .HasColumnType("int")
-            //    .IsOptional();
-            //modelBuilder.Entity<DbScsGutterUtilitySet>()
-            //    .Property(p => p.StandType)
-            //    .HasColumnName("StandType")
-            //    .HasColumnType("int")
-            //    .IsOptional();
-            //modelBuilder.Entity<DbScsGutterUtilitySet>()
-            //    .Property(p => p.StandType)
-            //    .HasColumnName("StructureType")
-            //    .HasColumnType("int")
-            //    .IsOptional();
-
-        }
         /// <summary>
         /// Выполняет заполнение свойств сущности из сериализованного в строку источника.
         /// </summary>
@@ -180,28 +67,21 @@ namespace Nano.Electric {
             }
             return results;
         }
-        [Obsolete("Вместо bool TrySetProperty следует использовать void SetProperty, контролируя возможные исключения.")]
-        public bool TrySetProperty<Tdest, Tprop>(Tdest product, string propName, Tprop sourceValue) where Tdest : class {
-            var propertyInfo = product.GetType().GetProperty(propName);
-            if (propertyInfo == null || !propertyInfo.CanWrite) {
-                return false;
-            }
-            if (propertyInfo.GetCustomAttribute<KeyAttribute>() != null) {
-                throw new InvalidOperationException($"Операция не разрешена. Свойство {propName} является частью ключа.");
-            }
-            try {
-                propertyInfo.SetValue(product, sourceValue, BindingFlags.Public, FieldBinder.Instance, null, CultureInfo.GetCultureInfo("Ru-ru"));
-                return true;
-            }
-            catch (Exception ex) {
-                throw new InvalidOperationException($"Операция не выполнена. Значение \"{sourceValue}\" свойства {propName} не удается привести к типу {propertyInfo.PropertyType}.", ex);
-            }
-        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="Tdest"></typeparam>
+        /// <typeparam name="Tprop"></typeparam>
+        /// <param name="product"></param>
+        /// <param name="propName"></param>
+        /// <param name="sourceValue"></param>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="InvalidOperationException"></exception>
         public void SetProperty<Tdest, Tprop>(Tdest product, string propName, Tprop sourceValue) where Tdest : class {
             var productType = product.GetType();
             var propertyInfo = productType.GetProperty(propName);
             if (propertyInfo == null) { throw new ArgumentException($"Свойство {propName} не найдено в типе {productType.Name}."); }
-            if(!propertyInfo.CanWrite) {
+            if (!propertyInfo.CanWrite) {
                 throw new ArgumentException($"Свойство {propName} не в типе {productType.Name} не доступно для записи.");
             }
             if (propertyInfo.GetCustomAttribute<KeyAttribute>() != null) {
@@ -277,7 +157,13 @@ namespace Nano.Electric {
             return value;
         }
         public DbImage CreateImage(string? imgName, string category, byte[] image) {
-            DbImage dbImg = this.DbImages.Create();
+            //DbImage dbImg = this.DbImages.Create();
+            var dbImg = new DbImage {
+                Text = imgName ?? string.Empty,
+                Category = category,
+                Image = image
+            };
+            //this.DbImages.Add(dbImg);
             int id = 1;
             if (this.DbImages.Local.Any()) {
                 id = Math.Max(id, this.DbImages.Local.Max(img => img.Id) + 1);
@@ -286,51 +172,69 @@ namespace Nano.Electric {
                 id = Math.Max(this.DbImages.Max(img => img.Id) + 1, id);
             }
             dbImg.Id = id;
-            dbImg.Text = imgName ?? string.Empty;
-            dbImg.Category = category;
-            dbImg.Image = image;
-            //var data = image;
+            //dbImg.Text = imgName ?? string.Empty;
+            //dbImg.Category = category;
+            //dbImg.Image = image;
             this.DbImages.Add(dbImg);
             return dbImg;
         }
-        public bool IsHaveColumns(string tableName, params string[] columns) {
-            if (Database.Connection is SQLiteConnection) {
-                try {
-                    // Get table schema using PRAGMA
-                    string pragmaQuery = $"PRAGMA table_info({tableName});";
-                    var tableSchema = Database.SqlQuery<TableColumn>(pragmaQuery).ToList();
+#if NETFRAMEWORK
+        public Context(DbConnection existingConnection, bool contextOwnsConnection) : base(existingConnection, contextOwnsConnection) {
+        }
+        partial void InitializeModel(DbModelBuilder modelBuilder) { 
+#else
+        public Context(DbConnection existingConnection, bool contextOwnsConnection)
+           : base(new DbContextOptionsBuilder<Context>().UseSqlite(existingConnection).Options) {
+        }
+        partial void InitializeModel(ModelBuilder modelBuilder) {
+#endif
+            // var connectionString = this.Database.Connection.ConnectionString;
+            //    var providerName = this.Database.Connection.GetType().Name;
 
-                    // Extract column names from schema
-                    var columnNames = tableSchema.Select(col => col.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-                    // Check if all required columns exist in the schema
-                    return columns.All(column => columnNames.Contains(column));
-                }
-                catch (Exception ex) {
-                    // Log the exception if necessary
-                    return false;
-                }
+#if NETFRAMEWORK
+            if (this.Database.Connection is SqlCeConnection) {
+                modelBuilder.Conventions.Add(new NanoCadPropertiesConvention());
             }
-            else if (Database.Connection is SqlCeConnection) {
-                try {
-                    // Query INFORMATION_SCHEMA.COLUMNS to get the column names for the table
-                    string query = @" SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @tableName";
-                    // Execute query and retrieve column names
-                    var columnNames = Database
-                        .SqlQuery<string>(query, new SqlParameter("@tableName", tableName))
-                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
-                    // Check if all specified columns exist in the table
-                    return columns.All(column => columnNames.Contains(column));
-                }
-                catch (Exception ex) {
-                    // Log the exception if necessary
-                    return false;
-                }
-            }
-            else {
-                throw new NotImplementedException($"Не реализовано для типа подключения {Database.Connection.GetType().Name}");
-            }
+#endif
+            modelBuilder.Entity<CaeMaterialUtility>()
+                .Property(t => t.MeashureUnits)
+                .HasColumnName("MeashureUnits");
         }
 
+        public bool IsHaveColumns(string tableName, params string[] columns) {
+#if NET8_0_OR_GREATER
+            var connection = Database.GetDbConnection(); // Используем GetDbConnection() в EF Core
+            if (connection is Microsoft.Data.Sqlite.SqliteConnection) {
+#else
+    var connection = Database.Connection;
+    if (connection is System.Data.SQLite.SQLiteConnection) {
+#endif
+                try {
+                    var tableSchema = Database.SqlQuery<TableColumn>($"PRAGMA table_info({tableName});").ToList();
+                    var columnNames = tableSchema.Select(col => col.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    return columns.All(column => columnNames.Contains(column));
+                }
+                catch (Exception) {
+                    return false;
+                }
+            }
+
+#if NETFRAMEWORK
+    if (connection is System.Data.SqlServerCe.SqlCeConnection) {
+        try {
+            string query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @tableName";
+            var columnNames = Database.SqlQuery<string>(query, new System.Data.SqlClient.SqlParameter("@tableName", tableName))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            return columns.All(column => columnNames.Contains(column));
+        }
+        catch (Exception) {
+            return false;
+        }
+    }
+#endif
+
+            throw new NotImplementedException($"Не реализовано для типа подключения {connection.GetType().Name}");
+        }
     }
 }
+

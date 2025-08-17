@@ -16,13 +16,21 @@
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);DBNE85;DBNE201;DBNE23_1;InitDbContextEnums</DefineConstants>
 	</PropertyGroup>
-	<ItemGroup>
+	<!--<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
+	</ItemGroup>-->
+	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
 		<PackageReference Include="EntityFramework.SqlServerCompact" Version="6.4.4" />
 		<PackageReference Include="System.Data.SQLite.EF6" Version="1.0.119" />
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
 		<PackageReference Include="System.Data.SQLite" Version="1.0.119" />
+		<Reference Include="System.Runtime.Caching" />
 	</ItemGroup>
 
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.2" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<Compile Remove="Cadwise\Exporter.cs" />
@@ -158,8 +166,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Reference Include="System.Runtime.Caching" />
+	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
 	</ItemGroup>
+
 
 	<Import Project="$(MSBuildProjectName).csproj.local" Condition="Exists('$(MSBuildProjectName).csproj.local')" />
 

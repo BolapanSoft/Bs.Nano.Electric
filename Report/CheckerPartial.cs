@@ -4,28 +4,35 @@ using Nano.Electric;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Entity;
 using System.Data.SqlClient;
+#if NETFRAMEWORK
 using System.Data.SQLite;
-using System.Data.SqlServerCe;
+using System.Data.Entity;
+using System.Data.SqlServerCe; 
+#else
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+#endif
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Data;
 
 namespace Bs.Nano.Electric.Report {
     public partial class Checker {
         private record struct UrlElement(string Code, string Url);
-        private struct Product : IProduct {
-            public string Code { get; set; }
+        //private struct Product : IProduct {
+        //    public string Code { get; set; }
 
-            public int Id { get; set; }
-            public int? DbImageRef { get; set; }
-            public string Name { get; set; }
-            public string Manufacturer { get; set; }
-        }
+        //    public int Id { get; set; }
+        //    public int? DbImageRef { get; set; }
+        //    public string Name { get; set; }
+        //    public string Manufacturer { get; set; }
+        //    public string SpecDescription { get; set; }
+        //}
         internal class Material {
             public string Code { get; set; }
             public string Mass { get; set; }
@@ -75,7 +82,7 @@ namespace Bs.Nano.Electric.Report {
                 ReportErrors(logger, item, isTruncateReport);
             }
         }
-        protected static void ReportErrors(ILogger logger, Exception ex, bool isTruncateReport) {
+        protected static void ReportErrors(ILogger logger, Exception? ex, bool isTruncateReport) {
             if (ex is null) { return; }
             if (ex is AggregateException aggrEx) {
                 ReportErrors(logger, aggrEx, isTruncateReport);
@@ -143,28 +150,69 @@ namespace Bs.Nano.Electric.Report {
         }
         private List<(string Code, string ArticleName, string TableName, string TypeDescription)> LoadCodes(Context context, IQueryable dbSet, string tableName, Type entityType) {
             string typeDescription = Context.GetDefaultLocalizeValue(entityType);
-            if (typeof(IProduct).IsAssignableFrom(entityType)) {
-                try {
-                    List<(string Code, string ArticleName, string TableName, string TypeDescription)> products = new(1024);
-                    /*using (var context = connector.Connect())*/
-                    {
-                        //var query = dbSet.Cast<object>().ToList();// Convert dbSet to query
-                        // Load all entity from dbSet query
-                        foreach (var entity in dbSet.AsNoTracking()) {
-                            IProduct product = (IProduct)entity;
-                            products.Add((product.Code, product.Name, tableName, typeDescription));
-                        }
-                    }
-                    return products;
-                }
-                catch (Exception ex) {
-                    logger.LogWarning(ex.ToString());
-                    return new();
-                }
-            }
-            else {
+            if (!typeof(IProduct).IsAssignableFrom(entityType))
                 return new();
+            List<(string Code, string ArticleName, string TableName, string TypeDescription)> products = new(1024);
+            try {
+                ///*using (var context = connector.Connect())*/
+                //{
+                //    //var query = dbSet.Cast<object>().ToList();// Convert dbSet to query
+                //    // Load all entity from dbSet query
+                //    foreach (var entity in dbSet.AsNoTracking()) {
+                //        IProduct product = (IProduct)entity;
+                //        products.Add((product.Code, product.Name, tableName, typeDescription));
+                //    }
+                //}
+                //return products;
+#if NETFRAMEWORK
+                using var efConnection = context.Database.Connection;
+                if (efConnection.State != ConnectionState.Open)
+                    efConnection.Open();
+
+                
+                // Build SQL command
+                string sql = $"SELECT Code, Name FROM {tableName}"; // Use parameterized if dynamic parts can be unsafe
+
+                using var command = efConnection.CreateCommand();
+                command.CommandText = sql;
+                using var reader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+
+                while (reader.Read()) {
+                    string code = reader.IsDBNull(0) ? "" : reader.GetString(0);
+                    string name = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                    products.Add((code, name, tableName, typeDescription));
+                }
             }
+            catch (Exception ex) {
+                logger.LogWarning(ex.ToString());
+            }
+#else
+                using var efConnection = context.Database.GetDbConnection();
+                if (efConnection.State != ConnectionState.Open)
+                    efConnection.Open();
+
+                // Ensure it's SQLite
+                if (efConnection is not SqliteConnection sqliteConn)
+                    sqliteConn = new SqliteConnection(efConnection.ConnectionString);
+
+                // Build SQL command
+                string sql = $"SELECT Code, Name FROM {tableName}"; // Use parameterized if dynamic parts can be unsafe
+
+                using var command = sqliteConn.CreateCommand();
+                command.CommandText = sql;
+                using var reader = command.ExecuteReader(CommandBehavior.SequentialAccess);
+
+                while (reader.Read()) {
+                    string code = reader.IsDBNull(0) ? "" : reader.GetString(0);
+                    string name = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                    products.Add((code, name, tableName, typeDescription));
+                }
+            }
+            catch (Exception ex) {
+                logger.LogWarning(ex.ToString());
+            }
+#endif
+            return products;
         }
         private List<(string Code, string ArticleName, string TableName, string TypeDescription)> LoadAllCodes() {
             List<(string Code, string ArticleName, string TableName, string TypeDescription)> allCodes = new();
@@ -277,108 +325,218 @@ namespace Bs.Nano.Electric.Report {
             }
             throw ex;
         }
-        private static List<string> GetTablesWithCodeFieldAndRecords(DbContext context) {
-            var tableNames = new List<string>();
-            var connection = (SqlCeConnection)context.Database.Connection;
+        //private static List<string> GetTablesWithCodeFieldAndRecords(DbContext context) {
+        //    var tableNames = new List<string>();
+        //    var connection = (SqlCeConnection)context.Database.Connection;
 
-            // Открываем соединение
-            connection.Open();
+        //    // Открываем соединение
+        //    connection.Open();
 
-            var schema = connection.GetSchema("Tables");
-            foreach (System.Data.DataRow row in schema.Rows) {
-                string tableName = row["TABLE_NAME"].ToString();
-                string query = $"SELECT COUNT(*) FROM [{tableName}] WHERE [Code] IS NOT NULL";
+        //    var schema = connection.GetSchema("Tables");
+        //    foreach (System.Data.DataRow row in schema.Rows) {
+        //        string tableName = row["TABLE_NAME"].ToString();
+        //        string query = $"SELECT COUNT(*) FROM [{tableName}] WHERE [Code] IS NOT NULL";
 
-                using (var command = new SqlCeCommand(query, connection)) {
-                    try {
-                        int count = (int)command.ExecuteScalar();
-                        if (count > 0) {
-                            tableNames.Add(tableName);
-                        }
-                    }
-                    catch (SqlCeException) {
-                        // Пропускаем таблицы, у которых нет поля "Code"
-                    }
-                }
-            }
+        //        using (var command = new SqlCeCommand(query, connection)) {
+        //            try {
+        //                int count = (int)command.ExecuteScalar();
+        //                if (count > 0) {
+        //                    tableNames.Add(tableName);
+        //                }
+        //            }
+        //            catch (SqlCeException) {
+        //                // Пропускаем таблицы, у которых нет поля "Code"
+        //            }
+        //        }
+        //    }
 
-            connection.Close();
-            return tableNames;
-        }
-        private static (bool isHaveField, IEnumerable<T> values) GetValues<T>(INanocadDBConnector connector, string tableName, string columnName) where T : struct {
-            List<T> values = new();
-            bool allRight = false;
-            if (!(IsCorrectTableName(tableName) && IsCorrectColumnName(columnName))) {
-                return (allRight, values);
-            }
-            try {
-                using (var context = connector.Connect()) {
-                    string strQuery = $"SELECT [{columnName}] FROM [{tableName}]";
-                    var query = context.Database.SqlQuery<T>(strQuery);
-                    values = query.ToList();
-                    allRight = true;
-                }
-            }
-            catch (Exception) {
-            }
-            return (allRight, values);
-        }
+        //    connection.Close();
+        //    return tableNames;
+        //}
+        //private static (bool isHaveField, IEnumerable<T> values) GetValues<T>(INanocadDBConnector connector, string tableName, string columnName) where T : struct {
+        //    List<T> values = new();
+        //    bool allRight = false;
+        //    if (!(IsCorrectTableName(tableName) && IsCorrectColumnName(columnName))) {
+        //        return (allRight, values);
+        //    }
+        //    try {
+        //        using (var context = connector.Connect()) {
+        //            string strQuery = $"SELECT [{columnName}] FROM [{tableName}]";
+        //            var query = context.Database.SqlQuery<T>(strQuery);
+        //            values = query.ToList();
+        //            allRight = true;
+        //        }
+        //    }
+        //    catch (Exception) {
+        //    }
+        //    return (allRight, values);
+        //}
+        //private static (bool isHaveMaterial, IEnumerable<Material> values) GetMaterialValues(INanocadDBConnector connector, string tableName) {
+        //    List<Material> values = new();
+        //    bool allRight = false;
+        //    if (!(IsCorrectTableName(tableName))) {
+        //        return (allRight, Array.Empty<Material>());
+        //    }
+        //    try {
+        //        using (var context = connector.Connect()) {
+        //            string strQuery = $"SELECT [Code], [Mass] FROM [{tableName}]";
+        //            var query = context.Database.SqlQuery<Material>(strQuery);
+        //            values = query.ToList();
+        //            allRight = true;
+        //        }
+        //    }
+        //    catch (Exception ex) {
+        //        ;
+        //    }
+        //    return (allRight, values);
+        //}
         private static (bool isHaveMaterial, IEnumerable<Material> values) GetMaterialValues(INanocadDBConnector connector, string tableName) {
-            List<Material> values = new();
+            if (!IsCorrectTableName(tableName))
+                return (false, Array.Empty<Material>());
+
+            var values = new List<Material>();
             bool allRight = false;
-            if (!(IsCorrectTableName(tableName))) {
-                return (allRight, Array.Empty<Material>());
-            }
+
             try {
-                using (var context = connector.Connect()) {
-                    string strQuery = $"SELECT [Code], [Mass] FROM [{tableName}]";
-                    var query = context.Database.SqlQuery<Material>(strQuery);
-                    values = query.ToList();
-                    allRight = true;
-                }
+                using var context = connector.Connect();
+#if NETFRAMEWORK
+                string sql = $"SELECT [Code], [Mass] FROM [{tableName}]";
+                values = context.Database.SqlQuery<Material>(sql).ToList();
+#else
+        using var conn = context.Database.GetDbConnection();
+        if (conn.State != ConnectionState.Open)
+            conn.Open();
+
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $"SELECT [Code], [Mass] FROM [{tableName}]";
+
+        using var reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            values.Add(new Material
+            {
+                Code = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
+                Mass = reader.IsDBNull(1) ? string.Empty : reader.GetString(1)
+            });
+        }
+#endif
+                allRight = true;
             }
-            catch (Exception ex) {
-                ;
+            catch {
+                // Optional logging
             }
+
             return (allRight, values);
         }
 
-        protected static IEnumerable<IProduct> GetProducts(Context context, string tableName) {
-            if (!(IsCorrectTableName(tableName))) {
-                throw new ArgumentException($"Строка \"{tableName}\" нея является допустимым именем таблицы.", nameof(tableName));
+        //protected static IEnumerable<IProduct> GetProducts(Context context, string tableName) {
+        //    if (!(IsCorrectTableName(tableName))) {
+        //        throw new ArgumentException($"Строка \"{tableName}\" нея является допустимым именем таблицы.", nameof(tableName));
+        //    }
+        //    string strQuery = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer], [Id], [SpecDescription] FROM [{tableName}]";
+        //    var query = context.Database.SqlQuery<NtProduct>(strQuery);
+        //    var l = query.ToList();
+        //    return l;
+        //}
+        protected static List<IProduct> GetProducts(Context context, string tableName) {
+            if (!IsCorrectTableName(tableName))
+                throw new ArgumentException($"Строка \"{tableName}\" не является допустимым именем таблицы.", nameof(tableName));
+    string sql = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer], [Id], [SpecDescription] FROM [{tableName}]";
+
+#if NETFRAMEWORK
+    return context.Database.SqlQuery<NtProduct>(sql).ToList().Cast<IProduct>().ToList();
+#else
+            var list = new List<IProduct>();
+            using var conn = context.Database.GetDbConnection();
+            if (conn.State != ConnectionState.Open)
+                conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = sql;
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read()) {
+                list.Add(new NtProduct {
+                    Code = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
+                    DbImageRef = reader.IsDBNull(1) ? null : reader.GetInt32(1),
+                    Name = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                    Manufacturer = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                    Id = reader.GetInt32(4),
+                    SpecDescription = reader.IsDBNull(5) ? string.Empty : reader.GetString(5)
+                });
             }
-            string strQuery = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer], [Id] FROM [{tableName}]";
-            var query = context.Database.SqlQuery<NtProduct>(strQuery);
-            var l = query.ToList();
-            return l;
+            return list;
+#endif
         }
+        //private static IEnumerable<(string code, string uri)> GetUriValues(Context context, string tableName) {
+        //    List<(string code, string uri)> values = new();
+        //    if (!(IsCorrectTableName(tableName))) {
+        //        return Array.Empty<(string code, string uri)>();
+        //    }
+        //    try {
+        //        var tableSchemaQuery = context.Database;
+        //        if (context.Database.Connection is SQLiteConnection) {
+        //            var isHaveUrl = context.IsHaveColumns(tableName, "Code", "Url");
+        //            if (isHaveUrl) {
+        //                string strQuery = $"SELECT [Code], [Url] FROM [{tableName}]";
+        //                var query = context.Database.SqlQuery<UrlElement>(strQuery);
+        //                values = query.Select(el => (el.Code, el.Url)).ToList();
+        //                return values;
+        //            }
+        //            else {
+        //                return Array.Empty<(string code, string uri)>();
+        //            }
+        //        }
+        //        else {
+        //            string strQuery = $"SELECT [Code], [Url] FROM [{tableName}]";
+        //            var query = context.Database.SqlQuery<(string code, string uri)>(strQuery);
+        //            values = query.ToList();
+        //            return values;
+        //        }
+        //    }
+        //    catch (Exception ex) {
+        //        return Array.Empty<(string code, string uri)>();
+        //    }
+        //}
         private static IEnumerable<(string code, string uri)> GetUriValues(Context context, string tableName) {
-            List<(string code, string uri)> values = new();
-            if (!(IsCorrectTableName(tableName))) {
+            if (!IsCorrectTableName(tableName))
                 return Array.Empty<(string code, string uri)>();
-            }
+
+            var values = new List<(string code, string uri)>();
+
             try {
-                var tableSchemaQuery = context.Database;
-                if (context.Database.Connection is SQLiteConnection) {
-                    var isHaveUrl = context.IsHaveColumns(tableName, "Code", "Url");
-                    if(isHaveUrl ) {
-                        string strQuery = $"SELECT [Code], [Url] FROM [{tableName}]";
-                        var query = context.Database.SqlQuery<UrlElement>(strQuery);
-                        values = query.Select(el=>(el.Code, el.Url)).ToList();
-                        return values;
-                    }
-                    else {
-                        return Array.Empty<(string code, string uri)>();
-                    }
+#if NETFRAMEWORK
+            string sql = $"SELECT [Code], [Url] FROM [{tableName}]";
+        if (context.Database.Connection is SQLiteConnection && context.IsHaveColumns(tableName, "Code", "Url"))
+        {
+            values = context.Database.SqlQuery<UrlElement>(sql)
+                                     .Select(el => (el.Code, el.Url))
+                                     .ToList();
+        }
+        else
+        {
+            values = context.Database.SqlQuery<(string code, string uri)>(sql).ToList();
+        }
+#else
+                using var conn = context.Database.GetDbConnection();
+                if (conn is SqliteConnection && !context.IsHaveColumns(tableName, "Code", "Url"))
+                    return Array.Empty<(string code, string uri)>();
+                if (conn.State != ConnectionState.Open)
+                    conn.Open();
+
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = $"SELECT [Code], [Url] FROM [{tableName}]";
+
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read()) {
+                    string code = reader.IsDBNull(0) ? string.Empty : reader.GetString(0);
+                    string url = reader.IsDBNull(1) ? string.Empty : reader.GetString(1);
+                    values.Add((code, url));
                 }
-                else {
-                    string strQuery = $"SELECT [Code], [Url] FROM [{tableName}]";
-                    var query = context.Database.SqlQuery<(string code, string uri)>(strQuery);
-                    values = query.ToList();
-                    return values;
-                }
+#endif
+                return values;
             }
-            catch (Exception ex) {
+            catch {
                 return Array.Empty<(string code, string uri)>();
             }
         }

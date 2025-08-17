@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Data.Common;
+using System.IO;
+using System.Runtime.Serialization;
+#if NETFRAMEWORK
 using System.Data.SQLite;
 using System.Data.SqlServerCe;
-using System.IO;
-using Bs.Nano.Electric.Model;
+#elif NET8_0_OR_GREATER
+using Microsoft.Data.Sqlite;
+#endif
 using NanoCadContext = Nano.Electric.Context;
-using System.Runtime.Serialization;
 
 namespace Bs.Nano.Electric.Model {
     [Serializable]
@@ -14,71 +17,68 @@ namespace Bs.Nano.Electric.Model {
             SqlServerCompact,
             SQLite
         }
-        [NonSerialized]
-        private readonly string connectionString;
-        [NonSerialized]
-        private readonly DbProvider provider;
+
         public readonly string dbFileName;
+        private readonly string connectionString;
+        private readonly DbProvider provider;
+
         public ContextConnector(string fullFileName) {
-            if (string.IsNullOrWhiteSpace(fullFileName) || 
-                !(fullFileName.ToLower().EndsWith(".sdf") || fullFileName.ToLower().EndsWith(".db")))
-                throw new ArgumentException(nameof(fullFileName), $"Переданная строка \"{fullFileName}\" должна ссылаться на файл .sdf или .db");
-            if (File.Exists(fullFileName)) {
-                this.dbFileName = fullFileName;
-                if (dbFileName.ToLower().EndsWith(".sdf")) {
-                    connectionString = $"Data Source=\"{fullFileName}\";Max Database Size=2560"; 
-                    provider= DbProvider.SqlServerCompact;
-                }
-                else if (dbFileName.ToLower().EndsWith(".db")) {
-                    connectionString = $"Data Source=\"{fullFileName}\";Version=3;";
-                    provider= DbProvider.SQLite;
-                }
-                else {
-                    throw new ArgumentOutOfRangeException(nameof(dbFileName), $"Переданная строка \"{dbFileName}\" должна ссылаться на файл .sdf или .db");
-                }
+            if (string.IsNullOrWhiteSpace(fullFileName)) {
+                throw new ArgumentException("Путь к файлу не может быть пустым.", nameof(fullFileName));
             }
-            else
-            {
+
+            string lowerFileName = fullFileName.ToLower();
+            if (!lowerFileName.EndsWith(".sdf") && !lowerFileName.EndsWith(".db")) {
+                throw new ArgumentException($"Файл \"{fullFileName}\" должен иметь расширение .sdf или .db", nameof(fullFileName));
+            }
+
+            if (!File.Exists(fullFileName)) {
                 throw new FileNotFoundException($"Файл не найден: \"{fullFileName}\".");
             }
-        }
-        protected ContextConnector(SerializationInfo info, StreamingContext context) {
-            dbFileName = info.GetString(nameof(dbFileName));
-            if (dbFileName.ToLower().EndsWith(".sdf")) {
-                connectionString = $"Data Source=\"{dbFileName}\";Max Database Size=2560";
-                provider = DbProvider.SqlServerCompact;
-            }
-            else if (dbFileName.ToLower().EndsWith(".db")) {
-                connectionString = $"Data Source=\"{dbFileName}\";Version=3;";
-                provider = DbProvider.SQLite;
-            }
-            else 
-                connectionString= string.Empty;
-        }
-        public NanoCadContext Connect() {
-            var context = new NanoCadContext(GetConnection(), contextOwnsConnection: true);
-            return context;
-        }
-        public DbConnection GetConnection() {
-            switch (provider) {
-                case DbProvider.SqlServerCompact:
-                    return GetSqlCEConnection();
-                case DbProvider.SQLite:
-                    return GetSQLiteConnection();
-                default:
-                    throw new InvalidOperationException($"Для файла {Path.GetFileName(connectionString)} провайдер не определен.");
-            }
-        }
-        private DbConnection GetSqlCEConnection() {
-            DbConnection connection = new SqlCeConnection(connectionString);
-            return connection;
-        }
-        private DbConnection GetSQLiteConnection() {
-            DbConnection connection = new SQLiteConnection(connectionString);
-            return connection;
+
+            dbFileName = fullFileName;
+            (connectionString, provider) = CreateConnectionString(fullFileName);
         }
 
-        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context) {
+        protected ContextConnector(SerializationInfo info, StreamingContext context) {
+            dbFileName = info.GetString(nameof(dbFileName)) ?? throw new SerializationException("Не удалось десериализовать путь к файлу.");
+            (connectionString, provider) = CreateConnectionString(dbFileName);
+        }
+
+        public NanoCadContext Connect() => new NanoCadContext(GetConnection(), contextOwnsConnection: true);
+
+        public DbConnection GetConnection() => provider switch {
+#if NETFRAMEWORK
+            DbProvider.SqlServerCompact => new SqlCeConnection(connectionString),
+#endif
+            DbProvider.SQLite => CreateSQLiteConnection(),
+            _ => throw new InvalidOperationException($"Для файла {Path.GetFileName(dbFileName)} провайдер не определен.")
+        };
+
+        private static (string ConnectionString, DbProvider Provider) CreateConnectionString(string fileName) {
+#if NETFRAMEWORK
+            return fileName.ToLower() switch {
+                var name when name.EndsWith(".sdf", StringComparison.OrdinalIgnoreCase) => ($"Data Source=\"{fileName}\";Max Database Size=2560", DbProvider.SqlServerCompact),
+                var name when name.EndsWith(".db", StringComparison.OrdinalIgnoreCase) => ($"Data Source=\"{fileName}\";Version=3;", DbProvider.SQLite),
+                _ => throw new ArgumentOutOfRangeException(nameof(fileName), $"Файл \"{fileName}\" должен иметь расширение .sdf или .db")
+            }; 
+#else
+            return fileName.ToLower() switch {
+                //var name when name.EndsWith(".sdf") => ($"Data Source=\"{fileName}\";Max Database Size=2560", DbProvider.SqlServerCompact),
+                var name when name.EndsWith(".db", StringComparison.OrdinalIgnoreCase) => ($"Data Source=\"{fileName}\"", DbProvider.SQLite),
+                _ => throw new ArgumentOutOfRangeException(nameof(fileName), $"Файл \"{fileName}\" должен иметь расширение .db")
+            }; 
+#endif
+        }
+
+        private DbConnection CreateSQLiteConnection() =>
+#if NETFRAMEWORK
+            new SQLiteConnection(connectionString);
+#elif NET8_0_OR_GREATER
+            new SqliteConnection(connectionString);
+#endif
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context) {
             info.AddValue(nameof(dbFileName), dbFileName);
         }
     }

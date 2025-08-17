@@ -1,20 +1,37 @@
-// Ignore Spelling: Amperemeters
+﻿// Ignore Spelling: Amperemeters
 #pragma warning disable VSSpell001 // Spell Check
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity;
 using System.Linq;
+
+#if NETFRAMEWORK
+using System.Data.Entity;
+#else
+using Microsoft.EntityFrameworkCore;
+#endif
 
 namespace Nano.Electric {
     public partial class Context : DbContext {
-        public Context()
-            : base("name=Context") {
+#if NETFRAMEWORK
+        public Context() : base("name=Context") { }
+        public Context(string context) : base($"name={context}") { }
+#else
+        private readonly string _connectionString;
+
+        public Context() {
+            _connectionString = "Data Source=database.db";
         }
 
-        public Context(string context): base($"name={context}") {
+        public Context(string connectionString) {
+            _connectionString = connectionString;
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+            optionsBuilder.UseSqlite(_connectionString);
+        }
+#endif
 
         public virtual DbSet<AutomatValuesScale> AutomatValuesScales { get; set; }
         public virtual DbSet<CaeMaterialUtility> CaeMaterialUtilities { get; set; }
@@ -139,9 +156,16 @@ namespace Nano.Electric {
         public virtual DbSet<ScsUtpSocket> ScsUtpSockets { get; set; }
         public virtual DbSet<ScsWorkPlaceDbKit> ScsWorkPlaceDbKits { get; set; }
 
+#if NETFRAMEWORK
         protected override void OnModelCreating(DbModelBuilder modelBuilder) {
             InitializeModel(modelBuilder);
         }
-        partial void InitializeModel(DbModelBuilder modelBuilder);
+        partial void InitializeModel(DbModelBuilder modelBuilder); 
+#elif NETCOREAPP
+        protected override void OnModelCreating(ModelBuilder modelBuilder) {
+            InitializeModel(modelBuilder);
+        }
+        partial void InitializeModel(ModelBuilder modelBuilder); 
+#endif
     }
 }

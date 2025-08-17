@@ -18,13 +18,13 @@ namespace Nano.Electric {
         ScsCableSystemType? CableSystemType { get; set; }
 
     }
-
     public interface IProduct : IHaveId {
         string Code { get; }
         //int Id { get; set; }
         int? DbImageRef { get; set; }
         string Name { get; set; }
         string Manufacturer { get; set; }
+        string SpecDescription { get; set; }
     }
     public interface ICommonProduct : IProduct { 
         string? Series { get; set; }
@@ -40,8 +40,9 @@ namespace Nano.Electric {
     public partial class ScsPortType : IHaveId { }
     public partial class ElWire : IProduct, IHaveCableSystemTypeRef, IHaveImageRef { }
     public partial class ElWireConductMaterial : IHaveId { }
-    public partial class ElWireIsolationMaterial : IHaveId { }
+    public partial class ElWireIsolationMaterial : IHaveId{}
     public partial class ScsCableSystemType : IHaveId { }
+    public partial class DbCaeMaterialUtilitySet : IHaveId, IHaveImageRef  { }
     public partial class ScsGutterCanal : ICommonProduct, IHaveImageRef { }
     public partial class ScsCabelCanal : ICommonProduct, IHaveImageRef { }
     public partial class ScsCableFitting : ICommonProduct, IHaveImageRef { }
@@ -90,6 +91,7 @@ namespace Nano.Electric {
     public partial class DbElSocket : ICommonProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElDbCase : ICommonProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElSocketUtility : ICommonProduct, IHaveImageRef, IHaveSafeDegree, IHaveDbClimate { }
+    public partial class ElSocketUtility : IProduct, IHaveImageRef, IHaveSafeDegree, IHaveDbClimate { }
     public partial class ElWireMark : IHaveId { }
     public partial class DbGraphic : IHaveId, IDbGraphic { }
 
@@ -105,7 +107,7 @@ namespace Nano.Electric {
     public partial class ScsServiceColumnUtilityUnit : ICommonProduct, IHaveImageRef{ }
     public partial class ScsHatch : ICommonProduct, IHaveImageRef, IHaveDbGraphicRef { }
     public partial class ScsServiceColumn : ICommonProduct, IHaveImageRef, IHaveDbGraphicRef { }
-    public partial class ScsCord : IProduct, IHaveCableSystemTypeRef, IHaveImageRef { }
+    public partial class ScsCord : IHaveId, IHaveCableSystemTypeRef, IHaveImageRef { }
     public partial class DbScsTubeSeriesConfiguration : IHaveId { }
     /*
     public partial class __ : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }

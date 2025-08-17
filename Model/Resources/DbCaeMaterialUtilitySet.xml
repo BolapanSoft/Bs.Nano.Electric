@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-16"?>
+<DbCaeMaterialUtilitySet>
+	<Properties />
+	<Children>
+		<Child TypeName="DbUtilityUnit">
+			<Properties>
+				<SpecCount>1</SpecCount>
+				<UtilityObject TableName="CaeMaterialUtility" Id="34" />
+				<UtilityTypeId>CaeMaterialUtility</UtilityTypeId>
+			</Properties>
+		</Child>
+		<Child TypeName="DbUtilityUnit">
+			<Properties>
+				<SpecCount>1</SpecCount>
+				<UtilityObject TableName="CaeMaterialUtility" Id="40" />
+				<UtilityTypeId>CaeMaterialUtility</UtilityTypeId>
+			</Properties>
+		</Child>
+		<Child TypeName="DbUtilityUnit">
+			<Properties>
+				<SpecCount>1</SpecCount>
+				<UtilityObject TableName="CaeMaterialUtility" Id="41" />
+				<UtilityTypeId>CaeMaterialUtility</UtilityTypeId>
+			</Properties>
+		</Child>
+		<Child TypeName="DbUtilityUnit">
+			<Properties>
+				<SpecCount>1</SpecCount>
+				<UtilityObject TableName="CaeMaterialUtility" Id="42" />
+				<UtilityTypeId>CaeMaterialUtility</UtilityTypeId>
+			</Properties>
+		</Child>
+	</Children>
+</DbCaeMaterialUtilitySet>
