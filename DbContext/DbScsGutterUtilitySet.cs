@@ -1,4 +1,4 @@
-namespace Nano.Electric {
+﻿namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -9,13 +9,13 @@ namespace Nano.Electric {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public string DbName { get; set; }
+        public string? DbName { get; set; }
 
-        public string DbDescription { get; set; }
+        public string? DbDescription { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public string DbCatalog { get; set; }
+        public string? DbCatalog { get; set; }
 
 #if !InitDbContextEnums
         public int? StandType { get; set; }
@@ -23,7 +23,7 @@ namespace Nano.Electric {
         public int? StructureType { get; set; }
 
         public int? LevelType { get; set; }
-  public int? KnotType { get; set; }
+        public int? KnotType { get; set; }
 
         public int? InstallType { get; set; }
 
@@ -32,9 +32,9 @@ namespace Nano.Electric {
 
 
 
-        public string Seria { get; set; }
+        public string? Seria { get; set; }
         [MaxLength(-1)]
-        public string KitStructure { get; set; }
+        public string? KitStructure { get; set; }
 
         public int? OrderNumber { get; set; }
 

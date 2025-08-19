@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace Nano.Electric
     {
         public double? Bconst { get; set; }
 
-        public string condMatName { get; set; }
+        public string? condMatName { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }

@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using Nano.Electric.Enums;
     using System;
@@ -13,23 +13,23 @@ namespace Nano.Electric
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string ShortName { get; set; }
+        public string? ShortName { get; set; }
 
-        public string DbComment { get; set; }
+        public string? DbComment { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public string DbSeries { get; set; }
+        public string? DbSeries { get; set; }
 
-        public string Standart { get; set; }
+        public string? Standart { get; set; }
 
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         public double? CountPerBox { get; set; }
 
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
         public int? EnvType { get; set; }
 
@@ -39,7 +39,7 @@ namespace Nano.Electric
 
         public double? Diameter { get; set; }
 
-        public string Mass { get; set; }
+        public string? Mass { get; set; }
 
         public int? OrderNumber { get; set; }
 
@@ -52,7 +52,7 @@ namespace Nano.Electric
 
         public bool? InImport { get; set; }
 
-        public string Url { get; set; }
+        public string? Url { get; set; }
 #if InitDbContextEnums
         public ScsCableSystemType? CableSystemType { get; set; }
 #else

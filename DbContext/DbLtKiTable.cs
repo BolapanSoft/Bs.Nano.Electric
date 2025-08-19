@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -11,16 +11,16 @@ namespace Nano.Electric
 #if !InitDbContextEnums
         public int? CurveType { get; set; }
         [MaxLength(-1)]
-        public string CurveDb { get; set; }
+        public string? CurveDb { get; set; }
 #endif
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public string DbName { get; set; }
+        public string? DbName { get; set; }
 
-        public string DbDescription { get; set; }
+        public string? DbDescription { get; set; }
 
-        public string Category { get; set; }
+        public string? Category { get; set; }
      
         public int? OrderNumber { get; set; }
 

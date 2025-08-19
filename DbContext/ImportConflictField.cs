@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -12,13 +12,13 @@ namespace Nano.Electric
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public string TableName { get; set; }
+        public string? TableName { get; set; }
 
         public int? ConflictObjectId { get; set; }
 
-        public string DbFieldName { get; set; }
+        public string? DbFieldName { get; set; }
 
-        public string ExcelValue { get; set; }
+        public string? ExcelValue { get; set; }
 
         public int? OrderNumber { get; set; }
 
@@ -26,8 +26,8 @@ namespace Nano.Electric
 
         public bool? InImport { get; set; }
 
-        public string OldValue { get; set; }
+        public string? OldValue { get; set; }
 
-        public string NewValue { get; set; }
+        public string? NewValue { get; set; }
     }
 }

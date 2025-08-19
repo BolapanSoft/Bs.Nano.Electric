@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -11,28 +11,28 @@ namespace Nano.Electric
     {
         public double? CableDiameter { get; set; }
 
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         public int? CordCount { get; set; }
 
         public double? CordSection { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
-        public string Mass { get; set; }
+        public string? Mass { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public int? OrderNumber { get; set; }
 
-        public string AutoDbSpecDescription { get; set; }
+        public string? AutoDbSpecDescription { get; set; }
 
-        public string ThreadLabel { get; set; }
+        public string? ThreadLabel { get; set; }
 
         public int? ThreadType { get; set; }
 
@@ -46,6 +46,6 @@ namespace Nano.Electric
 
         public bool? InImport { get; set; }
 
-        public string Url { get; set; }
+        public string? Url { get; set; }
     }
 }

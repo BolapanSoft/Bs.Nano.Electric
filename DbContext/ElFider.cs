@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace Nano.Electric
 
         public int? KnifeSwitch { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public int? OrderNumber { get; set; }
 

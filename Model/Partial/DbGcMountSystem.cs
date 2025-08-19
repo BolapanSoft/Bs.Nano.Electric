@@ -9,14 +9,15 @@ namespace Nano.Electric {
     /// </summary>
     public partial class DbGcMountSystem : KitElement, IXmlSerializable/*, IProduct*/, IHaveId {
         [NotMapped]
-        public string Code => DbName;
+        public string? Code => DbName;
         [NotMapped]
-        public string Name { get => DbNaming; set => DbNaming = value; }
+        public string? Name { get => DbNaming; set => DbNaming = value; }
         [NotMapped]
-        public string Manufacturer { get => string.Empty; set {; } }
+        public string? Manufacturer { get => string.Empty; set {; } }
         /// <summary>
         /// Конфигурация узлов крепления
         /// </summary>
+        [NotMapped]
         public DbScsGutterUtilitySet StandGutterUtilitySet { get; set; }
         [NotMapped]
         public IEnumerable<DbGcSystemPlain> SystemPlains {

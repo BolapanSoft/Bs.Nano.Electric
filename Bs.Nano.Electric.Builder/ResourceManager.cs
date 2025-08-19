@@ -8,24 +8,48 @@ using Path = System.IO.Path;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Bs.Nano.Electric.Builder {
-    public class ResourceManager {
+    public abstract class ResourceManager(IMemoryCache cache, IElectricBuilderConfiguration configuration) {
         public class SheetCommon<Tsc> : SheetCommon /*where Tsc : IProduct*/ {
+            private DateTime _lastWriteTimeUtc = default; // время последней успешной загрузки
+#if NETFRAMEWORK
+            public SheetRef Source { get; set; }
+            public string TableName { get; set; }
+#else
             public SheetRef Source { get; init; }
             public string TableName { get; init; }
+#endif
+            public bool IsLoaded => _lastWriteTimeUtc > DateTime.MinValue;
             public void Load() {
-                base.LoadResource(Source.FileName, Source.SheetName);
+                var shRef = Source;
+                FileInfo fi = new FileInfo(shRef.FileName);
+                if (!fi.Exists) {
+                    throw new FileNotFoundException(shRef.FileName);
+                }
+                var currentWriteTime = fi.LastWriteTimeUtc;
+                // если уже загружали и файл не изменился → выходим
+                if (_lastWriteTimeUtc == currentWriteTime) {
+                    return;
+                }
+                var tempFileName = Path.GetTempFileName();
+                try {
+                    File.Copy(fi.FullName, tempFileName, overwrite: true);
+                    base.LoadResource(tempFileName, shRef.SheetName);
+                }
+                finally {
+                    File.Delete(tempFileName);
+                }
+                _lastWriteTimeUtc = currentWriteTime;
+                if (currentWriteTime == default) {
+                    currentWriteTime = DateTime.UtcNow;
+                }
             }
         }
         public record struct SheetRef(string FileName, string SheetName);
 
 
         //private static Dictionary<Configuration, Dictionary<SheetRef, SheetCommon>> globalSheetCache = new();
-        private readonly IMemoryCache _cache;
-        private readonly IElectricBuilderConfiguration configuration;
-
-        public ResourceManager(IElectricBuilderConfiguration configuration) {
-            this.configuration = configuration;
-        }
+        protected readonly IMemoryCache _cache = cache;
+        protected readonly IElectricBuilderConfiguration configuration = configuration;
 
         private string GetDbInf_Description() {
             throw new NotImplementedException();
@@ -59,7 +83,7 @@ namespace Bs.Nano.Electric.Builder {
         public bool TryGetSheet<Tnc>([NotNullWhen(true)] out SheetCommon<Tnc> sheetCommon, string? resourcePath = null)
             where Tnc : class {
             string[] classNameParts = (typeof(Tnc).Name).Split('.');
-            string className = classNameParts[^1];
+            string className = classNameParts[classNameParts.Length - 1];
             IConfiguration fileSection = configuration.GetSection($"Tables:{className}");
             if ((fileSection is null)) {
                 sheetCommon = null;
@@ -129,22 +153,23 @@ namespace Bs.Nano.Electric.Builder {
         }
         //internal static Dictionary<string, (string Name, string NanoElectricTable)> KnownProducts => lzKnownProducts.Value;
         #region ResourceLoaders
-
-        private SheetCommon<Tnc> LoadShc<Tnc>(SheetRef shRef) {
+        public SheetCommon<Tnc> LoadShc<Tnc>(SheetRef shRef) {
             SheetCommon<Tnc> shc;
             var cacheKey = $"{shRef.FileName}:{shRef.SheetName}";
             try {
-                shc=_cache.GetOrCreate(cacheKey, entry => {
-                    shc = new SheetCommon<Tnc>() { Source = shRef, TableName = typeof(Tnc) == typeof(Object) ? string.Empty : typeof(Tnc).Name.Split('.')[^1] };
+                shc = _cache.GetOrCreate(cacheKey, entry => {
+                    shc = new SheetCommon<Tnc>() { Source = shRef, TableName = typeof(Tnc) == typeof(Object) ? string.Empty : typeof(Tnc).Name };
                     return shc;
                 })!;
                 shc.Load();
+
             }
             catch (Exception ex) {
                 throw new InvalidOperationException($"Загрузка таблицы {shRef} завершилась ошибкой", ex);
             }
             return shc;
         }
+
         //internal async Task<SheetCommon> LoadShcAsync(SheetRef shRef) {
         //    if (sheetCache.ContainsKey(shRef)) {
         //        return sheetCache[shRef];

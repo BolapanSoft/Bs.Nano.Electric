@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -12,17 +12,17 @@ namespace Nano.Electric
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public string DbName { get; set; }
+        public string? DbName { get; set; }
 
-        public string Mark { get; set; }
+        public string? Mark { get; set; }
 
         public bool? DirPortMark { get; set; }
 
         public double? MountHeight { get; set; }
 
-        public string LayerName { get; set; }
+        public string? LayerName { get; set; }
 
-        public string LayerColor { get; set; }
+        public string? LayerColor { get; set; }
 
         public bool? LayerIsPrintable { get; set; }
 
@@ -34,7 +34,7 @@ namespace Nano.Electric
 
         public double? DbDepth { get; set; }
         [MaxLength(-1)]
-        public string KitStructure { get; set; }
+        public string? KitStructure { get; set; }
 
         public int? OrderNumber { get; set; }
 

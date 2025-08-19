@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace Nano.Electric
     public partial class ElWireMark
     {
 #if !InitDbContextEnums
-        public string MarkNameMain { get; set; }
+        public string? MarkNameMain { get; set; }
         public int? WireCategory { get; set; }
         public int? WireShellFire { get; set; }
         public int? WireArmor { get; set; }
@@ -18,8 +18,8 @@ namespace Nano.Electric
         public int? materialId { get; set; }
 
 #endif
-        public string DbDocument { get; set; }
-        public string markName { get; set; }
+        public string? DbDocument { get; set; }
+        public string? markName { get; set; }
 
         public double? higherPermTemp { get; set; }
 

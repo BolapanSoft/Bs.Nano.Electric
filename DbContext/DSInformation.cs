@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -9,28 +9,28 @@ namespace Nano.Electric
     [Table("DSInformation")]
     public partial class DSInformation
     {
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public bool? HideEmptyTables { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")]
-        public int Id { get; set; }
+            public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string MLDescription { get; set; }
+        public string? MLDescription { get; set; }
 
         public bool? IsEnableEditMultypleObjects { get; set; }
 
-        public string Category { get; set; }
+        public string? Category { get; set; }
 
-        public string ModelHash { get; set; }
+        public string? ModelHash { get; set; }
 
         public int? BranchVersion { get; set; }
 #if DBNE201
 
-        public string AppliedConverters { get; set; }
+        public string? AppliedConverters { get; set; }
 #endif
     }
 }

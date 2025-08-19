@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -12,7 +12,7 @@ namespace Nano.Electric
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public string DbName { get; set; }
+        public string? DbName { get; set; }
 
         public int? OrderNumber { get; set; }
 

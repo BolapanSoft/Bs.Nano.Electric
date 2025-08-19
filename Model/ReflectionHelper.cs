@@ -11,104 +11,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Nano.Electric {
-    public static class EnumConverter<TEnum> where TEnum : Enum {
-        private static readonly bool _isFlagsEnum;
-        private static readonly uint _allflags;
-        private static string[] _descriptions;
-        private static string[] _enumNames;
-        private static TEnum[] _enumValues;
-        static EnumConverter() {
-            bool isFlags = EnumConverter<TEnum>._isFlagsEnum = typeof(TEnum).GetCustomAttribute<FlagsAttribute>() is not null;
-            InitStaticFields();
-            if (isFlags) {
-                _allflags = 0;
-                foreach (var item in _enumValues!) {
-                    _allflags += ToUint(item);
-                }
-            }
-            else {
-                _allflags = ToUint(_enumValues[_enumValues.Length - 1]);
-            }
-        }
-
-        private static void InitStaticFields() {
-            GetEnumData(out string[] enumNames, out TEnum[] enumValues);
-            EnumConverter<TEnum>._enumNames = enumNames;
-            EnumConverter<TEnum>._enumValues = enumValues;
-            _descriptions = new string[enumNames.Length];
-            for (int i = 0; i < enumNames.Length; i++) {
-                var name = enumNames[i];
-                var memberInfo = typeof(TEnum).GetMember(name);
-                var descriptionAttribute = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
-                var value = (TEnum)Enum.Parse(typeof(TEnum), name);
-                _descriptions[i] = descriptionAttribute?.Description ?? string.Empty;
-            }
-        }
-
-        public static string GetDescription(TEnum value) {
-            if (_isFlagsEnum) {
-                StringBuilder sb = new StringBuilder();
-                int i = 0;
-                for (; i < _enumValues.Length - 1; i++) {
-                    if ((ToUint(_enumValues[i]) & ToUint(value)) == ToUint(_enumValues[i])) {
-                        if (sb.Length > 0) {
-                            sb.Append("; ");
-                        }
-                        sb.Append(GetDescriptionSingleValue(_enumValues[i]));
-                    }
-                }
-                if ((ToUint(_enumValues[i]) & ToUint(value)) == ToUint(_enumValues[i])) {
-                    if (sb.Length > 0) {
-                        sb.Append("; ");
-                    }
-                    sb.Append(sb.Append(GetDescriptionSingleValue(_enumValues[i])));
-                }
-                return sb.ToString();
-            }
-            else {
-                return GetDescriptionSingleValue(value);
-            }
-        }
-        public static bool IsDefineValue(TEnum value) {
-            if (_isFlagsEnum) {
-                var uintValue = ToUint(value);
-                return ((~_allflags) & uintValue) == 0;
-            }
-            else {
-                int i = Array.BinarySearch(_enumValues, value);
-                return i >= 0;
-            }
-        }
-        public static bool IsDefineValue(string value) {
-
-            foreach (var item in _enumNames) {
-                if (item == value)
-                    return true;
-            }
-            return false;
-        }
-        private static void GetEnumData(out string[] enumNames, out TEnum[] enumValues) {
-            TEnum[] array = Enum.GetValues(typeof(TEnum)).Cast<TEnum>().ToArray();
-            Array.Sort(array);
-            string[] array2 = new string[array.Length];
-            for (int i = 0; i < array2.Length; i++) {
-                array2[i] = array[i].ToString();
-            }
-            enumNames = array2;
-            enumValues = array;
-        }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static uint ToUint(TEnum val) {
-            return Unsafe.As<TEnum, uint>(ref val);
-        }
-        private static string GetDescriptionSingleValue(TEnum value) {
-            int i = Array.BinarySearch(_enumValues, value);
-            if (i >= 0) {
-                return _descriptions[i];
-            }
-            return string.Empty;
-        }
-    }
     internal static class ReflectionHelper {
         private static readonly MemoryCache memoryCache = new MemoryCache(new MemoryCacheOptions());
         /// <summary>
@@ -161,7 +63,7 @@ namespace Nano.Electric {
         }
 
 
-        public static string GetDescription<TEnum>(this TEnum enumValue) where TEnum : Enum {
+        public static string GetDescription<TEnum>(this TEnum enumValue) where TEnum :struct, Enum {
             return EnumConverter<TEnum>.GetDescription(enumValue);
         }
         /// <summary>

@@ -1,4 +1,4 @@
-namespace Nano.Electric {
+﻿namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -8,13 +8,13 @@ namespace Nano.Electric {
     public partial class DbDwgFile {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] 
-        public int Id { get; set; }
+            public int Id { get; set; }
 
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public string Category { get; set; }
+        public string? Category { get; set; }
 
         public int? OrderNumber { get; set; }
 

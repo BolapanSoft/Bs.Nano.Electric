@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -24,15 +24,15 @@ namespace Nano.Electric
 
         public int? Climate { get; set; }
 
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
-        public string DbDocument { get; set; }
+        public string? DbDocument { get; set; }
 
         public int? ExplodeLevel { get; set; }
 
-        public string DbName { get; set; }
+        public string? DbName { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public double? Efficiency { get; set; }
 
@@ -46,9 +46,9 @@ namespace Nano.Electric
 
         public double? LightLength { get; set; }
 
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
-        public string Mass { get; set; }
+        public string? Mass { get; set; }
 
         public double? MaxSectionConductor { get; set; }
 
@@ -60,16 +60,16 @@ namespace Nano.Electric
 
         public int? SafeDegree { get; set; }
 
-        public string Series { get; set; }
+        public string? Series { get; set; }
 
 
-        public string SpecDescription { get; set; }
+        public string? SpecDescription { get; set; }
 
         public double? Voltage { get; set; }
 
         public double? Width { get; set; }
 
-        public string UserCategory { get; set; }
+        public string? UserCategory { get; set; }
 
         public double? PraPower { get; set; }
  
@@ -77,7 +77,7 @@ namespace Nano.Electric
 
         public double? LightFlux { get; set; }
         [MaxLength(-1)]
-        public string CurvePmContent { get; set; }
+        public string? CurvePmContent { get; set; }
 
 
         public int? CwPCode { get; set; }
@@ -86,16 +86,16 @@ namespace Nano.Electric
 
 
 
-        public string KccFileName { get; set; }
+        public string? KccFileName { get; set; }
 
-        public string EtmCode { get; set; }
+        public string? EtmCode { get; set; }
 
 
         public double? Diameter { get; set; }
 
         public bool? InImport { get; set; }
 
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
 
         public double? EmergancyWorkTime { get; set; }
@@ -106,7 +106,7 @@ namespace Nano.Electric
 
         public double? EmergancyAverageLux { get; set; }
 
-        public string DbLighting { get; set; }
+        public string? DbLighting { get; set; }
 
         public double? LightEmergencyFlux { get; set; }
 
@@ -115,11 +115,11 @@ namespace Nano.Electric
         public int? DbGraphicRef { get; set; }
 
 #if DBNE23
-        public string DbClassificatorCode { get; set; }
+        public string? DbClassificatorCode { get; set; }
 #endif
 
 #if DBNE23
-        public string SafeDegreeIk { get; set; }
+        public string? SafeDegreeIk { get; set; }
 #endif
     }
 }

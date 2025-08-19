@@ -1,4 +1,4 @@
-// Ignore Spelling: Ik
+﻿// Ignore Spelling: Ik
 
 namespace Nano.Electric
 {
@@ -13,23 +13,23 @@ namespace Nano.Electric
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")]
-        public int Id { get; set; }
+            public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string Series { get; set; }
+        public string? Series { get; set; }
 
-        public string UserCategory { get; set; }
+        public string? UserCategory { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public string SpecDescription { get; set; }
+        public string? SpecDescription { get; set; }
 
-        public string DbDocument { get; set; }
+        public string? DbDocument { get; set; }
 
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
-        public string Code { get; set; }
+        public string? Code { get; set; }
 #if !InitDbContextEnums
         public int? StructureType { get; set; }
         public int? BoardType { get; set; }
@@ -38,8 +38,8 @@ namespace Nano.Electric
         public int? CableLeadIn { get; set; }
 #endif
 #if VER23_1
-        public string DbClassificatorCode { get; set; }
-        public string SafeDegreeIk { get; set; }
+        public string? DbClassificatorCode { get; set; }
+        public string? SafeDegreeIk { get; set; }
 #endif
         public double? DbVoltage { get; set; }
 
@@ -51,7 +51,7 @@ namespace Nano.Electric
 
 
 
-        public string Mass { get; set; }
+        public string? Mass { get; set; }
 
         public double? DbHeight { get; set; }
 
@@ -96,11 +96,11 @@ namespace Nano.Electric
         [Column("DbSafeDegree")]
         public int? SafeDegree { get; set; }
 
-        public string EtmCode { get; set; }
+        public string? EtmCode { get; set; }
 
         public bool? InImport { get; set; }
 
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
 
 

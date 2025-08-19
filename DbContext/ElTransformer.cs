@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace Nano.Electric
 
         public double? ActiveResistanceNullSequence { get; set; }
 
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         public int? ConnectingScheme { get; set; }
 
@@ -21,7 +21,7 @@ namespace Nano.Electric
 
         public double? DbDepth { get; set; }
 
-        public string DbDocument { get; set; }
+        public string? DbDocument { get; set; }
 
         public double? DbHeight { get; set; }
 
@@ -35,7 +35,7 @@ namespace Nano.Electric
 
         public double? DbWidth { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public double? FullResistance { get; set; }
 
@@ -46,13 +46,13 @@ namespace Nano.Electric
 
         public double? KzPower { get; set; }
 
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
-        public string Mass { get; set; }
+        public string? Mass { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string NameFull { get; set; }
+        public string? NameFull { get; set; }
 
         public double? NoLoadCurrent { get; set; }
 
@@ -64,28 +64,28 @@ namespace Nano.Electric
 
         public double? ReactiveResistanceNullSequence { get; set; }
 
-        public string Series { get; set; }
+        public string? Series { get; set; }
 
-        public string SpecDescription { get; set; }
+        public string? SpecDescription { get; set; }
 
         public int? CwPCode { get; set; }
 
         public int? DbImageRef { get; set; }
 
-        public string EtmCode { get; set; }
+        public string? EtmCode { get; set; }
 
         public bool? InImport { get; set; }
 
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         public int? DbGraphicRef { get; set; }
 
 #if DBNE23
-        public string DbClassificatorCode { get; set; }
+        public string? DbClassificatorCode { get; set; }
 #endif
 
         #if DBNE23
-        public string SafeDegreeIk { get; set; }
+        public string? SafeDegreeIk { get; set; }
 #endif   
     }
 }

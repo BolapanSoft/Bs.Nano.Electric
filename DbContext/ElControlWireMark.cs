@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -12,15 +12,15 @@ namespace Nano.Electric
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")] public int Id { get; set; }
 
-        public string MarkNameMain { get; set; }
+        public string? MarkNameMain { get; set; }
 
-        public string markName { get; set; }
+        public string? markName { get; set; }
 
         public string сomment { get; set; }
 
         public string SpecСomment { get; set; }
 
-        public string DbDocument { get; set; }
+        public string? DbDocument { get; set; }
 
         public double? voltage { get; set; }
 
@@ -32,7 +32,7 @@ namespace Nano.Electric
 
         public int? WireArmor { get; set; }
 
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         public int? OrderNumber { get; set; }
 

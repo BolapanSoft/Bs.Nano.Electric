@@ -1,4 +1,4 @@
-// Ignore Spelling: Scs
+﻿// Ignore Spelling: Scs
 
 namespace Nano.Electric
 {
@@ -10,35 +10,35 @@ namespace Nano.Electric
     [Table("ScsGutterBolting")]
     public partial class ScsGutterBolting
     {
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
-        public string DbDocument { get; set; }
+        public string? DbDocument { get; set; }
 
-        public string DbOtherName { get; set; }
+        public string? DbOtherName { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")]
         public override int Id { get; set; }
 
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
-        public string Mass { get; set; }
+        public string? Mass { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public int? OrderNumber { get; set; }
 
-        public string Series { get; set; }
+        public string? Series { get; set; }
 
-        public string SpecDescription { get; set; }
+        public string? SpecDescription { get; set; }
 
 
         public double? CountPerBox { get; set; }
 
 #if !InitDbContextEnums
-        public int? СanalBoltingType { get; set; }
+        public int СanalBoltingType { get; set; }
 
         public int? MountType { get; set; }
 
@@ -63,14 +63,14 @@ namespace Nano.Electric
 
         public int? DbImageRef { get; set; }
 
-        public string EtmCode { get; set; }
+        public string? EtmCode { get; set; }
 
         public bool? InImport { get; set; }
 
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
 #if DBNE23
-        public string DbClassificatorCode { get; set; }
+        public string? DbClassificatorCode { get; set; }
 #endif
     }
 }

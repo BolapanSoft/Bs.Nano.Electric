@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -15,17 +15,17 @@ namespace Nano.Electric
         public int? CableSystemType { get; set; }
         public int? wireMark { get; set; }
 #endif
-        public string AutoDbSpecDescription { get; set; }
+        public string? AutoDbSpecDescription { get; set; }
 
         public int? conductorsNumberL { get; set; }
 
         public int? conductorsNumberPEN { get; set; }
 
-        public string conductsDesignation { get; set; }
+        public string? conductsDesignation { get; set; }
 
         public double? ContactResistance { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         public double? diameter { get; set; }
 
@@ -38,9 +38,9 @@ namespace Nano.Electric
 
         public int? longLoadCurrent { get; set; }
 
-        public string mass { get; set; }
+        public string? mass { get; set; }
 
-        public string mfrId { get; set; }
+        public string? mfrId { get; set; }
 
         public int? OrderNumber { get; set; }
 
@@ -59,35 +59,35 @@ namespace Nano.Electric
 
 
 
-        public string wireName { get; set; }
+        public string? wireName { get; set; }
         [Column("DbCode")]
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
         public double? CountPerBox { get; set; }
 
         public int? CwPCode { get; set; }
 
-        public string ShortName { get; set; }
+        public string? ShortName { get; set; }
 
         public bool? IsAutoSpecDescription { get; set; }
 
-        public string DbSpecDescription { get; set; }
+        public string? DbSpecDescription { get; set; }
 
-        public int? сonductorsPairNumber { get; set; }
+        public int сonductorsPairNumber { get; set; }
 
         public int? DbImageRef { get; set; }
 
 
-        public string EtmCode { get; set; }
+        public string? EtmCode { get; set; }
 
         public bool? InImport { get; set; }
 
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         public double? SectionalDiameter { get; set; }
 
 #if DBNE23
-        public string DbClassificatorCode { get; set; }
+        public string? DbClassificatorCode { get; set; }
 #endif
     }
 }

@@ -7,29 +7,28 @@ namespace Nano.Electric {
         int Id { get; set; }
     }
     public interface IHaveImageRef {
-        string Code { get; }
+        string? Code { get; }
         //int Id { get; set; }
         int? DbImageRef { get; set; }
 
     }
     public interface IHaveCableSystemTypeRef {
-        string Code { get; }
+        string? Code { get; }
         //int Id { get; set; }
         ScsCableSystemType? CableSystemType { get; set; }
 
     }
     public interface IProduct : IHaveId {
-        string Code { get; }
+        string? Code { get; }
         //int Id { get; set; }
         int? DbImageRef { get; set; }
-        string Name { get; set; }
-        string Manufacturer { get; set; }
-        string SpecDescription { get; set; }
+        string? Name { get; set; }
+        string? Manufacturer { get; set; }
+        string? SpecDescription { get; set; }
     }
     public interface ICommonProduct : IProduct { 
         string? Series { get; set; }
         string? Description { get; set; }
-        string? SpecDescription { get; set; }
         string? Url { get; set; }
 
     }

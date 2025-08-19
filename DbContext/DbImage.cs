@@ -1,4 +1,4 @@
-namespace Nano.Electric
+п»їnamespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -10,19 +10,19 @@ namespace Nano.Electric
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         [Column("id")]
-        public int Id { get; set; }
+            public int Id { get; set; }
         /// <summary>
-        /// Образ изображения в памяти.
+        /// РћР±СЂР°Р· РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РІ РїР°РјСЏС‚Рё.
         /// </summary>
-        /// <remarks>Внутренний формат хранения изображений в nanoCad Elecnro - .png</remarks>
+        /// <remarks>Р’РЅСѓС‚СЂРµРЅРЅРёР№ С„РѕСЂРјР°С‚ С…СЂР°РЅРµРЅРёСЏ РёР·РѕР±СЂР°Р¶РµРЅРёР№ РІ nanoCad Elecnro - .png</remarks>
         [MaxLength(-1)]
-        public byte[] Image { get; set; }
+        public byte[]? Image { get; set; }
 
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public string Category { get; set; }
+        public string? Category { get; set; }
 
         public int? OrderNumber { get; set; }
 

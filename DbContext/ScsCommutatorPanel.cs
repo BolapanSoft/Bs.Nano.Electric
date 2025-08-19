@@ -1,4 +1,4 @@
-namespace Nano.Electric
+ï»¿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -10,8 +10,8 @@ namespace Nano.Electric
     public partial class ScsCommutatorPanel
     {
 #if !InitDbContextEnums
-        // Ñîõğàíèòü â ïîëå KitStructure
-        public string BlockName { get; set; }
+        // Ğ¡Ğ¾Ñ…Ñ€Ğ°Ğ½Ğ¸Ñ‚ÑŒ Ğ² Ğ¿Ğ¾Ğ»Ğµ KitStructure
+        public string? BlockName { get; set; }
         public int? PortTypeIn { get; set; }
 
         public int? PortTypeOut { get; set; }    
@@ -24,25 +24,25 @@ namespace Nano.Electric
 
         public int? InletCountOut { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string Series { get; set; }
+        public string? Series { get; set; }
 
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
-        public string SpecDescription { get; set; }
+        public string? SpecDescription { get; set; }
 
-        public string DbDocument { get; set; }
+        public string? DbDocument { get; set; }
 
-        public string Code { get; set; }
+        public string? Code { get; set; }
 
-        public string EtmCode { get; set; }
+        public string? EtmCode { get; set; }
 
-        public string Manufacturer { get; set; }
+        public string? Manufacturer { get; set; }
 
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
-        public string Mass { get; set; }
+        public string? Mass { get; set; }
 
         public int? SlotSize { get; set; }
 
@@ -53,7 +53,7 @@ namespace Nano.Electric
 
         public double? Height { get; set; }
         //[MaxLength(-1)]
-        //public string KitStructure { get; set; }
+        //public string? KitStructure { get; set; }
 
         public int? OrderNumber { get; set; }
 

@@ -19,7 +19,7 @@ using System.Data.SqlServerCe;
 #else
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 #endif
 
 namespace Nano.Electric {
@@ -195,10 +195,119 @@ namespace Nano.Electric {
             if (this.Database.Connection is SqlCeConnection) {
                 modelBuilder.Conventions.Add(new NanoCadPropertiesConvention());
             }
+            modelBuilder.Entity<DbGcMountSystem>()
+                .HasOptional(p => p.StandGutterUtilitySet)
+                .WithMany()
+                .HasForeignKey(ms => ms.Stand);
+#if InitDbContextEnums
+            modelBuilder.Entity<DbLtKiTable>()
+               .HasKey(e => e.Id);
+            modelBuilder.Entity<ElLighting>()
+                .HasOptional(p => p.DbLtKiTable)
+                .WithMany()
+                .Map(m => m.MapKey("KiTable"));
+            modelBuilder.Entity<ElWireMark>()
+                .HasOptional(p => p.IsolationMaterial)
+                .WithMany()
+                .Map(m => m.MapKey("isolationMaterialId"));
+            modelBuilder.Entity<ElWireMark>()
+                .HasOptional(p => p.Material)
+                .WithMany()
+                .Map(m => m.MapKey("materialId"));
+            modelBuilder.Entity<ElWire>()
+                .HasOptional(p => p.CableSystemType)
+                .WithMany()
+                .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ScsSwitchSocketPanel>()
+                .HasOptional(p => p.CableSystemType)
+                .WithMany()
+                .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ScsUtpSocket>()
+                .HasOptional(p => p.CableSystemType)
+                .WithMany()
+                .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ElWire>()
+                .HasOptional(p => p.wireMark)
+                .WithMany()
+                .Map(m => m.MapKey("wireMark"));
+            modelBuilder.Entity<ElLighting>()
+                .HasOptional(l => l.Lamp)
+                .WithMany()
+                .Map(m => m.MapKey("Lamp"));
+#endif
+#else
+            modelBuilder.Entity<DbGcMountSystem>()
+                .HasOne(p => p.StandGutterUtilitySet)  
+                .WithMany()
+                .HasForeignKey(ms => ms.Stand)  
+                .IsRequired(false);
+#if InitDbContextEnums
+            modelBuilder.Entity<DbLtKiTable>()
+                .HasKey(e => e.Id);
+
+            modelBuilder.Entity<ElLighting>()
+                .HasOne(p => p.DbLtKiTable)        
+                .WithMany()
+                .HasForeignKey("KiTable")          
+                .IsRequired(false);                
+            modelBuilder.Entity<ElWireMark>()
+                .HasOne(p => p.IsolationMaterial)
+                .WithMany()
+                .HasForeignKey("isolationMaterialId")
+                .IsRequired(false);
+
+            modelBuilder.Entity<ElWireMark>()
+                .HasOne(p => p.Material)
+                .WithMany()
+                .HasForeignKey("materialId")
+                .IsRequired(false);
+
+            modelBuilder.Entity<ElWire>()
+                .HasOne(p => p.CableSystemType)
+                .WithMany()
+                .HasForeignKey("CableSystemTypeId")
+                .IsRequired(false);
+            modelBuilder.Entity<ElWire>()
+                .Property<int?>("CableSystemTypeId")
+                .HasColumnName("CableSystemType");
+
+            modelBuilder.Entity<ElWire>()
+                .HasOne(p => p.wireMark)
+                .WithMany()
+                .HasForeignKey("wireMarkId")
+                .IsRequired(false);
+            modelBuilder.Entity<ElWire>()
+                .Property<int?>("wireMarkId")
+                .HasColumnName("wireMark");
+
+            modelBuilder.Entity<ScsSwitchSocketPanel>()
+                .HasOne(p => p.CableSystemType)
+                .WithMany()
+                .HasForeignKey("CableSystemTypeId")
+                .IsRequired(false);
+            modelBuilder.Entity<ElWire>()
+                .Property<int?>("CableSystemTypeId")
+                .HasColumnName("CableSystemType");
+            
+            modelBuilder.Entity<ElLighting>()
+                .HasOne(l => l.Lamp)
+                .WithMany()
+                .HasForeignKey("LampId")
+                .IsRequired(false);
+            modelBuilder.Entity<ElLighting>()
+                .Property<int?>("LampId")
+                .HasColumnName("Lamp");
+            
+#endif
 #endif
             modelBuilder.Entity<CaeMaterialUtility>()
                 .Property(t => t.MeashureUnits)
                 .HasColumnName("MeashureUnits");
+            modelBuilder.Ignore<DbGcKnotStand>();
+            modelBuilder.Ignore<DbGcKnotPlain>();
+            modelBuilder.Ignore<DbGcKnotLevel>();
+            modelBuilder.Ignore<DbGcSystemPlain>();
+
         }
 
         public bool IsHaveColumns(string tableName, params string[] columns) {

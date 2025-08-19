@@ -18,7 +18,7 @@ namespace Nano.Electric {
 
 #endif
         [MaxLength(-1)]
-        public string KitStructure { get => GetKitStructureAsXML(this); set {; } }
+        public string? KitStructure { get => GetKitStructureAsXML(this); set {; } }
         protected override void WriteProperties(XmlWriter writer) {
             ;
         }

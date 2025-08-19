@@ -13,15 +13,15 @@ namespace Nano.Electric {
         /// <summary>
         /// Тип несущего элемента
         /// </summary>
-        public DbGcKnotLevelType LevelType { get; set; }
+        public DbGcKnotLevelType? LevelType { get; set; }
         /// <summary>
         /// Тип крепления ярусов
         /// </summary>
-        public DbGcKnotStandType StandType { get; set; }
+        public DbGcKnotStandType? StandType { get; set; }
         /// <summary>
         /// Количество креплений ярусов
         /// </summary>
-        public DbGcKnotStandStructureType StructureType { get; set; }
+        public DbGcKnotStandStructureType? StructureType { get; set; }
         /// <summary>
         /// Односторонняя/Двухсторонняя
         /// </summary>
@@ -29,15 +29,16 @@ namespace Nano.Electric {
         /// <summary>
         /// Крепление
         /// </summary>
-        public DbGcKnotInstallType InstallType { get; set; }
+        public DbGcKnotInstallType? InstallType { get; set; }
         [NotMapped]
-        public DbGcKnotStand Stand {
+        public DbGcKnotStand? Stand {
             get {
                 if (Children.Count == 0)
                     return null;
                 return Children[0] as DbGcKnotStand;
             }
             set {
+                Throw.IfNull(value);
                 if (Children.Count == 0)
                     Children.Add(value);
                 else

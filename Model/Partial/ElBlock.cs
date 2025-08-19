@@ -12,7 +12,7 @@ namespace Nano.Electric {
         public AutomatContactType? ContactType { get; set; } = AutomatContactType.STATIC;
 #endif
         [MaxLength(-1)]
-        public string KitStructure { get => GetKitStructureAsXML(this); set {; } }
+        public string? KitStructure { get => GetKitStructureAsXML(this); set {; } }
         protected override void WriteProperties(XmlWriter writer) {
             ;
         }

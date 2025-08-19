@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -10,27 +10,27 @@ namespace Nano.Electric
     public partial class DbGcMountSystem
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Id { get; set; }
+            public int Id { get; set; }
 
         public double? PostDistance { get; set; }
 
-        public string DbName { get; set; }
+        public string? DbName { get; set; }
 
-        public string DbNaming { get; set; }
+        public string? DbNaming { get; set; }
 
-        public string DbDescription { get; set; }
+        public string? DbDescription { get; set; }
 
-        public string DbCatalog { get; set; }
+        public string? DbCatalog { get; set; }
 
-        public string LayerName { get; set; }
+        public string? LayerName { get; set; }
 
-        public string LayerColor { get; set; }
+        public string? LayerColor { get; set; }
 
         public bool? LayerIsPrintable { get; set; }
 
         public int? LayerLineWeigh { get; set; }
         [MaxLength(-1)]
-        public string KitStructure { get; set; }
+        public string? KitStructure { get; set; }
 
         public int? OrderNumber { get; set; }
 

@@ -1,4 +1,4 @@
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;
@@ -13,7 +13,7 @@ namespace Nano.Electric
 
         public int? ObjectId { get; set; }
 
-        public string TableName { get; set; }
+        public string? TableName { get; set; }
 
         public int? ObjectStatus { get; set; }
 

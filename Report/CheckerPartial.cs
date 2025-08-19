@@ -122,8 +122,8 @@ namespace Bs.Nano.Electric.Report {
         /// <typeparam name="TEnum"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        private static bool IsDefined<TEnum>(TEnum value) where TEnum : Enum {
-            return EnumConverter<TEnum>.IsDefineValue(value);
+        private static bool IsDefined<TEnum>(TEnum value) where TEnum : struct, Enum {
+            return EnumConverter<TEnum>.IsDefinedValue(value);
         }
         /// <summary>
         /// Для элемента перечислений возвращает значение атрибута Description, если оно определено.
@@ -131,8 +131,8 @@ namespace Bs.Nano.Electric.Report {
         /// <typeparam name="TEnum"></typeparam>
         /// <param name="value"></param>
         /// <returns></returns>
-        private static string GetDescription<TEnum>(TEnum value) where TEnum : System.Enum {
-            if (!EnumConverter<TEnum>.IsDefineValue(value)) {
+        private static string GetDescription<TEnum>(TEnum value) where TEnum : struct, Enum {
+            if (!EnumConverter<TEnum>.IsDefinedValue(value)) {
                 return $"Некорректное значение:{System.Convert.ToUInt64(value)}";
             }
             return EnumConverter<TEnum>.GetDescription(value);
