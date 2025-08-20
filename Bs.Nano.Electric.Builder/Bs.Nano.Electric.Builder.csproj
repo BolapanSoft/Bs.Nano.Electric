@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<BaseOutputPath>..\bin\</BaseOutputPath>
-		<VersionPrefix>1.1.6</VersionPrefix>
+		<VersionPrefix>1.1.7</VersionPrefix>
 		<LangVersion>12</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>

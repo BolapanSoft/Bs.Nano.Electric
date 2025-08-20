@@ -1118,6 +1118,7 @@ namespace Bs.Nano.Electric.Builder {
                 //context.SaveChanges();
             }
             mountSystemSet.DbName = job.Attribute.DbName;
+            mountSystemSet.Name = job.Attribute.DbDescription;
             mountSystemSet.DbCatalog = job.Attribute.DbCatalog;
             mountSystemSet.LayerName = string.Empty;
             mountSystemSet.LayerColor = "'Blue'";
@@ -1414,6 +1415,7 @@ namespace Bs.Nano.Electric.Builder {
                             throw new InvalidDataException($"Элемент с артикулом {btRowCode} не найден в таблице {Context.GetDefaultLocalizeValue<ScsGutterBolting>()}");
                         }
                         switch (bt.CanalBoltingType) {
+                            case ScsGutterBoltingTypeEnum.CONSOLE:
                             case ScsGutterBoltingTypeEnum.POST:
                                 sguSet.StandType = DbGcKnotStandType.POST;
                                 break;

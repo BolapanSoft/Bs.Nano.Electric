@@ -43,7 +43,7 @@ namespace Nano.Electric.Enums {
         [Description("")]
         CONNECTOR = 3,
         /// <summary>
-        /// Суппорт
+        /// Устарело
         /// </summary>
         [Description("Суппорт")]
         SUPPORT = 4,
