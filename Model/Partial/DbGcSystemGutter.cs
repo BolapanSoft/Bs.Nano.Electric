@@ -15,7 +15,7 @@ namespace Nano.Electric {
         public bool IsEnabled { get; set; } = true;
         public bool IsUse { get; set; } = true;
         public DbGcStrightSegmentComplectType ComplectType { get; set; }
-        public DbScsGcSeriaConfigiration Configuration { get; set; }
+        public DbScsGcSeriaConfigiration? Configuration { get; set; }
         public IEnumerable<DbUtilityUnit> UtilityUnits {
             get {
                 return base.GetChildren<DbUtilityUnit>();
@@ -27,13 +27,13 @@ namespace Nano.Electric {
         }
         protected override void WriteProperties(XmlWriter writer) {
             writer.WriteElementString(nameof(ComplectType), ComplectType.ToString());
-            if (!(Configuration is null)) {
+            if (Configuration is not null) {
                 XElement el = new XElement(nameof(Configuration));
                 el.Add(new XAttribute("TableName", nameof(DbScsGcSeriaConfigiration)));
                 el.Add(new XAttribute("Id", Configuration.Id));
                 el.WriteTo(writer);
             }
-            if (!(Gutter is null)) {
+            if (Gutter is not null) {
                 XElement el = new XElement(nameof(Gutter));
                 el.Add(new XAttribute("TableName", nameof(ScsGutterCanal)));
                 el.Add(new XAttribute("Id", Gutter.Id));

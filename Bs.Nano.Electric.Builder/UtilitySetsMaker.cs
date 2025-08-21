@@ -124,6 +124,7 @@ namespace Bs.Nano.Electric.Builder {
             foreach (var item in job) {
                 using (var context = connector.Connect())
                 using (var trans = context.Database.BeginTransaction()) {
+                    EnsureLoaded(context);
                     try {
                         DbScsGcSeriaConfigiration config = MakeSeriesConfiguration(context, item.Value);
                         trans.Commit();
@@ -160,7 +161,8 @@ namespace Bs.Nano.Electric.Builder {
             try {
                 gusSource = resources.GutterUtilitySetSource;
                 logger.LogInformation("Загружены Конфигурации трасс лотков и узлов крепления, комплектации узлов крепления.");
-            }            catch (SectionNotFoundException ex) {
+            }
+            catch (SectionNotFoundException ex) {
                 logger.LogWarning($"Создание конфигураций трасс лотков и узлов крепления пропущено. {ex.Message}");
                 return;
             }
@@ -179,7 +181,7 @@ namespace Bs.Nano.Electric.Builder {
             }
             int count = 0;
             IEnumerable<MountSystemSetJob> jobSource = gusSource
-                .Where(row => !string.IsNullOrEmpty(row["Code"]) )
+                .Where(row => !string.IsNullOrEmpty(row["Code"]))
                 .Select(row => ParceMountSystemSetJob(row, mssJobParts)
                 );
 
@@ -189,7 +191,9 @@ namespace Bs.Nano.Electric.Builder {
                 logger.LogInformation("Построение конфигурации трасс лотков \"{}\".", job.Attribute.DbName);
                 using (Context context = connector.Connect())
                 using (var trans = context.Database.BeginTransaction()) {
+                    EnsureLoaded(context);
                     try {
+                        EnsureLoaded(context);
                         MakeMountSystemSet(context, job);
                         context.SaveChanges();
                         trans.Commit();
@@ -228,6 +232,7 @@ namespace Bs.Nano.Electric.Builder {
             foreach (var confJob in jobs) {
                 using (var context = connector.Connect())
                 using (var trans = context.Database.BeginTransaction()) {
+                    EnsureLoaded(context);
                     try {
                         DbCcMountSystem config = MakeDbCcMountSystem(context, confJob);
                         context.SaveChanges();
@@ -267,6 +272,7 @@ namespace Bs.Nano.Electric.Builder {
             foreach (var confJob in jobs) {
                 using (var context = connector.Connect())
                 using (var trans = context.Database.BeginTransaction()) {
+                    EnsureLoaded(context);
                     try {
                         DbTbMountSystem config = MakeDbTbMountSystem(context, confJob);
                         context.SaveChanges();
@@ -305,6 +311,7 @@ namespace Bs.Nano.Electric.Builder {
             foreach (var confJob in jobs) {
                 using (var context = connector.Connect())
                 using (var trans = context.Database.BeginTransaction()) {
+                    EnsureLoaded(context);
                     try {
                         DbScsTubeSeriesConfiguration config = MakeTubeSeriesConfiguration(context, confJob);
                         context.SaveChanges();
@@ -358,11 +365,14 @@ namespace Bs.Nano.Electric.Builder {
             kit.MountPlain.IsUse = confJob.CcMsMount.IsUse;
             kit.MountPlain.PostDistance = confJob.CcMsMount.PostDistance;
             foreach (var unit in confJob.UtilityUnits) {
-                if (TryFindDbUtilityUnit(context, unit.UtilityUnitCode, out var element)) {
+                if (TryFindDbUtilityUnit(logger, context, unit.UtilityUnitCode, out DbUtilityUnit? element)) {
                     kit.MountPlain.Add(element);
                 }
-                else
-                    logger.LogWarning($"Ошибка в конфигурации для элемента {unit.Code}: артикул {unit.UtilityUnitCode} не является элементом таблицы \"Материалы\" или \"Комплектации материалов\".");
+                else {
+                    logger.LogWarning($"В конфигурации {kit.Name} элемент {unit.UtilityUnitCode} пропущен.");
+                }
+                //else
+                //    logger.LogWarning($"Ошибка в конфигурации для элемента {unit.Code}: артикул {unit.UtilityUnitCode} не является элементом таблицы \"Материалы\" или \"Комплектации материалов\".");
             }
             kit.KitStructure = GetKitStructureAsXML(kit);
             return kit;
@@ -395,11 +405,14 @@ namespace Bs.Nano.Electric.Builder {
             kit.MountPlain.IsUse = confJob.CcMsMount.IsUse;
             kit.MountPlain.PostDistance = confJob.CcMsMount.PostDistance;
             foreach (var unit in confJob.UtilityUnits) {
-                if (TryFindDbUtilityUnit(context, unit.UtilityUnitCode, out var element)) {
+                if (TryFindDbUtilityUnit(logger, context, unit.UtilityUnitCode, out var element)) {
                     kit.MountPlain.Add(element);
                 }
-                else
-                    logger.LogWarning($"Ошибка в конфигурации для элемента {unit.Code}: артикул {unit.UtilityUnitCode} не является элементом таблицы \"Материалы\" или \"Комплектации материалов\".");
+                else {
+                    logger.LogWarning($"В конфигурации {kit.Name} элемент {unit.UtilityUnitCode} пропущен.");
+                }
+                //    else
+                //        logger.LogWarning($"Ошибка в конфигурации для элемента {unit.Code}: артикул {unit.UtilityUnitCode} не является элементом таблицы \"Материалы\" или \"Комплектации материалов\".");
             }
             kit.KitStructure = GetKitStructureAsXML(kit);
             return kit;
@@ -548,13 +561,14 @@ namespace Bs.Nano.Electric.Builder {
                                                     itemCount += partItem.Amount;
                                                     sectionParts.Dequeue();
                                                 }
-                                                if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                                                if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
 
                                                     utilityUnit.SpecCount = itemCount;
                                                     segment.AddChild(utilityUnit);
                                                 }
                                                 else {
-                                                    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры структуры {sectionName} не распознан.");
+                                                    logger.LogWarning($"В секции {sectionName} элемент {itemCode} пропущен.");
+                                                    //throw new InvalidDataException($"Элемент \"{itemCode}\" структуры структуры {sectionName} не распознан.");
                                                 }
                                             }
                                         }
@@ -597,13 +611,16 @@ namespace Bs.Nano.Electric.Builder {
                                                     sectionParts.Dequeue();
                                                 }
                                                 ;
-                                                if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                                                if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
                                                     utilityUnit.SpecCount = itemCount;
                                                     segment.AddChild(utilityUnit);
                                                 }
                                                 else {
-                                                    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры {sectionName} не распознан.");
+                                                    logger.LogWarning($"В секции {sectionName} элемент {itemCode} пропущен."); 
                                                 }
+                                                //else {
+                                                //    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры {sectionName} не распознан.");
+                                                //}
                                             }
                                         }
                                         ;
@@ -697,7 +714,7 @@ namespace Bs.Nano.Electric.Builder {
             return kit;
         }
 
-        private void MakeDbGcHBend(Context context, DbGcHBend segment, IEnumerable<SeriesConfigurationPartItem>? parts) {
+        private void MakeDbGcHBend(Context context, DbGcHBend segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
             Queue<SeriesConfigurationPartItem> sectionParts = new Queue<SeriesConfigurationPartItem>(parts);
             while (sectionParts.Count > 0) {
                 var configPartItem = sectionParts.Dequeue();
@@ -732,19 +749,20 @@ namespace Bs.Nano.Electric.Builder {
                         segment.AddChild(accessory);
                         continue;
                     }
-                    if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                    if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
                         utilityUnit.SpecCount = itemCount;
                         segment.AddChild(utilityUnit);
                         continue;
                     }
-                    {
-                        throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcHBend не распознан.");
+                    else {
+                        logger.LogWarning($"В секции {sectionName?.Split('.').Last()} элемент {itemCode} пропущен.");
                     }
+                    //    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcHBend не распознан.");
+                    //}
                 }
             }
-            ;
         }
-        private void MakeDbGcHBend(Context context, DbGcVBendInner segment, IEnumerable<SeriesConfigurationPartItem>? parts) {
+        private void MakeDbGcHBend(Context context, DbGcVBendInner segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
             Queue<SeriesConfigurationPartItem> sectionParts = new Queue<SeriesConfigurationPartItem>(parts);
             while (sectionParts.Count > 0) {
                 var configPartItem = sectionParts.Dequeue();
@@ -779,19 +797,22 @@ namespace Bs.Nano.Electric.Builder {
                         segment.AddChild(accessory);
                         continue;
                     }
-                    if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                    if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
                         utilityUnit.SpecCount = itemCount;
                         segment.AddChild(utilityUnit);
                         continue;
                     }
-                    {
-                        throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcVBendInner не распознан.");
+                    else {
+                        logger.LogWarning($"В секции {sectionName?.Split('.').Last()} элемент {itemCode} пропущен.");
                     }
+                    //{
+                    //    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcVBendInner не распознан.");
+                    //}
                 }
             }
             ;
         }
-        private void MakeDbGcHBend(Context context, DbGcVBendOuter segment, IEnumerable<SeriesConfigurationPartItem>? parts) {
+        private void MakeDbGcHBend(Context context, DbGcVBendOuter segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
             Queue<SeriesConfigurationPartItem> sectionParts = new Queue<SeriesConfigurationPartItem>(parts);
             while (sectionParts.Count > 0) {
                 var configPartItem = sectionParts.Dequeue();
@@ -826,19 +847,22 @@ namespace Bs.Nano.Electric.Builder {
                         segment.AddChild(accessory);
                         continue;
                     }
-                    if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                    if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
                         utilityUnit.SpecCount = itemCount;
                         segment.AddChild(utilityUnit);
                         continue;
                     }
-                    {
-                        throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcVBendOuter не распознан.");
+                    else {
+                        logger.LogWarning($"В секции {sectionName?.Split('.').Last()} элемент {itemCode} пропущен.");
                     }
+                    //{
+                    //    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcVBendOuter не распознан.");
+                    //}
                 }
             }
             ;
         }
-        private void MakeDbGcHBend(Context context, DbGcVBendUniversal segment, IEnumerable<SeriesConfigurationPartItem>? parts) {
+        private void MakeDbGcHBend(Context context, DbGcVBendUniversal segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
             Queue<SeriesConfigurationPartItem> sectionParts = new Queue<SeriesConfigurationPartItem>(parts);
             while (sectionParts.Count > 0) {
                 var configPartItem = sectionParts.Dequeue();
@@ -866,19 +890,22 @@ namespace Bs.Nano.Electric.Builder {
                         segment.AddChild(accessory);
                         continue;
                     }
-                    if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                    if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
                         utilityUnit.SpecCount = itemCount;
                         segment.AddChild(utilityUnit);
                         continue;
                     }
-                    {
-                        throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcVBendUniversal не распознан.");
+                    else {
+                        logger.LogWarning($"В секции {sectionName?.Split('.').Last()} элемент {itemCode} пропущен.");
                     }
+                    //{
+                    //    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcVBendUniversal не распознан.");
+                    //}
                 }
             }
             ;
         }
-        private void MakeDbGcHBend(Context context, DbGcTriple segment, IEnumerable<SeriesConfigurationPartItem>? parts) {
+        private void MakeDbGcHBend(Context context, DbGcTriple segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
             Queue<SeriesConfigurationPartItem> sectionParts = new Queue<SeriesConfigurationPartItem>(parts);
             while (sectionParts.Count > 0) {
                 var configPartItem = sectionParts.Dequeue();
@@ -913,19 +940,22 @@ namespace Bs.Nano.Electric.Builder {
                         segment.AddChild(accessory);
                         continue;
                     }
-                    if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                    if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
                         utilityUnit.SpecCount = itemCount;
                         segment.AddChild(utilityUnit);
                         continue;
                     }
-                    {
-                        throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcTriple не распознан.");
+                    else {
+                        logger.LogWarning($"В секции {sectionName?.Split('.').Last()} элемент {itemCode} пропущен.");
                     }
+                    //{
+                    //    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcTriple не распознан.");
+                    //}
                 }
             }
             ;
         }
-        private void MakeDbGcHBend(Context context, DbGcCross segment, IEnumerable<SeriesConfigurationPartItem>? parts) {
+        private void MakeDbGcHBend(Context context, DbGcCross segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
             Queue<SeriesConfigurationPartItem> sectionParts = new Queue<SeriesConfigurationPartItem>(parts);
             while (sectionParts.Count > 0) {
                 var configPartItem = sectionParts.Dequeue();
@@ -960,19 +990,22 @@ namespace Bs.Nano.Electric.Builder {
                         segment.AddChild(accessory);
                         continue;
                     }
-                    if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                    if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
                         utilityUnit.SpecCount = itemCount;
                         segment.AddChild(utilityUnit);
                         continue;
                     }
-                    {
-                        throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcCross не распознан.");
+                    else {
+                        logger.LogWarning($"В секции {sectionName?.Split('.').Last()} элемент {itemCode} пропущен.");
                     }
+                    //{
+                    //    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcCross не распознан.");
+                    //}
                 }
             }
             ;
         }
-        private void MakeDbGcHBend(Context context, DbGcMsPassage segment, IEnumerable<SeriesConfigurationPartItem>? parts) {
+        private void MakeDbGcHBend(Context context, DbGcMsPassage segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
             Queue<SeriesConfigurationPartItem> sectionParts = new Queue<SeriesConfigurationPartItem>(parts);
             while (sectionParts.Count > 0) {
                 var configPartItem = sectionParts.Dequeue();
@@ -1007,19 +1040,22 @@ namespace Bs.Nano.Electric.Builder {
                         segment.AddChild(accessory);
                         continue;
                     }
-                    if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                    if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
                         utilityUnit.SpecCount = itemCount;
                         segment.AddChild(utilityUnit);
                         continue;
                     }
-                    {
-                        throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcMsPassage не распознан.");
+                    else {
+                        logger.LogWarning($"В секции {sectionName?.Split('.').Last()} элемент {itemCode} пропущен.");
                     }
+                    //{
+                    //    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcMsPassage не распознан.");
+                    //}
                 }
             }
             ;
         }
-        private void MakeDbGcHBend(Context context, DbGcMsJoint segment, IEnumerable<SeriesConfigurationPartItem>? parts) {
+        private void MakeDbGcHBend(Context context, DbGcMsJoint segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
             Queue<SeriesConfigurationPartItem> sectionParts = new Queue<SeriesConfigurationPartItem>(parts);
             while (sectionParts.Count > 0) {
                 var configPartItem = sectionParts.Dequeue();
@@ -1047,19 +1083,22 @@ namespace Bs.Nano.Electric.Builder {
                         segment.AddChild(accessory);
                         continue;
                     }
-                    if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                    if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
                         utilityUnit.SpecCount = itemCount;
                         segment.AddChild(utilityUnit);
                         continue;
                     }
-                    {
-                        throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcMsJoint не распознан.");
+                    else {
+                        logger.LogWarning($"В секции {sectionName?.Split('.').Last()} элемент {itemCode} пропущен.");
                     }
+                    //{
+                    //    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcMsJoint не распознан.");
+                    //}
                 }
             }
             ;
         }
-        private void MakeDbGcHBend(Context context, DbGcMsCork segment, IEnumerable<SeriesConfigurationPartItem>? parts) {
+        private void MakeDbGcHBend(Context context, DbGcMsCork segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
             Queue<SeriesConfigurationPartItem> sectionParts = new Queue<SeriesConfigurationPartItem>(parts);
             while (sectionParts.Count > 0) {
                 var configPartItem = sectionParts.Dequeue();
@@ -1087,14 +1126,17 @@ namespace Bs.Nano.Electric.Builder {
                         segment.AddChild(accessory);
                         continue;
                     }
-                    if (TryFindDbUtilityUnit(context, itemCode, out var utilityUnit)) {
+                    if (TryFindDbUtilityUnit(logger, context, itemCode, out var utilityUnit)) {
                         utilityUnit.SpecCount = itemCount;
                         segment.AddChild(utilityUnit);
                         continue;
                     }
-                    {
-                        throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcMsCork не распознан.");
+                    else {
+                        logger.LogWarning($"В секции {sectionName?.Split('.').Last()} элемент {itemCode} пропущен.");
                     }
+                    //{
+                    //    throw new InvalidDataException($"Элемент \"{itemCode}\" структуры DbGcMsCork не распознан.");
+                    //}
                 }
             }
             ;
@@ -1189,29 +1231,34 @@ namespace Bs.Nano.Electric.Builder {
                             .AsNoTracking()
                             .FirstOrDefault(sgc => sgc.Code == gutterRow.ItemCode);
                         if (gutterCanal is null) {
-                            throw new InvalidDataException($"При продукт {gutterRow.ItemCode} не найден в таблице \"{Context.GetDefaultLocalizeValue<ScsGutterCanal>()}\".");
+                            logger.LogWarning($"В конфигурации {mountSystemSet.Name} элемент  {gutterRow.ItemCode} не найден в таблице \"{Context.GetDefaultLocalizeValue<ScsGutterCanal>()}\"." +
+                                $"Добавление лотка пропущено.");
+                            continue;
+                            //throw new InvalidDataException($"При продукт {gutterRow.ItemCode} не найден в таблице \"{Context.GetDefaultLocalizeValue<ScsGutterCanal>()}\".");
                         }
 
                         DbScsGcSeriaConfigiration? config = null;
-                        try {
-                            var confCode = GetDbScsGcSeriesConfiguration_Key(gutterCanal.GutterType, gutterCanal.Series);
-                            config = context.DbScsGcSeriaConfigirations
-                                .AsNoTracking()
-                                .FirstOrDefault(item => item.DbName == confCode);
-                            if (config is null) {
-                                logger.LogInformation($"Конфигурация соединительных элементов \"{confCode}\" не найдена. Построим из задания.");
-                                seriesConfigurationJob ??= resources.SeriesConfigurationJobs;
-                                if (seriesConfigurationJob.TryGetValue(confCode, out var confJob)) {
-                                    config = MakeSeriesConfiguration(context, confJob);
-                                }
-                                else {
-                                    throw new InvalidDataException($"В задании на конфигурации соединительных элементов не содержится описания конфигурации \"{confCode}\".");
-                                }
-                            }
+                        var confCode = GetDbScsGcSeriesConfiguration_Key(gutterCanal.GutterType, gutterCanal.Series);
+                        config = context.DbScsGcSeriaConfigirations
+                            .AsNoTracking()
+                            .FirstOrDefault(item => item.DbName == confCode);
+                        if (config is null) {
+                            //seriesConfigurationJob ??= resources.SeriesConfigurationJobs;
+                            //if (seriesConfigurationJob.TryGetValue(confCode, out var confJob)) {
+                            //    logger.LogInformation($"Конфигурация соединительных элементов \"{confCode}\" не найдена. Построим из задания.");
+                            //    config = MakeSeriesConfiguration(context, confJob);
+                            //}
+                            //else {
+                            //    throw new InvalidDataException($"В задании на конфигурации соединительных элементов не содержится описания конфигурации \"{confCode}\".");
+                            //}
+                            logger.LogWarning($"Не найдена конфигурация соединительных элементов {confCode}.");
+                            logger.LogWarning($"В конфигурации {mountSystemSet.Name} для лотка {gutterCanal.Code} не сопоставлена конфигурация соединительных элементов.");
                         }
-                        catch (Exception ex) {
-                            throw new InvalidDataException($"При создании или извлечении конфигурации соединительных элементов для артикула [{gutterRow.ItemCode}] произошла ошибка.", ex);
-                        }
+                        //try {
+                        //}
+                        //catch (Exception ex) {
+                        //    throw new InvalidDataException($"При создании или извлечении конфигурации соединительных элементов для артикула [{gutterRow.ItemCode}] произошла ошибка.", ex);
+                        //}
 
                         var gutter = plain.Gutter = new DbGcSystemGutter {
                             Gutter = gutterCanal,
@@ -1221,15 +1268,17 @@ namespace Bs.Nano.Electric.Builder {
                             Configuration = config
                         };
                         #region DbGcSystemGutter.DbUtilityUnit
-                        var gutterAccessoryList = job.JobParts.Where(item => item.KitStructureItem == KitStructureType.DbUtilityUnit && item.ParentUid == gutterRow.Uid); // Лоток\Комплектующие
+                        var gutterAccessoryList = job.JobParts.
+                            Where(item => item.KitStructureItem == KitStructureType.DbUtilityUnit && item.ParentUid == gutterRow.Uid); // Лоток\Комплектующие
                         foreach (var gutterAccessoryRow in gutterAccessoryList) {
                             //DbUtilityUnit? dbUtilityUnit;
-                            if (TryFindDbUtilityUnit(context, gutterAccessoryRow.ItemCode, out var dbUtilityUnit)) {
+                            if (TryFindDbUtilityUnit(logger, context, gutterAccessoryRow.ItemCode, out var dbUtilityUnit)) {
                                 dbUtilityUnit.SpecCount = gutterAccessoryRow.ItemQuantity;
                                 plain.AddChild(dbUtilityUnit);
                             }
                             else {
-                                throw new InvalidDataException($"При извлечении продукта {gutterAccessoryRow.ItemCode} как элемента \"Комплектующие\" произошла ошибка: Элемент среди допустимых комплектующих не найден.");
+                                logger.LogWarning($"В конфигурации {mountSystemSet.Name} элемент {gutterAccessoryRow.ItemCode} пропущен.");
+                                //throw new InvalidDataException($"При извлечении продукта {gutterAccessoryRow.ItemCode} как элемента \"Комплектующие\" произошла ошибка: Элемент среди допустимых комплектующих не найден.");
                             }
                         }
                         #endregion
@@ -1408,42 +1457,57 @@ namespace Bs.Nano.Electric.Builder {
                     string btRowCode = btRow.ItemCode;
                     /*if (!string.IsNullOrEmpty(btRowCode))*/
                     {
+                        var btLength = btRow.TotalLayersHeight;
                         var bt = context.ScsGutterBoltings
                             .Select(bt => new { bt.Id, bt.Code, bt.Length, bt.ProfileLength, bt.Heigth, bt.CanalBoltingType })
                             .FirstOrDefault(bt => bt.Code == btRowCode);
                         if (bt is null) {
-                            throw new InvalidDataException($"Элемент с артикулом {btRowCode} не найден в таблице {Context.GetDefaultLocalizeValue<ScsGutterBolting>()}");
+                            logger.LogWarning($"Элемент с артикулом {btRowCode} не найден в таблице {Context.GetDefaultLocalizeValue<ScsGutterBolting>()}");
+                            logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {btRowCode} пропущен.");
+                            //throw new InvalidDataException($"Элемент с артикулом {btRowCode} не найден в таблице {Context.GetDefaultLocalizeValue<ScsGutterBolting>()}");
                         }
-                        switch (bt.CanalBoltingType) {
-                            case ScsGutterBoltingTypeEnum.CONSOLE:
-                            case ScsGutterBoltingTypeEnum.POST:
-                                sguSet.StandType = DbGcKnotStandType.POST;
-                                break;
-                            case ScsGutterBoltingTypeEnum.STUD:
-                                sguSet.StandType = DbGcKnotStandType.STUD;
-                                break;
-                            case ScsGutterBoltingTypeEnum.PROFILE:
-                                sguSet.StandType = DbGcKnotStandType.PROFILE;
-                                break;
-                            default:
-                                throw new InvalidDataException($"Указан некорректный артикул крепления ярусов \"{btRowCode}\". Изделие должно являться стойкой, профилем или шпилькой.");
+                        else {
+                            switch (bt.CanalBoltingType) {
+                                case ScsGutterBoltingTypeEnum.CONSOLE:
+                                case ScsGutterBoltingTypeEnum.POST:
+                                    sguSet.StandType = DbGcKnotStandType.POST;
+                                    break;
+                                case ScsGutterBoltingTypeEnum.STUD:
+                                    sguSet.StandType = DbGcKnotStandType.STUD;
+                                    break;
+                                case ScsGutterBoltingTypeEnum.PROFILE:
+                                    sguSet.StandType = DbGcKnotStandType.PROFILE;
+                                    break;
+                                default: {
+                                        logger.LogWarning($"Указан некорректный артикул крепления ярусов \"{btRowCode}\". Изделие должно являться стойкой, профилем, консолью или шпилькой.");
+                                        logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {btRowCode} пропущен.");
+                                        bt = null;
+                                        break;
+                                    }
+                                    //throw new InvalidDataException($"Указан некорректный артикул крепления ярусов \"{btRowCode}\". Изделие должно являться стойкой, профилем, консолью или шпилькой.");
+                            }
+                            if (bt is not null) {
+                                if (!btLength.HasValue) {
+                                    btLength =
+                                        bt.CanalBoltingType == ScsGutterBoltingTypeEnum.PROFILE ? (bt.ProfileLength.HasValue ? (int)bt.ProfileLength.Value : 500) :
+                                        bt.CanalBoltingType == ScsGutterBoltingTypeEnum.POST ? (bt.Heigth.HasValue ? (int)bt.Heigth.Value : 500) :
+                                        bt.CanalBoltingType == ScsGutterBoltingTypeEnum.STUD ? (bt.Heigth.HasValue ? (int)bt.Heigth.Value : 500) :
+                                        bt.CanalBoltingType == ScsGutterBoltingTypeEnum.CONSOLE ? (bt.Length.HasValue ? (int)bt.Length.Value : 300) :
+                                        0;
+                                }
+                                ks.Bolting = context.ScsGutterBoltings.Find(bt.Id); // new ScsGutterBolting { Id = bt.Id };  
+                            }
                         }
-                        var btLength = btRow.TotalLayersHeight;
-                        if (!btLength.HasValue) {
-                            btLength = bt.CanalBoltingType == ScsGutterBoltingTypeEnum.PROFILE ? (bt.ProfileLength.HasValue ? (int)bt.ProfileLength : 0)
-                            : bt.CanalBoltingType == ScsGutterBoltingTypeEnum.POST ? (bt.Heigth.HasValue ? (int)bt.Heigth : 0)
-                            : bt.CanalBoltingType == ScsGutterBoltingTypeEnum.STUD ? (bt.Heigth.HasValue ? (int)bt.Heigth : 0)
-                            : 0;
-                        }
-                        ks.Bolting = context.ScsGutterBoltings.Find(bt.Id); // new ScsGutterBolting { Id = bt.Id };
-                        ks.Length = btLength.Value;
+                        ks.Length = btLength.HasValue ? btLength.Value : 500;
                     }
                     var btRowId = btRow.Uid;
                     foreach (var childItem in job.JobParts.Where(item => item.ParentUid == btRowId).ToArray()) {
                         if (childItem.KitStructureItem == KitStructureType.DbUtilityUnit) {
                             var unitCode = childItem.ItemCode;
-                            if (!TryFindDbUtilityUnit(context, unitCode, out var dbUtilityUnit)) {
-                                throw new InvalidDataException($"При извлечении продукта {unitCode} как элемента \"Комплектующие\" произошла ошибка: Элемент среди допустимых комплектующих не найден.");
+                            if (!TryFindDbUtilityUnit(logger, context, unitCode, out var dbUtilityUnit)) {
+                                logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {unitCode} пропущен.");
+                                continue;
+                                //throw new InvalidDataException($"При извлечении продукта {unitCode} как элемента \"Комплектующие\" произошла ошибка: Элемент среди допустимых комплектующих не найден.");
                             }
                             dbUtilityUnit.SpecCount = childItem.ItemQuantity;
                             ks.AddChild(dbUtilityUnit);
@@ -1451,7 +1515,9 @@ namespace Bs.Nano.Electric.Builder {
                         else if (childItem.KitStructureItem == KitStructureType.DbShelf) {
                         }
                         else {
-                            throw new InvalidDataException($"При построении элемента {childItem} произошла ошибка. Для элемента конфигурации \"Крепление ярусов\" в качестве подчиненного можно указать только элемент \"Полка\" или \"Комплектующие\".");
+                            logger.LogWarning($"Для элемента конфигурации \"Крепление ярусов\" в качестве подчиненного можно указать только элемент \"Полка\" или \"Комплектующие\".");
+                            logger.LogWarning($"В конфигурации узлов крепления {sguSet.DbName} элемент {childItem.ItemCode} пропущен.");
+                            //throw new InvalidDataException($"При построении элемента {childItem} произошла ошибка. Для элемента конфигурации \"Крепление ярусов\" в качестве подчиненного можно указать только элемент \"Полка\" или \"Комплектующие\".");
                         }
                     }
                 }
@@ -1480,7 +1546,8 @@ namespace Bs.Nano.Electric.Builder {
                 }
                 var dbShelfs = job.JobParts.Where(item => item.KitStructureItem == KitStructureType.DbShelf).ToArray();
                 if (dbShelfs.Length == 0) {
-                    throw new InvalidDataException($"В структуре подчиненности для элемента \"{job.Attribute.DbName}\" не указано ни одного элемента конфигурации типа \"Полка\".");
+                    logger.LogWarning($"В структуре подчиненности для элемента \"{job.Attribute.DbName}\" не указано ни одного элемента конфигурации типа \"Полка\".");
+                    //throw new InvalidDataException($"В структуре подчиненности для элемента \"{job.Attribute.DbName}\" не указано ни одного элемента конфигурации типа \"Полка\".");
                 }
                 var plainCounter = new PlainCounter(dbShelfs.Length, sguSet.KnotType.Value).GetEnumerator();
                 DbGcKnotLevel level = null;
@@ -1496,46 +1563,53 @@ namespace Bs.Nano.Electric.Builder {
                     }
                     else {
                         dbShelf = context.ScsGutterBoltings.FirstOrDefault(p => p.Code == gutterBoltingCode);
-
                         if (dbShelf is null) {
-                            throw new InvalidDataException($"Элемент с артикулом {gutterBoltingCode} не найден в таблице {Context.GetDefaultLocalizeValue<ScsGutterBolting>()}");
+                            logger.LogWarning($"Элемент с артикулом {gutterBoltingCode} не найден в таблице {Context.GetDefaultLocalizeValue<ScsGutterBolting>()}");
+                            logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {gutterBoltingCode} пропущен.");
+                            dbShelf = null;
+                            sguSet.LevelType = DbGcKnotLevelType.NO;
+                            //throw new InvalidDataException($"Элемент с артикулом {gutterBoltingCode} не найден в таблице {Context.GetDefaultLocalizeValue<ScsGutterBolting>()}");
                         }
-                        // Проверка изделия на допустимый тип элемента яруса 
-
-                        switch (dbShelf.CanalBoltingType) {
-                            case ScsGutterBoltingTypeEnum.PROFILE:
-                                sguSet.LevelType = DbGcKnotLevelType.PROFILE;
-                                break;
-                            case ScsGutterBoltingTypeEnum.CROSSBAR:
-                                sguSet.LevelType = DbGcKnotLevelType.CROSSBAR;
-                                break;
-                            case ScsGutterBoltingTypeEnum.CRAMP:
-                                sguSet.LevelType = DbGcKnotLevelType.CRAMP;
-                                break;
-                            case ScsGutterBoltingTypeEnum.CONSOLE:
-                                ScsGcConsoleMountType consoleType = dbShelf.ConsoleMountType!.Value;
-                                switch (consoleType) {
-                                    case ScsGcConsoleMountType.CELL:
-                                        sguSet.LevelType = DbGcKnotLevelType.C_BRACKET;
-                                        break;
-                                    case ScsGcConsoleMountType.L_WALL:
-                                        sguSet.LevelType = DbGcKnotLevelType.L_BRACKET;
-                                        break;
-                                    default:
-                                        sguSet.LevelType = DbGcKnotLevelType.CONSOLE;
-                                        break;
-                                }
-                                break;
-                            case ScsGutterBoltingTypeEnum.OTHER:
-                                sguSet.LevelType = DbGcKnotLevelType.NO;
-                                break;
-                            default:
-                                StringBuilder sb = new StringBuilder();
-                                sb.Append($"Для элемента \"{KitStructureType.DbShelf.GetDescription()}\" указанное изделие \"{dbShelf.CanalBoltingType.GetDescription()}\" недопустимо. ");
-                                sb.Append($"Необходимо указать {ScsGutterBoltingTypeEnum.PROFILE.GetDescription()}, ");
-                                sb.Append($"{ScsGutterBoltingTypeEnum.CROSSBAR.GetDescription()}, {ScsGutterBoltingTypeEnum.CONSOLE.GetDescription()}, ");
-                                sb.Append($"или {ScsGutterBoltingTypeEnum.CRAMP.GetDescription()}.");
-                                throw new InvalidDataException(sb.ToString());
+                        else {
+                            // Проверка изделия на допустимый тип элемента яруса 
+                            switch (dbShelf.CanalBoltingType) {
+                                case ScsGutterBoltingTypeEnum.PROFILE:
+                                    sguSet.LevelType = DbGcKnotLevelType.PROFILE;
+                                    break;
+                                case ScsGutterBoltingTypeEnum.CROSSBAR:
+                                    sguSet.LevelType = DbGcKnotLevelType.CROSSBAR;
+                                    break;
+                                case ScsGutterBoltingTypeEnum.CRAMP:
+                                    sguSet.LevelType = DbGcKnotLevelType.CRAMP;
+                                    break;
+                                case ScsGutterBoltingTypeEnum.CONSOLE:
+                                    ScsGcConsoleMountType consoleType = dbShelf.ConsoleMountType!.Value;
+                                    switch (consoleType) {
+                                        case ScsGcConsoleMountType.CELL:
+                                            sguSet.LevelType = DbGcKnotLevelType.C_BRACKET;
+                                            break;
+                                        case ScsGcConsoleMountType.L_WALL:
+                                            sguSet.LevelType = DbGcKnotLevelType.L_BRACKET;
+                                            break;
+                                        default:
+                                            sguSet.LevelType = DbGcKnotLevelType.CONSOLE;
+                                            break;
+                                    }
+                                    break;
+                                case ScsGutterBoltingTypeEnum.OTHER:
+                                    sguSet.LevelType = DbGcKnotLevelType.NO;
+                                    break;
+                                default:
+                                    StringBuilder sb = new StringBuilder();
+                                    sb.Append($"Для элемента \"{KitStructureType.DbShelf.GetDescription()}\" указанное изделие \"{dbShelf.CanalBoltingType.GetDescription()}\" недопустимо. ");
+                                    sb.Append($"Необходимо указать {ScsGutterBoltingTypeEnum.PROFILE.GetDescription()}, ");
+                                    sb.Append($"{ScsGutterBoltingTypeEnum.CROSSBAR.GetDescription()}, {ScsGutterBoltingTypeEnum.CONSOLE.GetDescription()}, ");
+                                    sb.Append($"или {ScsGutterBoltingTypeEnum.CRAMP.GetDescription()}.");
+                                    logger.LogError(sb.ToString());
+                                    logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {gutterBoltingCode} пропущен.");
+                                    break;
+                                    //throw new InvalidDataException(sb.ToString());
+                            } 
                         }
                     }
                     if (sguSet.KnotType == ScsGcStandType.TWO_SIDE && plainCounter.Current.Number == 2) {
@@ -1567,8 +1641,10 @@ namespace Bs.Nano.Electric.Builder {
                     foreach (var childItem in job.JobParts.Where(item => item.ParentUid == itemUid).ToArray()) {
                         if (childItem.KitStructureItem == KitStructureType.DbUtilityUnit) {
                             var unitCode = childItem.ItemCode;
-                            if (!TryFindDbUtilityUnit(context, unitCode, out var dbUtilityUnit)) {
-                                throw new InvalidDataException($"При извлечении продукта \"{unitCode}\" как элемента \"Комплектующие\" произошла ошибка: Элемент среди допустимых комплектующих не найден.");
+                            if (!TryFindDbUtilityUnit(logger, context, unitCode, out var dbUtilityUnit)) {
+                                logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {unitCode} пропущен.");
+                                continue;
+                                //throw new InvalidDataException($"При извлечении продукта \"{unitCode}\" как элемента \"Комплектующие\" произошла ошибка: Элемент среди допустимых комплектующих не найден.");
                             }
                             dbUtilityUnit.SpecCount = childItem.ItemQuantity;
                             dbGcKnotPlain.AddChild(dbUtilityUnit);
@@ -1577,7 +1653,9 @@ namespace Bs.Nano.Electric.Builder {
 
                         }
                         else {
-                            throw new InvalidDataException($"При построении элемента {childItem} произошла ошибка. Для элемента конфигурации \"Полка\" в качестве подчиненного можно указать только элемент\"Лоток\" или \"Комплектующие\". ");
+                            logger.LogWarning($"Для элемента конфигурации \"Полка\" в качестве подчиненного можно указать только элемент \"Лоток\" или \"Комплектующие\". ");
+                            logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {childItem.ItemCode} пропущен.");
+                            //throw new InvalidDataException($"При построении элемента {childItem} произошла ошибка. Для элемента конфигурации \"Полка\" в качестве подчиненного можно указать только элемент\"Лоток\" или \"Комплектующие\". ");
                         }
                     }
                 }
@@ -1666,6 +1744,20 @@ namespace Bs.Nano.Electric.Builder {
                 return null;
             return gcPart;
         }
+        private static bool TryFindDbUtilityUnit(ILogger logger, Context context, string code, [NotNullWhen(true)] out DbUtilityUnit? dbUtilityUnit) {
+            if (TryFindDbUtilityUnit(context, code, out var element)) {
+                dbUtilityUnit = element;
+            }
+            else {
+                logger.LogWarning($"Ошибка поиска элемента \"Комплектующие\": артикул {code} не является элементом одной из таблиц" +
+                    $" \"Материалы и комплектация\\Материалы\", " +
+                    $" \"Материалы и комплектация\\Комплектации материалов\", \"Лотки\\Аксессуары лотков\"," +
+                    $" \"Крепления лотков\\Элементы крепления\", \"Крепления лотков\\Аксессуары крепления\".");
+                dbUtilityUnit = null;
+            }
+            return dbUtilityUnit is not null;
+        }
+
         /// <summary>
         /// Производит поиск элемента для использования как элемента конфигурации.
         /// </summary>
@@ -1679,18 +1771,23 @@ namespace Bs.Nano.Electric.Builder {
             // Поиск по Local (уже в памяти, с нормальным сравнением строк)
             DbUtilityUnit? unit;
             do {
+                // "Материалы и комплектация\\Материалы"
                 unit = context.CaeMaterialUtilities.Local.FirstOrDefault(u => string.Equals(u.Code, code, StringComparison.Ordinal));
                 if (unit is not null)
                     break;
+                //Материалы и комплектация\\Комплектации материалов
                 unit = context.DbCaeMaterialUtilitySets.Local.FirstOrDefault(u => string.Equals(u.DbName, code, StringComparison.Ordinal));
                 if (unit is not null)
                     break;
+                // Лотки\\Аксессуары лотков
                 unit = context.DbScsGcAccessoryUnits.Local.FirstOrDefault(u => string.Equals(u.Code, code, StringComparison.Ordinal));
                 if (unit is not null)
                     break;
+                //Крепления лотков\\Аксессуары крепления
                 unit = context.DbScsGcBoltingAccessoryUnits.Local.FirstOrDefault(u => string.Equals(u.Code, code, StringComparison.Ordinal));
                 if (unit is not null)
                     break;
+                // Крепления лотков\\Элементы крепления
                 unit = context.ScsGutterBoltings.Local.FirstOrDefault(u => string.Equals(u.Code, code, StringComparison.Ordinal));
             } while (false);
             if (unit is not null) {
@@ -1801,7 +1898,7 @@ namespace Bs.Nano.Electric.Builder {
             LayerHeight: layerHeight,
             ComplectType: complectType
         );
-            
+
             return value;
         }
         private static string GetKitStructureAsXML<Tkit>(Tkit kit) where Tkit : KitElement {

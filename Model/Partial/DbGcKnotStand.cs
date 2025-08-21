@@ -14,7 +14,7 @@ namespace Nano.Electric {
         public bool IsUse { get; set; }
         public int Length { get; set; }
 
-        public ScsGutterBolting Bolting { get; set; }
+        public ScsGutterBolting? Bolting { get; set; }
         public DbGcKnotStand() {
             IsEnabled = true;
             IsUse = true;
@@ -40,7 +40,7 @@ namespace Nano.Electric {
         }
 
         protected override void WriteProperties(XmlWriter writer) {
-            if (!(Bolting is null)) {
+            if (Bolting is not null) {
                 writer.WriteStartElement("Bolting");
                 writer.WriteAttributeString("TableName", "ScsGutterBolting");
                 writer.WriteAttributeString("Id", Bolting.Id.ToString());
