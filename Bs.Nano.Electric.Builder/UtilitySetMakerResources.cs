@@ -27,6 +27,7 @@ namespace Bs.Nano.Electric.Builder {
 #if NETFRAMEWORK
         public class MountSystemSetJobPart {
             public string SetCode { get; set; }
+            public string SetCodeSuffix { get; set; }
             public string Material { get; set; }
             public string ItemCode { get; set; }
             public int ItemQuantity { get; set; }
@@ -37,10 +38,11 @@ namespace Bs.Nano.Electric.Builder {
             public int? LayerHeight { get; set; }
             public DbGcStrightSegmentComplectType? ComplectType { get; set; }
 
-            public MountSystemSetJobPart(string SetCode, string Material, string ItemCode, int ItemQuantity,
+            public MountSystemSetJobPart(string SetCode, string SetCodeSuffix, string Material, string ItemCode, int ItemQuantity,
                 KitStructureType KitStructureItem, int Uid, int? ParentUid, int? TotalLayersHeight,
                 int? LayerHeight, DbGcStrightSegmentComplectType? ComplectType) {
                 this.SetCode = SetCode;
+                this.SetCodeSuffix = SetCodeSuffix;
                 this.Material = Material;
                 this.ItemCode = ItemCode;
                 this.ItemQuantity = ItemQuantity;
@@ -55,19 +57,17 @@ namespace Bs.Nano.Electric.Builder {
 
         public class MountSystemSetJob {
             public string Code { get; set; }
+            public string CodeSuffix { get; set; }
             public string Material { get; set; }
-            public (string DbName, string DbDescription, string Description, string DbCatalog,
-                string DbImageRef, double? PostDistance, DbGcKnotInstallType MountType,
-                ScsGcStandType KnotType, DbGcKnotStandStructureType StructureType) Attribute { get; set; }
+            public GcMountSystemJob Attribute { get; set; }
             public LinkedList<MountSystemSetJobPart> JobParts { get; set; }
 
             public MountSystemSetJob(
-                string Code,string Material,
-                (string DbName, string DbDescription, string Description, string DbCatalog,
-                    string DbImageRef, double? PostDistance, DbGcKnotInstallType MountType,
-                    ScsGcStandType KnotType, DbGcKnotStandStructureType StructureType) Attribute,
+                string Code, string CodeSuffix, string Material,
+                GcMountSystemJob Attribute,
                 LinkedList<MountSystemSetJobPart> JobParts) {
                 this.Code = Code;
+                this.CodeSuffix = CodeSuffix;
                 this.Material = Material;
                 this.Attribute = Attribute;
                 this.JobParts = JobParts;
@@ -206,12 +206,147 @@ namespace Bs.Nano.Electric.Builder {
                 this.Sections = Sections;
             }
         }
+        /// <summary>
+        /// Представляет элемент таблицы Узлы крепления
+        /// </summary>
+        public class ScsGutterUtilitySetJob {
+            public string Code { get; init; }
+            public string DbName { get; init; }
+            public string DbDescription { get; init; }
+            public string Description { get; init; }
+            public string Material { get; init; }
+            public string DbCatalog { get; init; }
+            public string DbImageRef { get; init; }
+            public DbGcKnotInstallType InstallType { get; init; }
+            public DbGcKnotStandStructureType StructureType { get; init; }
+            public ScsGcStandType KnotType { get; init; }
+   
+            public ScsGutterUtilitySetJob(
+                string Code,
+                string DbName,
+                string DbDescription,
+                 string Description,
+               string Material,
+                string DbCatalog,
+                string DbImageRef,
+                DbGcKnotInstallType InstallType,
+                DbGcKnotStandStructureType StructureType,
+                ScsGcStandType KnotType) {
+                this.Code = Code;
+                this.DbName = DbName;
+                this.DbDescription = DbDescription;
+                this.Description = Description;
+                this.Material = Material;
+                this.DbCatalog = DbCatalog;
+                this.DbImageRef = DbImageRef;
+                this.InstallType = InstallType;
+                this.StructureType = StructureType;
+                this.KnotType = KnotType;
+                
+            }
+        }
+
+        /// <summary>
+        /// Представляет элемент таблицы Трассы лотков
+        /// </summary>
+        public class GcMountSystemJob {
+            public string Code { get; init; }
+            public string CodeSuffix { get; init; }
+            public string StandDbName { get; init; }
+            public string DbName { get; init; }
+            public string DbNaming { get; init; }
+            public string DbDescription { get; init; }
+            public string Material { get; init; }
+            public string DbCatalog { get; init; }
+            public string DbImageRef { get; init; }
+            public double PostDistance { get; init; }
+
+            public GcMountSystemJob(
+                string Code,
+                string CodeSuffix,
+                string StandDbName,
+                string DbName,
+                string DbNaming,
+                string DbDescription,
+                string Material,
+                string DbCatalog,
+                string DbImageRef,
+                double PostDistance) {
+                this.Code = Code;
+                this.CodeSuffix = CodeSuffix;
+                this.StandDbName = StandDbName;
+                this.DbName = DbName;
+                this.DbNaming = DbNaming;
+                this.DbDescription = DbDescription;
+                this.Material = Material;
+                this.DbCatalog = DbCatalog;
+                this.DbImageRef = DbImageRef;
+                this.PostDistance = PostDistance;
+            }
+        }
+        public record DbScsGutterUtilitySetJob(
+            ScsGutterUtilitySetJob Attribute,
+            IEnumerable<MountSystemSetJobPart> JobParts);
+
 #else
-        public record MountSystemSetJobPart(string SetCode, string Material, string ItemCode, int ItemQuantity, KitStructureType KitStructureItem, int Uid, int? ParentUid, int? TotalLayersHeight, int? LayerHeight, DbGcStrightSegmentComplectType? ComplectType);
-        public record MountSystemSetJob(string Code,string Material, 
-            (string DbName, string DbDescription, string Description, string DbCatalog, string DbImageRef, double? PostDistance, DbGcKnotInstallType MountType, ScsGcStandType KnotType, DbGcKnotStandStructureType StructureType) Attribute,
+        public record MountSystemSetJobPart(
+            string SetCode, 
+            string SetCodeSuffix, 
+            string Material, 
+            string ItemCode, 
+            int ItemQuantity, 
+            KitStructureType KitStructureItem, 
+            int Uid, 
+            int? ParentUid, 
+            int? TotalLayersHeight, 
+            int? LayerHeight, 
+            DbGcStrightSegmentComplectType? ComplectType);
+        public record MountSystemSetJob(string Code, string CodeSuffix,
+            string Material,
+            GcMountSystemJob Attribute,
             LinkedList<MountSystemSetJobPart> JobParts);
+        public record DbScsGutterUtilitySetJobPart(
+            DbScsGutterUtilitySetJob Parent,
+            string ItemCode,
+            int ItemQuantity,
+            KitStructureType KitStructureItem,
+            int Uid,
+            int? ParentUid,
+            int? TotalLayersHeight,
+            int? LayerHeight);
+        public record DbScsGutterUtilitySetJob(
+            ScsGutterUtilitySetJob Attribute,
+            IEnumerable<MountSystemSetJobPart> JobParts);
         public record UtilityUnit(string Code, string UtilityUnitCode, int SpecCount = 1);
+        /// <summary>
+        /// Представляет элемент таблицы Узлы крепления
+        /// </summary>
+        public record ScsGutterUtilitySetJob(
+            string Code,
+            string DbName,
+            string DbDescription,
+            string Description,
+            string Material,
+            string DbCatalog,
+            string DbImageRef,
+            DbGcKnotInstallType InstallType,
+            DbGcKnotStandStructureType StructureType,
+            ScsGcStandType KnotType);
+        /// <summary>
+        /// Представляет элемент таблицы Трассы лотков
+        /// </summary>
+        public record GcMountSystemJob(
+            string Code,
+            string CodeSuffix,
+            string StandDbName,
+            string DbName,
+            string DbNaming,
+            string DbDescription,
+            string Material,
+            string DbCatalog,
+            string DbImageRef,
+            double PostDistance
+           );
         /// <summary>
         /// Представляет задание на построение конфигурации трасс настенных коробов.
         /// </summary>
@@ -249,7 +384,9 @@ namespace Bs.Nano.Electric.Builder {
         private readonly IElectricBuilderConfiguration configuration;
         private readonly ResourceManager resourceManager;
         private readonly Lazy<IEnumerable<SheetCommon.Row>> lzGutterUtilitySetSource;
-        private readonly Lazy<IEnumerable<SheetCommon.Row>> lzDbGcMountSystemSet;
+        //private readonly Lazy<IEnumerable<SheetCommon.Row>> lzDbGcMountSystemSet;
+        private readonly Lazy<IEnumerable<SheetCommon.Row>> lzScsGutterUtilitySet;
+        private readonly Lazy<IEnumerable<SheetCommon.Row>> lzGcMountSystemSet;
 
         private readonly Lazy<IEnumerable<CcMountSystemSetJob>> lzCcMountSystemSource;
         private readonly Lazy<IEnumerable<TbMountSystemJob>> lzDbTbMountSystemSource;
@@ -261,19 +398,24 @@ namespace Bs.Nano.Electric.Builder {
             this.configuration = configuration;
             this.resourceManager = resourceManager;
             lzGutterUtilitySetSource = new Lazy<IEnumerable<SheetCommon.Row>>(GetGutterUtilitySetSource(resourceManager, configuration));
-            lzDbGcMountSystemSet = new Lazy<IEnumerable<SheetCommon.Row>>(GetDbGcMountSystemSet(resourceManager, configuration));
+            //lzDbGcMountSystemSet = new Lazy<IEnumerable<SheetCommon.Row>>(GetDbGcMountSystemSet(resourceManager, configuration));
+            lzScsGutterUtilitySet = new(GetScsGutterUtilitySet(resourceManager, configuration));
+            lzGcMountSystemSet = new(GetGcMountSystemSet(resourceManager, configuration));
+
             lzSeriesConfigurationJobs = new(GetSeriesConfigurationJobs(resourceManager, configuration), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
             lzCcMountSystemSource = new(GetCcMountSystemJobs(resourceManager, configuration), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
             lzDbScsTubeSeriesConfigurationSource = new(GetDbScsTubeSeriesConfigurationJobs(resourceManager, configuration), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
             lzDbTbMountSystemSource = new(GetDbTbMountSystemJobs(resourceManager, configuration), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
             lzSeriaConfigurationMapping = new(GetSeriaConfigurationMapping(resourceManager, configuration), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication);
         }
+
+
         /// <summary>
         /// Перечень алиасов для материалов и типов покрытия.
         /// </summary>
         public abstract IEnumerable<string> KnownMaterials { get; }
         /// <summary>
-        /// Крепления лотков. Конфигурации узлов крепления.xlsx
+        /// Крепления лотков. Комплектации узлов крепления.
         /// </summary>
         /// <exception cref="SectionNotFoundException">В конфигурации не определена секция или один из необходимых ключей секции.</exception>
         public IEnumerable<SheetCommon.Row> GutterUtilitySetSource => lzGutterUtilitySetSource.Value;
@@ -281,7 +423,17 @@ namespace Bs.Nano.Electric.Builder {
         /// Конфигурации КНС. Конфигурации трасс лотков
         /// </summary>
         /// <exception cref="SectionNotFoundException">В конфигурации не определена секция или один из необходимых ключей секции.</exception>
-        public IEnumerable<SheetCommon.Row> DbGcMountSystemSet => lzDbGcMountSystemSet.Value;
+        //public IEnumerable<SheetCommon.Row> DbGcMountSystemSet => lzDbGcMountSystemSet.Value;
+        /// <summary>
+        /// Конфигурации узлов крепления. Общие параметры
+        /// </summary>
+        /// <exception cref="SectionNotFoundException">В конфигурации не определена секция или один из необходимых ключей секции.</exception>
+        public IEnumerable<SheetCommon.Row> ScsGutterUtilitySet => lzScsGutterUtilitySet.Value;
+        /// <summary>
+        /// Конфигурации трасс лотков. Общие параметры
+        /// </summary>
+        /// <exception cref="SectionNotFoundException">В конфигурации не определена секция или один из необходимых ключей секции.</exception>
+        public IEnumerable<SheetCommon.Row> GcMountSystemSet => lzGcMountSystemSet.Value;
         /// <summary>
         /// Конфигурации КНС. Конфигурации трасс настенных коробов
         /// </summary>
@@ -303,6 +455,49 @@ namespace Bs.Nano.Electric.Builder {
         /// <exception cref="SectionNotFoundException">В конфигурации не определена секция или один из необходимых ключей секции.</exception>
         public Dictionary<string, SeriesConfigurationJob> SeriesConfigurationJobs => lzSeriesConfigurationJobs.Value;
         public Dictionary<string, string> SeriaConfigurationMapping => lzSeriaConfigurationMapping.Value;
+        /// <summary>
+        /// Загружает Конфигурации узлов крепления. Общие параметры
+        /// </summary>
+        /// <param name="resourceManager"></param>
+        private Func<IEnumerable<SheetCommon.Row>> GetScsGutterUtilitySet(ResourceManager resourceManager, IElectricBuilderConfiguration configuration) {
+            return () => {
+                var section = configuration.GetSection("KitStructureSource:ScsGutterUtilitySetSource");
+                if (!section.Exists()) {
+                    throw new SectionNotFoundException("В конфигурации не определена секция \"KitStructureSource:ScsGutterUtilitySetSource\" (Конфигурации узлов крепления. Общие параметры).");
+                }
+                var kitStructuresPath = configuration.GetSection("KitStructureSource:Path").Value ?? "Resources\\Конфигурации";
+                string xlsxResource = section["FileName"] ??
+                      throw new SectionNotFoundException("В конфигурации в секции \"KitStructureSource:ScsGutterUtilitySetSource\" (Конфигурации узлов крепления. Общие параметры) не определено имя файла \"FileName\".");
+                string xlsxSheet = section["SheetName"] ?? "Лист1";
+                string fullFileName = Path.GetFullPath(Path.Combine(configuration.CurrentDirectory, kitStructuresPath, xlsxResource));
+                SheetRef shref = new(fullFileName, xlsxSheet);
+
+                SheetCommon setSource = resourceManager.LoadShc<object>(shref);
+                return setSource;
+            };
+        }
+        /// <summary>
+        /// Загружает Конфигурации трасс лотков. Общие параметры
+        /// </summary>
+        /// <param name="resourceManager"></param>
+        private Func<IEnumerable<SheetCommon.Row>> GetGcMountSystemSet(ResourceManager resourceManager, IElectricBuilderConfiguration configuration) {
+            return () => {
+                var section = configuration.GetSection("KitStructureSource:GcMountSystemSetSource");
+                if (!section.Exists()) {
+                    throw new SectionNotFoundException("В конфигурации не определена секция \"KitStructureSource:GcMountSystemSetSource\" (Конфигурации трасс лотков. Общие параметры).");
+                }
+                var kitStructuresPath = configuration.GetSection("KitStructureSource:Path").Value ?? "Resources\\Конфигурации";
+                string xlsxResource = section["FileName"] ??
+                      throw new SectionNotFoundException("В конфигурации в секции \"KitStructureSource:GcMountSystemSetSource\" (Конфигурации трасс лотков. Общие параметры) не определено имя файла \"FileName\".");
+                string xlsxSheet = section["SheetName"] ?? "Лист1";
+                string fullFileName = Path.GetFullPath(Path.Combine(configuration.CurrentDirectory, kitStructuresPath, xlsxResource));
+                SheetRef shref = new(fullFileName, xlsxSheet);
+
+                SheetCommon setSource = resourceManager.LoadShc<object>(shref);
+                return setSource;
+            };
+
+        }
         private static Func<Dictionary<string, SeriesConfigurationJob>> GetSeriesConfigurationJobs(ResourceManager resourceManager, IElectricBuilderConfiguration configuration) {
             return () => {
                 var section = configuration.GetSection("KitStructureSource:SeriaConfigurationSource");
@@ -321,21 +516,21 @@ namespace Bs.Nano.Electric.Builder {
                     switch (partName) {
                         case nameof(DbGcStrightSegment):
                         case nameof(DbGcStrightPartition): {
-                            return new SeriesConfigurationStraightPartItem(
-                                Code: item[partName],
-                                Amount: int.TryParse(item[$"Count {partName}"], out int amount) ? amount :
-                                    throw new InvalidDataException($"Для элемента {partName}:{item[partName]} неверно указано количество."),
-                                ComplectType: EnumConverter<DbGcStrightSegmentComplectType>.TryConvert(item[$"ComplectType {partName}"], out var complectType) ? complectType :
-                                    DbGcStrightSegmentComplectType.SEGMENT
-                                );
-                        }
+                                return new SeriesConfigurationStraightPartItem(
+                                    Code: item[partName],
+                                    Amount: int.TryParse(item[$"Count {partName}"], out int amount) ? amount :
+                                        throw new InvalidDataException($"Для элемента {partName}:{item[partName]} неверно указано количество."),
+                                    ComplectType: EnumConverter<DbGcStrightSegmentComplectType>.TryConvert(item[$"ComplectType {partName}"], out var complectType) ? complectType :
+                                        DbGcStrightSegmentComplectType.SEGMENT
+                                    );
+                            }
                         default: {
-                            return new SeriesConfigurationPartItem(
-                                Code: item[partName],
-                                Amount: int.TryParse(item[$"Count {partName}"], out int amount) ? amount : throw new InvalidDataException($"Для элемента {partName}:{item[partName]} неверно указано количество.")
-                            );
+                                return new SeriesConfigurationPartItem(
+                                    Code: item[partName],
+                                    Amount: int.TryParse(item[$"Count {partName}"], out int amount) ? amount : throw new InvalidDataException($"Для элемента {partName}:{item[partName]} неверно указано количество.")
+                                );
 
-                        }
+                            }
                     }
                 }
                 Dictionary<string, SeriesConfigurationJob> dic = setSource.Where(row => !string.IsNullOrWhiteSpace(row["DbName"]))

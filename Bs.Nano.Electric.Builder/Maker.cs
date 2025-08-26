@@ -80,8 +80,8 @@ namespace Bs.Nano.Electric.Builder {
             // Возвращаем наибольшее значение
             return Math.Max(localMax, dbMax);
         }
-        internal static DbImage LoadImage(Context context, string? imgName, string category, FileInfo fi) {
-            imgName = string.IsNullOrEmpty(imgName) ? fi.Name : imgName;
+        internal static DbImage LoadImage(Context context, string imgName, string category, FileInfo fi) {
+            //imgName = string.IsNullOrEmpty(imgName) ? fi.Name : imgName;
             imgName = Path.ChangeExtension(imgName, ".png");
             DbImage? img;
             if (string.IsNullOrEmpty(category)) {
