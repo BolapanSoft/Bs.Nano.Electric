@@ -19,6 +19,8 @@ using static Bs.Nano.Electric.Builder.ResourceManager;
 using static Bs.Nano.Electric.Builder.UtilitySetMakerResources;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Caching.Memory;
+
 
 
 #if NET48
@@ -97,9 +99,8 @@ namespace Bs.Nano.Electric.Builder {
         }
         private readonly ILogger logger;
         private readonly IElectricBuilderConfiguration configuration;
-        //private readonly ResourceManager resourceManager;
         private readonly UtilitySetMakerResources resources;
-
+        private MemoryCache? contextCache;
         public UtilitySetsMaker(ILogger logger, UtilitySetMakerResources resources, IElectricBuilderConfiguration configuration) {
             this.logger = logger;
             this.configuration = configuration;
@@ -111,35 +112,43 @@ namespace Bs.Nano.Electric.Builder {
         /// </summary>
         /// <param name="dbFileName"></param>
         public void MakeScsGutterCanalConfigurations(INanocadDBConnector connector) {
-            int i = 0;
-            Dictionary<string, SeriesConfigurationJob> job;
-            try {
-                job = resources.SeriesConfigurationJobs;
-                logger.LogInformation("Загружено задание на создание конфигураций соединительных элементов.");
-            }
-            catch (SectionNotFoundException ex) {
-                logger.LogWarning($"Создание конфигураций соединительных элементов пропущено. {ex.Message}");
-                return;
-            }
-            foreach (var item in job) {
-                using (var context = connector.Connect())
-                using (var trans = context.Database.BeginTransaction()) {
-                    EnsureLoaded(context);
+            using (contextCache = new(new MemoryCacheOptions { })) {
+                try {
+                    int i = 0;
+                    Dictionary<string, SeriesConfigurationJob> job;
                     try {
-                        DbScsGcSeriaConfigiration config = MakeSeriesConfiguration(context, item.Value);
-                        trans.Commit();
-                        logger.LogInformation("Конфигурация соединительных элементов \"{}\" сохранена в базу.", item.Key);
-                        i++;
+                        job = resources.SeriesConfigurationJobs;
+                        logger.LogInformation("Загружено задание на создание конфигураций соединительных элементов.");
                     }
-
-                    catch (Exception ex) {
-                        trans.Rollback();
-                        logger.LogError(ex, "При построении конфигурации соединительных элементов \"{}\" произошла ошибка.", item.Key);
-
+                    catch (SectionNotFoundException ex) {
+                        logger.LogWarning($"Создание конфигураций соединительных элементов пропущено. {ex.Message}");
+                        return;
                     }
+                    foreach (var item in job) {
+                        using (var context = connector.Connect())
+                        using (var trans = context.Database.BeginTransaction()) {
+                            EnsureLoaded(context);
+                            try {
+                                DbScsGcSeriaConfigiration config = MakeSeriesConfiguration(context, item.Value);
+                                trans.Commit();
+                                logger.LogInformation("Конфигурация соединительных элементов \"{}\" сохранена в базу.", item.Key);
+                                i++;
+                            }
+
+                            catch (Exception ex) {
+                                trans.Rollback();
+                                logger.LogError(ex, "При построении конфигурации соединительных элементов \"{}\" произошла ошибка.", item.Key);
+
+                            }
+                        }
+                    }
+                    logger.LogInformation($"Внесено {i} конфигураций соединительных элементов.");
+                }
+                finally {
+                    contextCache.Dispose();
+                    contextCache = null;
                 }
             }
-            logger.LogInformation($"Внесено {i} конфигураций соединительных элементов.");
 
         }
 
@@ -147,74 +156,103 @@ namespace Bs.Nano.Electric.Builder {
         /// Создание конфигураций трасс лотков
         /// </summary>
         public void MakeDbGcMountSystemSet(INanocadDBConnector connector) {
-            IEnumerable<SheetCommon.Row> mountSetSource;
-            int i = 0;
-            try {
-                mountSetSource = resources.GcMountSystemSet;
-                logger.LogInformation("Загружены Конфигурации трасс лотков. Общие параметры.");
-            }
-            catch (Exception ex) {
-                logger.LogWarning($"Создание конфигураций трасс лотков пропущено. {ex.Message}");
-                return;
-            }
-            IEnumerable<MountSystemSetJobPart> mssJobParts;
-            try {
-                mssJobParts = GetMountSystemSetJobParts();
-                logger.LogInformation("Загружена таблица \"Конфигурации трасс лотков и узлов крепления. Комплектации узлов крепления и трасс лотков.\"");
-            }
-            catch (SectionNotFoundException ex) {
-                logger.LogWarning($"Создание конфигураций трасс лотков пропущено. {ex.Message}");
-                return;
-            }
-
-
-            ////Func<SheetCommon.Row, string> getCatalog = (row) => string.IsNullOrEmpty(row["MountType"]) ?
-            ////    row["InstallType"] : $"{row["InstallType"]}\\{row["MountType"]}";
-            //IEnumerable<SheetCommon.Row> setSource_Senz = mountSetSource
-            //    .Where(row => !string.IsNullOrEmpty(row["Code"]));
-            //List<MountSystemSetJobPart> mssJobParts = new();
-            //var titles = mountSetSource.First().Titles;
-            //var knownCoatingTypes = resources.KnownMaterials
-            //    .Where(s => titles.Any(t => string.Compare(s, t, StringComparison.Ordinal) == 0))
-            //    .ToArray();
-            //foreach (string coatingTypeName in knownCoatingTypes) {
-            //    mssJobParts.AddRange(setSource_Senz.Select(row => ParceMountSystemSetJobPart(row, coatingTypeName)));
-            //}
-            int count = 0;
-
-            IEnumerable<MountSystemSetJob> jobSource = mountSetSource
-                .Where(row => !string.IsNullOrEmpty(row["Code"]))
-                .Select(row => ParceMountSystemSetJob(row, mssJobParts)
-                );
-
-            logger.LogInformation("Запуск построения конфигураций трасс лотков");
-
-            foreach (var job in jobSource) {
-                logger.LogInformation("Построение конфигурации трасс лотков \"{}\".", job.Attribute.DbName);
-                using (Context context = connector.Connect())
-                using (var trans = context.Database.BeginTransaction()) {
+            using (contextCache = new(new MemoryCacheOptions { })) {
+                try {
+                    IEnumerable<SheetCommon.Row> mountSetSource;
+                    int i = 0;
                     try {
-                        EnsureLoaded(context);
-                        MakeMountSystemSet(context, job);
-                        context.SaveChanges();
-                        trans.Commit();
-                        count++;
-                        logger.LogInformation("Конфигурация трасс лотков \"{}\" сохранена в базу.", job.Attribute.DbName);
+                        mountSetSource = resources.GcMountSystemSet;
+                        logger.LogInformation("Загружены Конфигурации трасс лотков. Общие параметры.");
                     }
                     catch (Exception ex) {
-                        trans.Rollback();
-                        logger.LogError(ex, "При построении конфигурации трасс лотков \"{}\" произошли ошибки.", job.Attribute.DbName);
+                        logger.LogWarning($"Создание конфигураций трасс лотков пропущено. {ex.Message}");
+                        return;
                     }
-                }
+                    IEnumerable<MountSystemSetJobPart> mssJobParts;
+                    try {
+                        mssJobParts = GetMountSystemSetJobParts();
+                        logger.LogInformation("Загружена таблица \"Конфигурации трасс лотков и узлов крепления. Комплектации узлов крепления и трасс лотков.\"");
+                    }
+                    catch (SectionNotFoundException ex) {
+                        logger.LogWarning($"Создание конфигураций трасс лотков пропущено. {ex.Message}");
+                        return;
+                    }
 
+
+                    ////Func<SheetCommon.Row, string> getCatalog = (row) => string.IsNullOrEmpty(row["MountType"]) ?
+                    ////    row["InstallType"] : $"{row["InstallType"]}\\{row["MountType"]}";
+                    //IEnumerable<SheetCommon.Row> setSource_Senz = mountSetSource
+                    //    .Where(row => !string.IsNullOrEmpty(row["Code"]));
+                    //List<MountSystemSetJobPart> mssJobParts = new();
+                    //var titles = mountSetSource.First().Titles;
+                    //var knownCoatingTypes = resources.KnownMaterials
+                    //    .Where(s => titles.Any(t => string.Compare(s, t, StringComparison.Ordinal) == 0))
+                    //    .ToArray();
+                    //foreach (string coatingTypeName in knownCoatingTypes) {
+                    //    mssJobParts.AddRange(setSource_Senz.Select(row => ParceMountSystemSetJobPart(row, coatingTypeName)));
+                    //}
+                    int count = 0;
+
+                    var jobSource = mountSetSource
+                        .Where(row => !string.IsNullOrEmpty(row["Code"]) && (row["Построить"] == "1" || row["Построить"] == "Да"));
+                    //.Select(row => ParceMountSystemSetJob(row, mssJobParts));
+
+                    logger.LogInformation("Запуск построения конфигураций трасс лотков");
+                    using (Context context = connector.Connect()) {
+                        EnsureLoaded(context);
+                        using (var trans = context.Database.BeginTransaction()) {
+                            try {
+                                MakeDbScsGutterUtilitySet(context);
+                                trans.Commit();
+                            }
+                            catch (Exception) {
+                                trans.Rollback();
+                                throw;
+                            }
+                        }
+
+                        foreach (var row in jobSource) {
+                            MountSystemSetJob job;
+                            try {
+                                job = ParceMountSystemSetJob(row, mssJobParts);
+                            }
+                            catch (AggregateException ex) {
+                                logger.LogWarning($"Строка задания {row.Index + 2} пропущена. {ex.Message}");
+                                foreach (var item in ex.InnerExceptions) {
+                                    logger.LogWarning($"{item.Message}");
+                                }
+                                continue;
+                            }
+                            logger.LogInformation("Построение конфигурации трасс лотков \"{}\".", job.Attribute.DbName);
+                            using (var trans = context.Database.BeginTransaction()) {
+                                try {
+                                    EnsureLoaded(context);
+                                    MakeMountSystemSet(context, job);
+                                    context.SaveChanges();
+                                    trans.Commit();
+                                    count++;
+                                    logger.LogInformation("Конфигурация трасс лотков \"{}\" сохранена в базу.", job.Attribute.DbName);
+                                }
+                                catch (Exception ex) {
+                                    trans.Rollback();
+                                    logger.LogError(ex, "При построении конфигурации трасс лотков \"{}\" произошли ошибки.", job.Attribute.DbName);
+                                }
+                            }
+                        }
+                    }
+                    logger.LogInformation("Внесено {count} элементов конфигураций трасс лотков (DbGcMountSystem).", count);
+                }
+                finally {
+                    contextCache.Dispose();
+                    contextCache = null;
+                }
             }
-            logger.LogInformation("Внесено {count} элементов конфигураций трасс лотков (DbGcMountSystem).", count);
         }
         /// <summary>
         /// Создание конфигураций узлов крепления
         /// </summary>
         /// <param name="connector"></param>
-        public void MakeDbScsGutterUtilitySet(INanocadDBConnector connector) {
+        private void MakeDbScsGutterUtilitySet(Context context) {
             List<ScsGutterUtilitySetJob> scsGutterUtilitySetSource = new(1024);
             try {
                 var source = resources.ScsGutterUtilitySet;
@@ -251,48 +289,13 @@ namespace Bs.Nano.Electric.Builder {
                     JobParts: mssJobParts.Where(jp => jp.SetCode == row.Code & jp.Material == row.Material)))
                 .ToList();
             foreach (var job in jobs) {
-                logger.LogInformation("Построение конфигурации узлов крепления \"{}\".", job.Attribute.DbName);
-                using (var context = connector.Connect())
-                using (var trans = context.Database.BeginTransaction()) {
+                MakeDbScsGutterUtilitySet(context, job);
+                //logger.LogInformation("Построение конфигурации узлов крепления \"{}\".", job.Attribute.DbName);
+                //using (Context context = connector.Connect())
+                //using (var trans = context.Database.BeginTransaction()) {
 
-                    MakeDbScsGutterUtilitySet(context, job);
-                }
+                //}
             }
-        }
-
-
-        private IEnumerable<MountSystemSetJobPart> GetMountSystemSetJobParts() {
-            IEnumerable<SheetCommon.Row> gusSource = resources.GutterUtilitySetSource;
-            List<MountSystemSetJobPart> mssJobParts = new();
-            var titles = gusSource.First().Titles;
-            var knownCoatingTypes = resources.KnownMaterials
-                .Where(s => titles.Any(t => string.Compare(s, t, StringComparison.Ordinal) == 0))
-                .ToArray();
-            foreach (string coatingTypeName in knownCoatingTypes) {
-                foreach (var row in gusSource) {
-                    try {
-                        var value = ParceMountSystemSetJobPart(row, coatingTypeName);
-                        mssJobParts.Add(value);
-                    }
-                    catch (AggregateException ex) {
-                        logger.LogWarning($"В таблице \"Комплектации узлов крепления и трасс лотков\" при загрузке строки {row.Index + 2} для исполнения {coatingTypeName} произошла или несколько ошибок.");
-                        foreach (var item in ex.InnerExceptions) {
-                            logger.LogWarning(ex.Message);
-                        }
-                        continue;
-                    }
-                    catch (Exception ex) {
-                        logger.LogWarning($"В таблице \"Комплектации узлов крепления и трасс лотков\" при загрузке строки {row.Index + 2} для исполнения {coatingTypeName} произошла ошибка. {ex.Message}");
-                        continue;
-                    }
-                }
-                //mssJobParts.AddRange(gusSource.Select(row => ParceMountSystemSetJobPart(row, coatingTypeName)));
-            }
-            return mssJobParts;
-        }
-
-        private MountSystemSetJobPart ParseJobPart(SheetCommon.Row gus) {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -302,37 +305,45 @@ namespace Bs.Nano.Electric.Builder {
         /// <exception cref="AggregateException"></exception>
         /// <exception cref="InvalidDataException"></exception>
         public void MakeDbCcMountSystemSet(INanocadDBConnector connector) {
-            IEnumerable<CcMountSystemSetJob> jobs;
-            try {
-                jobs = resources.CcMountSystemSource;
-                logger.LogInformation("Загружено задание на создание конфигураций трасс настенных коробов.");
-            }
-            catch (SectionNotFoundException ex) {
-                logger.LogWarning($"Создание конфигураций трасс настенных коробов пропущено. {ex.Message}");
-                return;
-            }
-            int i = 0;
-            foreach (var confJob in jobs) {
-                using (var context = connector.Connect())
-                using (var trans = context.Database.BeginTransaction()) {
-                    EnsureLoaded(context);
+            using (contextCache = new(new MemoryCacheOptions { })) {
+                try {
+                    IEnumerable<CcMountSystemSetJob> jobs;
                     try {
-                        DbCcMountSystem config = MakeDbCcMountSystem(context, confJob);
-                        context.SaveChanges();
-                        trans.Commit();
-                        logger.LogInformation("Конфигурация трасс настенных коробов \"{}\" сохранена в базу.", confJob.DbName);
+                        jobs = resources.CcMountSystemSource;
+                        logger.LogInformation("Загружено задание на создание конфигураций трасс настенных коробов.");
+                    }
+                    catch (SectionNotFoundException ex) {
+                        logger.LogWarning($"Создание конфигураций трасс настенных коробов пропущено. {ex.Message}");
+                        return;
+                    }
+                    int i = 0;
+                    foreach (var confJob in jobs) {
+                        using (var context = connector.Connect())
+                        using (var trans = context.Database.BeginTransaction()) {
+                            EnsureLoaded(context);
+                            try {
+                                DbCcMountSystem config = MakeDbCcMountSystem(context, confJob);
+                                context.SaveChanges();
+                                trans.Commit();
+                                logger.LogInformation("Конфигурация трасс настенных коробов \"{}\" сохранена в базу.", confJob.DbName);
+                                i++;
+                            }
+
+                            catch (Exception ex) {
+                                trans.Rollback();
+                                logger.LogError(ex, "При построении конфигурации трасс настенных коробов \"{}\" произошла ошибка.", confJob.DbName);
+                            }
+                        }
                         i++;
                     }
+                    logger.LogInformation($"Сохранено {i} конфигураций трасс настенных коробов.");
 
-                    catch (Exception ex) {
-                        trans.Rollback();
-                        logger.LogError(ex, "При построении конфигурации трасс настенных коробов \"{}\" произошла ошибка.", confJob.DbName);
-                    }
                 }
-                i++;
+                finally {
+                    contextCache.Dispose();
+                    contextCache = null;
+                }
             }
-            logger.LogInformation($"Сохранено {i} конфигураций трасс настенных коробов.");
-
 
         }
         /// <summary>
@@ -342,36 +353,44 @@ namespace Bs.Nano.Electric.Builder {
         /// <exception cref="AggregateException"></exception>
         /// <exception cref="InvalidDataException"></exception>
         public void MakeDbTbMountSystemSet(INanocadDBConnector connector) {
-            IEnumerable<TbMountSystemJob> jobs;
-            try {
-                jobs = resources.DbTbMountSystemSource;
-                logger.LogInformation("Загружено задание на создание конфигураций трасс труб.");
-            }
-            catch (SectionNotFoundException ex) {
-                logger.LogWarning($"Создание конфигураций трасс трасс труб. {ex.Message}");
-                return;
-            }
-            int i = 0;
-            foreach (var confJob in jobs) {
-                using (var context = connector.Connect())
-                using (var trans = context.Database.BeginTransaction()) {
-                    EnsureLoaded(context);
+            using (contextCache = new(new MemoryCacheOptions { })) {
+                try {
+                    IEnumerable<TbMountSystemJob> jobs;
                     try {
-                        DbTbMountSystem config = MakeDbTbMountSystem(context, confJob);
-                        context.SaveChanges();
-                        trans.Commit();
-                        logger.LogInformation("Конфигурация трасс трасс труб \"{}\" сохранена в базу.", confJob.DbName);
+                        jobs = resources.DbTbMountSystemSource;
+                        logger.LogInformation("Загружено задание на создание конфигураций трасс труб.");
+                    }
+                    catch (SectionNotFoundException ex) {
+                        logger.LogWarning($"Создание конфигураций трасс трасс труб. {ex.Message}");
+                        return;
+                    }
+                    int i = 0;
+                    foreach (var confJob in jobs) {
+                        using (var context = connector.Connect())
+                        using (var trans = context.Database.BeginTransaction()) {
+                            EnsureLoaded(context);
+                            try {
+                                DbTbMountSystem config = MakeDbTbMountSystem(context, confJob);
+                                context.SaveChanges();
+                                trans.Commit();
+                                logger.LogInformation("Конфигурация трасс трасс труб \"{}\" сохранена в базу.", confJob.DbName);
+                                i++;
+                            }
+
+                            catch (Exception ex) {
+                                trans.Rollback();
+                                logger.LogError(ex, "При построении конфигурации трасс трасс труб \"{}\" произошла ошибка.", confJob.DbName);
+                            }
+                        }
                         i++;
                     }
-
-                    catch (Exception ex) {
-                        trans.Rollback();
-                        logger.LogError(ex, "При построении конфигурации трасс трасс труб \"{}\" произошла ошибка.", confJob.DbName);
-                    }
+                    logger.LogInformation($"Сохранено {i} конфигураций трасс трасс труб.");
                 }
-                i++;
+                finally {
+                    contextCache.Dispose();
+                    contextCache = null;
+                }
             }
-            logger.LogInformation($"Сохранено {i} конфигураций трасс трасс труб.");
 
         }
         /// <summary>
@@ -381,35 +400,43 @@ namespace Bs.Nano.Electric.Builder {
         /// <exception cref="AggregateException"></exception>
         /// <exception cref="InvalidDataException"></exception>
         public void MakeGetDbScsTubeSeriesConfigurationSet(INanocadDBConnector connector) {
-            IEnumerable<DbScsTubeSeriesConfigurationJob> jobs;
-            try {
-                jobs = resources.DbScsTubeSeriesConfigurationSource.Where(el => !string.IsNullOrEmpty(el.DbName));
-                logger.LogInformation("Загружено задание на создание конфигураций соединительных элементов для труб.");
-            }
-            catch (SectionNotFoundException ex) {
-                logger.LogWarning($"Создание конфигураций соединительных элементов для труб пропущено. {ex.Message}");
-                return;
-            }
-            int i = 0;
-            foreach (var confJob in jobs) {
-                using (var context = connector.Connect())
-                using (var trans = context.Database.BeginTransaction()) {
-                    EnsureLoaded(context);
+            using (contextCache = new(new MemoryCacheOptions { })) {
+                try {
+                    IEnumerable<DbScsTubeSeriesConfigurationJob> jobs;
                     try {
-                        DbScsTubeSeriesConfiguration config = MakeTubeSeriesConfiguration(context, confJob);
-                        context.SaveChanges();
-                        trans.Commit();
-                        logger.LogInformation("Конфигурация трасс соединительных элементов для труб \"{}\" сохранена в базу.", confJob.DbName);
+                        jobs = resources.DbScsTubeSeriesConfigurationSource.Where(el => !string.IsNullOrEmpty(el.DbName));
+                        logger.LogInformation("Загружено задание на создание конфигураций соединительных элементов для труб.");
+                    }
+                    catch (SectionNotFoundException ex) {
+                        logger.LogWarning($"Создание конфигураций соединительных элементов для труб пропущено. {ex.Message}");
+                        return;
+                    }
+                    int i = 0;
+                    foreach (var confJob in jobs) {
+                        using (var context = connector.Connect())
+                        using (var trans = context.Database.BeginTransaction()) {
+                            EnsureLoaded(context);
+                            try {
+                                DbScsTubeSeriesConfiguration config = MakeTubeSeriesConfiguration(context, confJob);
+                                context.SaveChanges();
+                                trans.Commit();
+                                logger.LogInformation("Конфигурация трасс соединительных элементов для труб \"{}\" сохранена в базу.", confJob.DbName);
+                                i++;
+                            }
+                            catch (Exception ex) {
+                                trans.Rollback();
+                                logger.LogError(ex, "При построении конфигурации трасс соединительных элементов для труб \"{}\" произошла ошибка.", confJob.DbName);
+                            }
+                        }
                         i++;
                     }
-                    catch (Exception ex) {
-                        trans.Rollback();
-                        logger.LogError(ex, "При построении конфигурации трасс соединительных элементов для труб \"{}\" произошла ошибка.", confJob.DbName);
-                    }
+                    logger.LogInformation($"Сохранено {i} соединительных элементов для труб.");
                 }
-                i++;
+                finally {
+                    contextCache.Dispose();
+                    contextCache = null;
+                }
             }
-            logger.LogInformation($"Сохранено {i} соединительных элементов для труб.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -795,6 +822,194 @@ namespace Bs.Nano.Electric.Builder {
                 }
             }
             return kit;
+        }
+        // Конфигурации трасс лотков
+        private void MakeMountSystemSet(Context context, MountSystemSetJob job) {
+            //var gutterUtilitySet = MakeDbScsGutterUtilitySet(context, job);
+            var query = context.DbGcMountSystems.Where(s => s.DbName == job.Attribute.DbName);
+            //DbGcMountSystem? mountSystemSet = context.DbGcMountSystems
+            //            .FirstOrDefault(s => s.DbName == job.Attribute.DbName);
+            DbGcMountSystem? mountSystemSet = query.FirstOrDefault();
+            if (mountSystemSet is null) {
+                mountSystemSet = context.DbGcMountSystems.CreateEntity();
+                int id;
+                if (context.DbGcMountSystems.Any())
+                    id = context.DbGcMountSystems.Select(s => s.Id).Max() + 1;
+                else
+                    id = 1;
+                mountSystemSet.Id = id;
+                context.DbGcMountSystems.Add(mountSystemSet);
+                //context.SaveChanges();
+            }
+            mountSystemSet.DbName = job.Attribute.DbName;
+            mountSystemSet.Name = job.Attribute.DbDescription; // set to DbNaming
+            //mountSystemSet.DbNaming=job.Attribute.DbNaming;
+            mountSystemSet.DbCatalog = job.Attribute.DbCatalog;
+            mountSystemSet.LayerName = string.Empty;
+            mountSystemSet.LayerColor = "'Blue'";
+            mountSystemSet.LayerIsPrintable = true;
+            mountSystemSet.LayerLineWeigh = 30;
+            mountSystemSet.PostDistance = job.Attribute.PostDistance;
+            mountSystemSet.DbDescription = job.Attribute.DbDescription;
+            //SheetCommon.Row sourceRow = source.FirstOrDefault(row => row["DbName"] == setRow.Code);
+            //if (sourceRow.Titles.Length == 0) {// not found; create from mountSetResource
+            //mountSystemSet.LayerName = "КНС";
+            string imgFileName = job.Attribute.DbImageRef;
+            //string imageName = $"{Path.GetFileNameWithoutExtension(setRow.ImageFileName)}.MountSystemSet.png";
+            string imagesPart = configuration.GetSection("KitStructureSource:ImagesPath").Value ??
+                throw new InvalidOperationException($"В конфигурации не установлен путь для загрузки эскизов типовых решений (секция KitStructureSource:ImagesPath).");
+            string fullImageFileName = Path.Combine(imagesPart, imgFileName);
+            var image = GetOrCreate(context, fullImageFileName, target: (imgFileName, job.Attribute.DbDescription, "Конфигурации трасс лотков"));
+            mountSystemSet.DbImageRef = image.Id;
+            //image.Category = "Конфигурации КНС\\Конфигурации трасс лотков";
+            // Make KitStructure
+            DbScsGutterUtilitySet? sguSet = context.DbScsGutterUtilitySets.Local.FirstOrDefault(gus => gus.DbName == job.Attribute.StandDbName);
+            if (sguSet is null) {
+                throw new InvalidOperationException($"Конфигурация узла крепления \"{job.Attribute.StandDbName}\" не найдена в базе.");
+            }
+
+            {
+                MakeKitStructure(context, mountSystemSet, sguSet, job);
+                DbScsGutterUtilitySet utilitySet;
+                utilitySet = mountSystemSet.StandGutterUtilitySet = sguSet;
+                utilitySet.DbCatalog = job.Attribute.DbCatalog;
+
+                //try {
+                //    context.SaveChanges();
+                //}
+                //catch (System.Data.Entity.Validation.DbEntityValidationException ex) {
+                //    foreach (var vd in ex.EntityValidationErrors) {
+                //        foreach (var item in vd.ValidationErrors) {
+                //            Console.WriteLine($"{item.PropertyName}:\"{item.ErrorMessage}\".");
+                //        }
+                //    }
+                //    throw;
+                //}
+            }
+
+
+            // Save KitStructure
+            mountSystemSet.KitStructure = GetKitStructureAsXML(mountSystemSet);
+        }
+        // Конфигурации трасс лотков
+        private void MakeKitStructure(Context context, DbGcMountSystem mountSystemSet, DbScsGutterUtilitySet sguSet, MountSystemSetJob job) {
+            string dbName = job.Attribute.DbName;
+            IEnumerable<MountSystemSetJobPart> jobParts = job.JobParts.Where(item => !string.IsNullOrEmpty(item.SetCodeSuffix));
+            var dbShelfs = job.JobParts
+                .Where(item => item.KitStructureItem == KitStructureType.DbShelf)
+                .OrderBy(el => el.ParentUid)
+                .ToArray();
+            var plainCounter = new PlainCounter(dbShelfs.Length, sguSet.KnotType ?? ScsGcStandType.ONE_SIDE).GetEnumerator();
+            Dictionary<(int, int), (int Uid, int? ParentUid)> knownDbShelfs = new();
+            foreach (var item in dbShelfs) {
+                plainCounter.MoveNext();
+                knownDbShelfs[plainCounter.Current] = (item.Uid, item.ParentUid);
+            }
+            foreach (var level in sguSet.Stand.Levels) {
+                foreach (var knotPlain in level.KnotPlains) {
+                    DbGcSystemPlain plain = new DbGcSystemPlain();
+                    plain.LayerNumber = level.Number;
+                    plain.Number = knotPlain.Number;
+                    plain.DbShelf = knotPlain.Profile;
+                    plain.IsAutoSelection = true;
+                    double profileLength = GetGutterBoltingLength(plain.DbShelf) ?? 0;
+                    plain.DbProfileLength = (int)(profileLength);
+                    int parentUid = knownDbShelfs[(level.Number, knotPlain.Number)].Uid;
+                    var utilityUnits = jobParts
+                        .Where(item => item.KitStructureItem == KitStructureType.DbUtilityUnit && item.ParentUid == parentUid)
+                        .ToArray(); // Полка\Комплектующие
+                    foreach (var utilityUnitRow in utilityUnits) {
+                        //DbUtilityUnit? dbUtilityUnit;
+                        if (TryFindDbUtilityUnit(logger, context, utilityUnitRow.ItemCode, out var dbUtilityUnit)) {
+                            dbUtilityUnit!.SpecCount = utilityUnitRow.ItemQuantity;
+                            plain.AddChild(dbUtilityUnit);
+                        }
+                        else {
+                            logger.LogWarning($"В конфигурации трасс лотков {mountSystemSet.Name} пропущена строка {utilityUnitRow.SetCode}{utilityUnitRow.SetCodeSuffix}.  Элемент с именем {utilityUnitRow.ItemCode} не найден в базе данных.");
+                        }
+                        job.JobParts.Remove(utilityUnitRow);
+                    }
+                    var gutterRow = jobParts.FirstOrDefault(item => item.KitStructureItem == KitStructureType.Gutter && item.ParentUid == parentUid); // Лоток, подчиненный соответствующей полке
+
+                    if (gutterRow is not null && !string.IsNullOrEmpty(gutterRow.ItemCode)) {
+                        ScsGutterCanal? gutterCanal = context.ScsGutterCanals
+                            .AsNoTracking()
+                            .FirstOrDefault(sgc => sgc.Code == gutterRow.ItemCode);
+                        if (gutterCanal is null) {
+                            logger.LogWarning($"В конфигурации {mountSystemSet.Name} элемент  {gutterRow.ItemCode} не найден в таблице \"{Context.GetDefaultLocalizeValue<ScsGutterCanal>()}\"." +
+                                $"Добавление лотка пропущено.");
+                            job.JobParts.Remove(gutterRow);
+                            continue;
+                            //throw new InvalidDataException($"При продукт {gutterRow.ItemCode} не найден в таблице \"{Context.GetDefaultLocalizeValue<ScsGutterCanal>()}\".");
+                        }
+                        DbScsGcSeriaConfigiration? config = FindDbScsGcSeriaConfigiration(context, mountSystemSet, gutterRow, gutterCanal);
+             
+                        var gutter = plain.Gutter = new DbGcSystemGutter {
+                            Gutter = gutterCanal,
+                            ComplectType = gutterRow.ComplectType ?? DbGcStrightSegmentComplectType.SEGMENT,
+                            IsEnabled = true,
+                            IsUse = true,
+                            Configuration = config
+                        };
+                        #region DbGcSystemGutter.DbUtilityUnit
+                        var gutterAccessoryList = job.JobParts.
+                            Where(item => item.KitStructureItem == KitStructureType.DbUtilityUnit && item.ParentUid == gutterRow.Uid); // Лоток\Комплектующие
+                        foreach (var gutterAccessoryRow in gutterAccessoryList) {
+                            //DbUtilityUnit? dbUtilityUnit;
+                            if (TryFindDbUtilityUnit(logger, context, gutterAccessoryRow.ItemCode, out var dbUtilityUnit)) {
+                                dbUtilityUnit!.SpecCount = gutterAccessoryRow.ItemQuantity;
+                                plain.AddChild(dbUtilityUnit);
+                            }
+                            else {
+                                logger.LogWarning($"В конфигурации трасс лотков {mountSystemSet.Name} пропущена строка {gutterAccessoryRow.SetCode}{gutterAccessoryRow.SetCodeSuffix}.  Элемент с именем {gutterAccessoryRow.ItemCode} не найден в базе данных.");
+                            }
+                            job.JobParts.Remove(gutterAccessoryRow);
+                        }
+                        #endregion
+                        job.JobParts.Remove(gutterRow);
+                    }
+                    #region DbGcSystemPlain.DbUtilityUnit
+
+                    //foreach (var dbUtilityUnit in knotPlain.UtilityUnits) {
+                    //    plain.AddChild(dbUtilityUnit);
+                    //}
+                    //var accessoryList = row.Items.Where(item => item.KitStructureItem == "DbGcSystemPlain.DbUtilityUnit");
+                    //foreach (var accessory in accessoryList) {
+                    //    var unitCode = accessory.Code;
+                    //    if (TryFindDbUtilityUnit(context, unitCode, out var dbUtilityUnit)) {
+                    //        throw new InvalidDataException($"При извлечении продукта {unitCode} как элемента DbUtilityUnit произошла ошибка: Элемент не найден.");
+                    //    }
+                    //    int accessoryQuantity = accessory.Quantity;
+                    //    dbUtilityUnit.SpecCount = accessoryQuantity;
+                    //    plain.Add(dbUtilityUnit);
+                    //}
+                    #endregion
+                    mountSystemSet.Add(plain);
+                }
+            }
+
+            foreach (var utilityUnitRow in jobParts) {
+                logger.LogWarning($"В конфигурации трасс лотков {mountSystemSet.Name} пропущена строка {utilityUnitRow.SetCode}{utilityUnitRow.SetCodeSuffix}. В структуре подчиненности элемент должен быть дочерним элементом полки или лотка.");
+            }
+        }
+
+        private DbScsGcSeriaConfigiration? FindDbScsGcSeriaConfigiration(Context context, DbGcMountSystem mountSystemSet, MountSystemSetJobPart gutterRow, ScsGutterCanal gutterCanal) {
+            DbScsGcSeriaConfigiration? config = null;
+            var confCode = gutterRow.DbScsGcSeriaConfigiration;
+            if (string.IsNullOrEmpty(confCode)) {
+                confCode = GetDbScsGcSeriesConfiguration_Key(gutterCanal.GutterType, gutterCanal.Series ?? string.Empty);
+            }
+            config = context.DbScsGcSeriaConfigirations
+                .AsNoTracking()
+                .FirstOrDefault(item => item.DbName == confCode);
+            if (config is null) {
+                // Поиск подходящей конфигурации по типу и серии лотка, шаблону для поиска.
+                
+                logger.LogWarning($"Не найдена конфигурация соединительных элементов {confCode}.");
+                logger.LogWarning($"В конфигурации {mountSystemSet.Name} для лотка {gutterCanal.Code} не сопоставлена конфигурация соединительных элементов.");
+            }
+
+            return config;
         }
 
         private void MakeDbGcHBend(Context context, DbGcHBend segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
@@ -1224,264 +1439,6 @@ namespace Bs.Nano.Electric.Builder {
             }
             ;
         }
-        // Конфигурации трасс лотков
-        private void MakeMountSystemSet(Context context, MountSystemSetJob job) {
-            //var gutterUtilitySet = MakeDbScsGutterUtilitySet(context, job);
-            var query = context.DbGcMountSystems.Where(s => s.DbName == job.Attribute.DbName);
-            //DbGcMountSystem? mountSystemSet = context.DbGcMountSystems
-            //            .FirstOrDefault(s => s.DbName == job.Attribute.DbName);
-            DbGcMountSystem? mountSystemSet = query.FirstOrDefault();
-            if (mountSystemSet is null) {
-                mountSystemSet = context.DbGcMountSystems.CreateEntity();
-                int id;
-                if (context.DbGcMountSystems.Any())
-                    id = context.DbGcMountSystems.Select(s => s.Id).Max() + 1;
-                else
-                    id = 1;
-                mountSystemSet.Id = id;
-                context.DbGcMountSystems.Add(mountSystemSet);
-                //context.SaveChanges();
-            }
-            mountSystemSet.DbName = job.Attribute.DbName;
-            mountSystemSet.Name = job.Attribute.DbDescription; // set to DbNaming
-            //mountSystemSet.DbNaming=job.Attribute.DbNaming;
-            mountSystemSet.DbCatalog = job.Attribute.DbCatalog;
-            mountSystemSet.LayerName = string.Empty;
-            mountSystemSet.LayerColor = "'Blue'";
-            mountSystemSet.LayerIsPrintable = true;
-            mountSystemSet.LayerLineWeigh = 30;
-            mountSystemSet.PostDistance = job.Attribute.PostDistance;
-            mountSystemSet.DbDescription = job.Attribute.DbDescription;
-            //SheetCommon.Row sourceRow = source.FirstOrDefault(row => row["DbName"] == setRow.Code);
-            //if (sourceRow.Titles.Length == 0) {// not found; create from mountSetResource
-            //mountSystemSet.LayerName = "КНС";
-            string imgFileName = job.Attribute.DbImageRef;
-            //string imageName = $"{Path.GetFileNameWithoutExtension(setRow.ImageFileName)}.MountSystemSet.png";
-            string imagesPart = configuration.GetSection("KitStructureSource:ImagesPath").Value ??
-                throw new InvalidOperationException($"В конфигурации не установлен путь для загрузки эскизов типовых решений (секция KitStructureSource:ImagesPath).");
-            string fullImageFileName = Path.Combine(imagesPart, imgFileName);
-            var image = GetOrCreate(context, fullImageFileName, target: (imgFileName, job.Attribute.DbDescription, "Конфигурации трасс лотков"));
-            mountSystemSet.DbImageRef = image.Id;
-            //image.Category = "Конфигурации КНС\\Конфигурации трасс лотков";
-            // Make KitStructure
-            DbScsGutterUtilitySet? sguSet = context.DbScsGutterUtilitySets.FirstOrDefault(gus => gus.DbName == job.Attribute.StandDbName);
-            if(sguSet is null) {
-                throw new InvalidOperationException($"Конфигурация узла крепления \"{job.Attribute.StandDbName}\" не найдена в базе.");
-            }
-
-            {
-                MakeKitStructure(context, mountSystemSet, sguSet, job);
-                DbScsGutterUtilitySet utilitySet;
-                utilitySet = mountSystemSet.StandGutterUtilitySet = sguSet;
-                utilitySet.DbCatalog = job.Attribute.DbCatalog;
-
-                //try {
-                //    context.SaveChanges();
-                //}
-                //catch (System.Data.Entity.Validation.DbEntityValidationException ex) {
-                //    foreach (var vd in ex.EntityValidationErrors) {
-                //        foreach (var item in vd.ValidationErrors) {
-                //            Console.WriteLine($"{item.PropertyName}:\"{item.ErrorMessage}\".");
-                //        }
-                //    }
-                //    throw;
-                //}
-            }
-
-
-            // Save KitStructure
-            mountSystemSet.KitStructure = GetKitStructureAsXML(mountSystemSet);
-        }
-        // Конфигурации трасс лотков
-        private void MakeKitStructure(Context context, DbGcMountSystem mountSystemSet, DbScsGutterUtilitySet sguSet, MountSystemSetJob job) {
-            string dbName = job.Attribute.DbName;
-            var dbShelfs = job.JobParts.Where(item => item.KitStructureItem == KitStructureType.DbShelf).ToArray();
-            var plainCounter = new PlainCounter(dbShelfs.Length, sguSet.KnotType ?? ScsGcStandType.ONE_SIDE).GetEnumerator();
-            Dictionary<(int, int), (int Uid, int? ParentUid)> knownDbShelfs = new();
-            Dictionary<string, SeriesConfigurationJob>? seriesConfigurationJob = null;
-            foreach (var item in dbShelfs) {
-                plainCounter.MoveNext();
-                knownDbShelfs[plainCounter.Current] = (item.Uid, item.ParentUid);
-            }
-            foreach (var level in sguSet.Stand.Levels) {
-                foreach (var knotPlain in level.KnotPlains) {
-                    DbGcSystemPlain plain = new DbGcSystemPlain();
-                    plain.LayerNumber = level.Number;
-                    plain.Number = knotPlain.Number;
-                    plain.DbShelf = knotPlain.Profile;
-                    plain.IsAutoSelection = true;
-                    double profileLength = GetGutterBoltingLength(plain.DbShelf) ?? 0;
-                    plain.DbProfileLength = (int)(profileLength);
-                    int parentUid = knownDbShelfs[(level.Number, knotPlain.Number)].Uid;
-                    var gutterRow = job.JobParts.FirstOrDefault(item => item.KitStructureItem == KitStructureType.Gutter && item.ParentUid == parentUid); // Лоток, подчиненный соответствующей полке
-
-                    if (gutterRow is not null && !string.IsNullOrEmpty(gutterRow.ItemCode)) {
-                        ScsGutterCanal? gutterCanal = context.ScsGutterCanals
-                            .AsNoTracking()
-                            .FirstOrDefault(sgc => sgc.Code == gutterRow.ItemCode);
-                        if (gutterCanal is null) {
-                            logger.LogWarning($"В конфигурации {mountSystemSet.Name} элемент  {gutterRow.ItemCode} не найден в таблице \"{Context.GetDefaultLocalizeValue<ScsGutterCanal>()}\"." +
-                                $"Добавление лотка пропущено.");
-                            continue;
-                            //throw new InvalidDataException($"При продукт {gutterRow.ItemCode} не найден в таблице \"{Context.GetDefaultLocalizeValue<ScsGutterCanal>()}\".");
-                        }
-
-                        DbScsGcSeriaConfigiration? config = null;
-                        var confCode = GetDbScsGcSeriesConfiguration_Key(gutterCanal.GutterType, gutterCanal.Series ?? string.Empty);
-                        config = context.DbScsGcSeriaConfigirations
-                            .AsNoTracking()
-                            .FirstOrDefault(item => item.DbName == confCode);
-                        if (config is null) {
-                            //seriesConfigurationJob ??= resources.SeriesConfigurationJobs;
-                            //if (seriesConfigurationJob.TryGetValue(confCode, out var confJob)) {
-                            //    logger.LogInformation($"Конфигурация соединительных элементов \"{confCode}\" не найдена. Построим из задания.");
-                            //    config = MakeSeriesConfiguration(context, confJob);
-                            //}
-                            //else {
-                            //    throw new InvalidDataException($"В задании на конфигурации соединительных элементов не содержится описания конфигурации \"{confCode}\".");
-                            //}
-                            logger.LogWarning($"Не найдена конфигурация соединительных элементов {confCode}.");
-                            logger.LogWarning($"В конфигурации {mountSystemSet.Name} для лотка {gutterCanal.Code} не сопоставлена конфигурация соединительных элементов.");
-                        }
-                        //try {
-                        //}
-                        //catch (Exception ex) {
-                        //    throw new InvalidDataException($"При создании или извлечении конфигурации соединительных элементов для артикула [{gutterRow.ItemCode}] произошла ошибка.", ex);
-                        //}
-
-                        var gutter = plain.Gutter = new DbGcSystemGutter {
-                            Gutter = gutterCanal,
-                            ComplectType = gutterRow.ComplectType ?? DbGcStrightSegmentComplectType.SEGMENT,
-                            IsEnabled = true,
-                            IsUse = true,
-                            Configuration = config
-                        };
-                        #region DbGcSystemGutter.DbUtilityUnit
-                        var gutterAccessoryList = job.JobParts.
-                            Where(item => item.KitStructureItem == KitStructureType.DbUtilityUnit && item.ParentUid == gutterRow.Uid); // Лоток\Комплектующие
-                        foreach (var gutterAccessoryRow in gutterAccessoryList) {
-                            //DbUtilityUnit? dbUtilityUnit;
-                            if (TryFindDbUtilityUnit(logger, context, gutterAccessoryRow.ItemCode, out var dbUtilityUnit)) {
-                                dbUtilityUnit.SpecCount = gutterAccessoryRow.ItemQuantity;
-                                plain.AddChild(dbUtilityUnit);
-                            }
-                            else {
-                                logger.LogWarning($"В конфигурации {mountSystemSet.Name} элемент {gutterAccessoryRow.ItemCode} пропущен.");
-                                //throw new InvalidDataException($"При извлечении продукта {gutterAccessoryRow.ItemCode} как элемента \"Комплектующие\" произошла ошибка: Элемент среди допустимых комплектующих не найден.");
-                            }
-                        }
-                        #endregion
-                    }
-                    #region DbGcSystemPlain.DbUtilityUnit
-                    //foreach (var dbUtilityUnit in knotPlain.UtilityUnits) {
-                    //    plain.AddChild(dbUtilityUnit);
-                    //}
-                    //var accessoryList = row.Items.Where(item => item.KitStructureItem == "DbGcSystemPlain.DbUtilityUnit");
-                    //foreach (var accessory in accessoryList) {
-                    //    var unitCode = accessory.Code;
-                    //    if (TryFindDbUtilityUnit(context, unitCode, out var dbUtilityUnit)) {
-                    //        throw new InvalidDataException($"При извлечении продукта {unitCode} как элемента DbUtilityUnit произошла ошибка: Элемент не найден.");
-                    //    }
-                    //    int accessoryQuantity = accessory.Quantity;
-                    //    dbUtilityUnit.SpecCount = accessoryQuantity;
-                    //    plain.Add(dbUtilityUnit);
-                    //}
-                    #endregion
-                    mountSystemSet.Add(plain);
-                }
-            }
-
-            //string systemSetCode = job.DbName;
-            //var scsGutterBolting = row.Items.FirstOrDefault(item => item.KitStructureItem == "DbGcSystemPlain.DbShelf");
-            //string gutterBoltingCode = scsGutterBolting.Code;
-            //{
-            #region DbGcSystemPlain.DbShelf
-            //    try {
-            //        int quantity = scsGutterBolting.Quantity < 1 ? 1 : scsGutterBolting.Quantity;
-            //        var sgusSource = resources.GutterUtilitySetSource;
-            //        var sguSourceRow = sgusSource.First(row => row["DbName"] == systemSetCode);
-            //        ScsGcStandType knotType = sguSourceRow["KnotType"] == "Двусторонняя" ? ScsGcStandType.TWO_SIDE : ScsGcStandType.ONE_SIDE;
-            //        ScsGutterBolting? dbShelf = null;
-            //        if (!(string.IsNullOrEmpty(gutterBoltingCode)))
-            //            try {
-            //                dbShelf = context.ScsGutterBoltings.First(p => DbFunctions.Like(p.Code, gutterBoltingCode));
-            //            }
-            //            catch (Exception ex) {
-            //                throw new InvalidDataException($"При извлечении продукта {gutterBoltingCode} из таблицы ScsGutterBoltings произошла ошибка.", ex);
-            //            }
-
-            //        PlainCounter counter = new PlainCounter(quantity, knotType);
-            //        foreach (var item in counter) {
-            //            DbGcSystemPlain plain = new DbGcSystemPlain();
-            //            plain.LayerNumber = item.LayerNumber;
-            //            plain.Number = item.Number;
-            //            plain.DbShelf = dbShelf;
-
-            //            plain.IsAutoSelection = true;
-            //            double profileLength = GetGutterBoltingLength(dbShelf) ?? 250.0;
-            //            plain.DbProfileLength = (int)(profileLength);
-            //            var gutterRow = row.Items.FirstOrDefault(item => item.KitStructureItem == "DbGcSystemGutter.Gutter"); // Несущий элемент|Лоток
-            //            if (!string.IsNullOrEmpty(gutterRow.Code)) {
-            //                ScsGutterCanal gutterCanal;
-            //                try {
-            //                    gutterCanal = context.ScsGutterCanals.AsNoTracking().First(sgc => DbFunctions.Like(sgc.Code, gutterRow.Code));
-            //                }
-            //                catch (Exception ex) {
-            //                    throw new InvalidDataException($"При извлечении продукта {gutterRow.Code} из таблицы ScsGutterCanals произошла ошибка.", ex);
-            //                }
-            //                DbScsGcSeriaConfigiration? config = null;
-            //                try {
-            //                    var confCode = GetDbScsGcSeriesConfiguration_Key((int)gutterCanal.GutterType, gutterCanal.Series);
-            //                    var confJob = resources.SeriesConfigurationJobs[confCode];
-            //                    config = MakeSeriesConfiguration(context, confJob);
-            //                    config.DbName = confCode;
-            //                }
-            //                catch (Exception ex) {
-            //                    throw new InvalidDataException($"При создании или извлечении конфигурации соединительных элементов для артикула [{gutterRow.Code}] произошла ошибка.", ex);
-            //                }
-
-            //                var gutter = plain.Gutter = new DbGcSystemGutter {
-            //                    Gutter = gutterCanal,
-            //                    ComplectType = DbGcStrightSegmentComplectType.SEGMENT,
-            //                    IsEnabled = true,
-            //                    IsUse = true,
-            //                    IElectricBuilderConfiguration = config
-            //                };
-            //                #region DbGcSystemGutter.DbUtilityUnit
-            //                var gutterAccessoryList = row.Items.Where(item => item.KitStructureItem == "DbGcSystemGutter.DbUtilityUnit"); // Лоток\Комплектующие
-            //                foreach (var gutterAccessoryRow in gutterAccessoryList) {
-            //                    //DbUtilityUnit? dbUtilityUnit;
-            //                    if (TryFindDbUtilityUnit(context, gutterAccessoryRow.Code, out var dbUtilityUnit)) {
-            //                        dbUtilityUnit.SpecCount = gutterAccessoryRow.Quantity;
-            //                        gutter.AddChild(dbUtilityUnit);
-            //                    }
-            //                    else {
-            //                        throw new InvalidDataException($"При извлечении продукта {gutterAccessoryRow.Code} как элемента DbUtilityUnit произошла ошибка: Элемент не найден.");
-            //                    }
-            //                }
-            //                #endregion
-            //            }
-            //            #region DbGcSystemPlain.DbUtilityUnit
-            //            var accessoryList = row.Items.Where(item => item.KitStructureItem == "DbGcSystemPlain.DbUtilityUnit");
-            //            foreach (var accessory in accessoryList) {
-            //                var unitCode = accessory.Code;
-            //                if (TryFindDbUtilityUnit(context, unitCode, out var dbUtilityUnit)) {
-            //                    throw new InvalidDataException($"При извлечении продукта {unitCode} как элемента DbUtilityUnit произошла ошибка: Элемент не найден.");
-            //                }
-            //                int accessoryQuantity = accessory.Quantity;
-            //                dbUtilityUnit.SpecCount = accessoryQuantity;
-            //                plain.Add(dbUtilityUnit);
-            //            }
-            //            #endregion
-            //            mountSystemSet.Add(plain);
-            //        }
-            //    }
-            //    catch (Exception ex) {
-            //        throw new InvalidDataException($"При создании KitStructure для элемента {systemSetCode} произошла ошибка.", ex);
-            //    }
-            //}
-            #endregion
-        }
 
         // Конфигурации узлов крепления
         private DbScsGutterUtilitySet MakeDbScsGutterUtilitySet(Context context, DbScsGutterUtilitySetJob job) {
@@ -1491,20 +1448,21 @@ namespace Bs.Nano.Electric.Builder {
 
                 //var sgusSource = resources.GutterUtilitySetSource;
                 //var sourceRow = sgusSource.First(row => row["DbName"] == code);
-                int id;
+                int id = 1;
                 var gus = context.DbScsGutterUtilitySets
+                        .Select(r => new { r.Id, r.DbName })
                       .FirstOrDefault(gus => gus.DbName == dbName);
-                int? baseId = gus?.Id;
+                //int? baseId = gus?.Id;
                 DbScsGutterUtilitySet sguSet;
-                if (baseId.HasValue) {
-                    sguSet = context.DbScsGutterUtilitySets.Find((int)baseId);
+                if (gus is not null) {
+                    sguSet = context.DbScsGutterUtilitySets.Find(gus.Id)!;
                 }
                 else {
                     if (context.DbScsGutterUtilitySets.Any()) {
                         id = context.DbScsGutterUtilitySets.Select(s => s.Id).Max() + 1;
                     }
-                    else
-                        id = 1;
+                    if (context.DbScsGutterUtilitySets.Local.Any())
+                        id = Math.Max(id, context.DbScsGutterUtilitySets.Local.Select(s => s.Id).Max() + 1);
                     sguSet = new DbScsGutterUtilitySet { Id = id };
                     sguSet.DbName = dbName;
                     context.DbScsGutterUtilitySets.Add(sguSet);
@@ -1527,7 +1485,7 @@ namespace Bs.Nano.Electric.Builder {
                     IsUse = true,
                     Length = 0,
                 };
-                var jobParts = new LinkedList<MountSystemSetJobPart>(job.JobParts);
+                var jobParts = new LinkedList<MountSystemSetJobPart>(job.JobParts.Where(jp => string.IsNullOrEmpty(jp.SetCodeSuffix)));
                 var btRow = jobParts.FirstOrDefault(item => item.KitStructureItem == KitStructureType.Bolting);
                 if (btRow is null) {
                     sguSet.StandType = DbGcKnotStandType.NO;
@@ -1588,14 +1546,17 @@ namespace Bs.Nano.Electric.Builder {
                                 logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {unitCode} пропущен.");
                                 continue;
                             }
+                            jobParts.Remove(childItem);
                         }
                         else if (childItem.KitStructureItem == KitStructureType.DbShelf) {
                         }
                         else {
+                            jobParts.Remove(childItem);
                             logger.LogWarning($"Для элемента конфигурации \"Крепление ярусов\" в качестве подчиненного можно указать только элемент \"Полка\" или \"Комплектующие\".");
                             logger.LogWarning($"В конфигурации узлов крепления {sguSet.DbName} элемент {childItem.ItemCode} пропущен.");
                         }
                     }
+                    jobParts.Remove(btRow);
                 }
                 if (sguSet.KnotType == ScsGcStandType.TWO_SIDE) {
                     int shadowId = int.MinValue;
@@ -1611,8 +1572,8 @@ namespace Bs.Nano.Electric.Builder {
                                 // Если два подчиненных лотка, вставляется полка без комплектующих и второй лоток переподчиняется созданной полке.
                                 MountSystemSetJobPart gutterRow = gutterRows.Current;
                                 jobParts.Remove(gutterRow);
-                                MountSystemSetJobPart dbShelf1 = new MountSystemSetJobPart(dbShelf.SetCode, dbShelf.SetCodeSuffix, dbShelf.Material, dbShelf.ItemCode, 0, dbShelf.KitStructureItem, shadowId++, dbShelf.ParentUid, dbShelf.TotalLayersHeight, dbShelf.LayerHeight, dbShelf.ComplectType);
-                                MountSystemSetJobPart gutterRow1 = new MountSystemSetJobPart(gutterRow.SetCode, dbShelf.SetCodeSuffix, gutterRow.Material, gutterRow.ItemCode, 1, gutterRow.KitStructureItem, gutterRow.Uid, dbShelf1.Uid, gutterRow.TotalLayersHeight, gutterRow.LayerHeight, gutterRow.ComplectType);
+                                MountSystemSetJobPart dbShelf1 = new MountSystemSetJobPart(dbShelf.SetCode, dbShelf.SetCodeSuffix, dbShelf.Material, dbShelf.ItemCode, 0, dbShelf.KitStructureItem, shadowId++, dbShelf.ParentUid, dbShelf.TotalLayersHeight, dbShelf.LayerHeight, dbShelf.ComplectType, dbShelf.DbScsGcSeriaConfigiration);
+                                MountSystemSetJobPart gutterRow1 = new MountSystemSetJobPart(gutterRow.SetCode, dbShelf.SetCodeSuffix, gutterRow.Material, gutterRow.ItemCode, 1, gutterRow.KitStructureItem, gutterRow.Uid, dbShelf1.Uid, gutterRow.TotalLayersHeight, gutterRow.LayerHeight, gutterRow.ComplectType, gutterRow.DbScsGcSeriaConfigiration);
                                 jobParts.AddAfter(jobPartNode, gutterRow1);
                                 jobParts.AddAfter(jobPartNode, dbShelf1);
 
@@ -1744,6 +1705,35 @@ namespace Bs.Nano.Electric.Builder {
                 throw new InvalidOperationException($"При построении конфигурации узла крепления {job.Attribute.DbName} произошла ошибка.", ex);
             }
 
+        }
+        private IEnumerable<MountSystemSetJobPart> GetMountSystemSetJobParts() {
+            IEnumerable<SheetCommon.Row> gusSource = resources.MountSystemSetSource;
+            List<MountSystemSetJobPart> mssJobParts = new();
+            var titles = gusSource.First().Titles;
+            var knownCoatingTypes = resources.KnownMaterials
+                .Where(s => titles.Any(t => string.Compare(s, t, StringComparison.Ordinal) == 0))
+                .ToArray();
+            foreach (string coatingTypeName in knownCoatingTypes) {
+                foreach (var row in gusSource.Where(row => !string.IsNullOrEmpty(row["Code"]))) {
+                    try {
+                        var value = ParseMountSystemSetJobPart(row, coatingTypeName);
+                        mssJobParts.Add(value);
+                    }
+                    catch (AggregateException ex) {
+                        logger.LogWarning($"В таблице \"Комплектации узлов крепления и трасс лотков\" при загрузке строки {row.Index + 2} для исполнения {coatingTypeName} произошла или несколько ошибок.");
+                        foreach (var item in ex.InnerExceptions) {
+                            logger.LogWarning(ex.Message);
+                        }
+                        continue;
+                    }
+                    catch (Exception ex) {
+                        logger.LogWarning($"В таблице \"Комплектации узлов крепления и трасс лотков\" при загрузке строки {row.Index + 2} для исполнения {coatingTypeName} произошла ошибка. {ex.Message}");
+                        continue;
+                    }
+                }
+                //mssJobParts.AddRange(gusSource.Select(row => ParceMountSystemSetJobPart(row, coatingTypeName)));
+            }
+            return mssJobParts;
         }
 
         internal static DbImage GetOrCreate(Context context, string fullSourceFileName, (string? ImageName, string? Description, string Category) target) {
@@ -1960,11 +1950,16 @@ namespace Bs.Nano.Electric.Builder {
         /// </summary>
         /// <param name="resourceManager"></param>
         private static GcMountSystemJob ParseGcMountSystemSetJob(SheetCommon.Row row) {
+            List<Exception> exceptions = new();
             double ConvertToDouble(string value, string errorMessage) {
-                //if (double.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double result))
-                return double.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double result) ? result :
-                    double.TryParse(value, NumberStyles.AllowDecimalPoint, CultureInfo.GetCultureInfo("Ru-ru"), out result) ? result :
-                    throw new InvalidDataException(errorMessage);
+                //if (double.TryParse(value, PositiveNumberStyle, CultureInfo.InvariantCulture, out double result))
+                if (double.TryParse(value, PositiveNumberStyle, CultureInfo.InvariantCulture, out double result) ||
+                    double.TryParse(value, PositiveNumberStyle, CultureInfo.GetCultureInfo("Ru-ru"), out result))
+                    return result;
+                else {
+                    exceptions.Add(new InvalidDataException(errorMessage));
+                    return 0;
+                }
             }
             var value = new GcMountSystemJob(
                     Code: row[nameof(GcMountSystemJob.Code)],
@@ -1977,26 +1972,37 @@ namespace Bs.Nano.Electric.Builder {
                     DbCatalog: row[nameof(GcMountSystemJob.DbCatalog)],
                     DbImageRef: row[nameof(GcMountSystemJob.DbImageRef)],
                     PostDistance: ConvertToDouble(row[nameof(GcMountSystemJob.PostDistance)],
-                        $"Ошибка в строке {row.Index}: некорректное значение столбца PostDistance = \"{row[nameof(GcMountSystemJob.PostDistance)]}\".")
+                        $"Некорректное значение столбца PostDistance = \"{row[nameof(GcMountSystemJob.PostDistance)]}\".")
                     );
+            if (string.IsNullOrEmpty(value.Code)) {
+                exceptions.Add(new InvalidDataException($"Не установлено значение Code"));
+            }
+            if (string.IsNullOrEmpty(value.CodeSuffix)) {
+                exceptions.Add(new InvalidDataException($"Не установлено значение CodeSuffix"));
+            }
+            if (exceptions.Count > 0) {
+                throw new AggregateException($"В строке {row.Index + 2} одна или несколько ошибок.", exceptions);
+            }
             return value;
         }
         private static MountSystemSetJob ParceMountSystemSetJob(SheetCommon.Row row, IEnumerable<MountSystemSetJobPart> mssJobParts) {
             return new MountSystemSetJob(
                 Code: row["Code"],
                 CodeSuffix: row["CodeSuffix"] ?? string.Empty,
-                Material: row["Исполнение"],
+                Material: row["Material"],
                 Attribute: ParseGcMountSystemSetJob(row),
-                JobParts: new LinkedList<MountSystemSetJobPart>(mssJobParts.Where(item => item.SetCode == row["Code"] & item.SetCodeSuffix == row["CodeSuffix"] & item.Material == row["Исполнение"]))
+                JobParts: new LinkedList<MountSystemSetJobPart>(mssJobParts.Where(
+                    item => item.SetCode == row["Code"] &
+                    (item.SetCodeSuffix == row["CodeSuffix"] | string.IsNullOrEmpty(item.SetCodeSuffix)) &
+                    item.Material == row["Material"]))
                 );
         }
 
-        private static MountSystemSetJobPart ParceMountSystemSetJobPart(SheetCommon.Row row, string coatingTypeName) {
+        private static MountSystemSetJobPart ParseMountSystemSetJobPart(SheetCommon.Row row, string coatingTypeName) {
             List<Exception> exceptions = new List<Exception>();
             string setCode = row["Code"];
             if (string.IsNullOrEmpty(setCode))
-                ;
-            exceptions.Add(new InvalidDataException("Столбец 'Code' не может быть пустым."));
+                exceptions.Add(new InvalidDataException("Столбец 'Code' не может быть пустым."));
 
             string itemCode = row[coatingTypeName];
             string setCodeSuffix = row["CodeSuffix"];
@@ -2019,6 +2025,7 @@ namespace Bs.Nano.Electric.Builder {
             DbGcStrightSegmentComplectType? complectType =
                 EnumConverter<DbGcStrightSegmentComplectType>.TryConvert(row["ComplectType"], out var cType)
                     ? cType : null;
+            string dbScsGcSeriaConfigiration = row["DbScsGcSeriaConfigiration"];
             MountSystemSetJobPart value = new MountSystemSetJobPart(
             SetCode: setCode,
             SetCodeSuffix: setCodeSuffix,
@@ -2030,7 +2037,8 @@ namespace Bs.Nano.Electric.Builder {
             ParentUid: parentUid,
             TotalLayersHeight: totalLayersHeight,
             LayerHeight: layerHeight,
-            ComplectType: complectType
+            ComplectType: complectType,
+            DbScsGcSeriaConfigiration: dbScsGcSeriaConfigiration
         );
 
             return value;

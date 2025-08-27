@@ -37,10 +37,11 @@ namespace Bs.Nano.Electric.Builder {
             public int? TotalLayersHeight { get; set; }
             public int? LayerHeight { get; set; }
             public DbGcStrightSegmentComplectType? ComplectType { get; set; }
+            public string? DbScsGcSeriaConfigiration { get; set; }
 
             public MountSystemSetJobPart(string SetCode, string SetCodeSuffix, string Material, string ItemCode, int ItemQuantity,
                 KitStructureType KitStructureItem, int Uid, int? ParentUid, int? TotalLayersHeight,
-                int? LayerHeight, DbGcStrightSegmentComplectType? ComplectType) {
+                int? LayerHeight, DbGcStrightSegmentComplectType? ComplectType, string? DbScsGcSeriaConfigiration) {
                 this.SetCode = SetCode;
                 this.SetCodeSuffix = SetCodeSuffix;
                 this.Material = Material;
@@ -52,6 +53,7 @@ namespace Bs.Nano.Electric.Builder {
                 this.TotalLayersHeight = TotalLayersHeight;
                 this.LayerHeight = LayerHeight;
                 this.ComplectType = ComplectType;
+                this.DbScsGcSeriaConfigiration = DbScsGcSeriaConfigiration;
             }
         }
 
@@ -300,7 +302,8 @@ namespace Bs.Nano.Electric.Builder {
             int? ParentUid, 
             int? TotalLayersHeight, 
             int? LayerHeight, 
-            DbGcStrightSegmentComplectType? ComplectType);
+            DbGcStrightSegmentComplectType? ComplectType,
+            string? DbScsGcSeriaConfigiration);
         public record MountSystemSetJob(string Code, string CodeSuffix,
             string Material,
             GcMountSystemJob Attribute,
@@ -383,7 +386,7 @@ namespace Bs.Nano.Electric.Builder {
 #endif
         private readonly IElectricBuilderConfiguration configuration;
         private readonly ResourceManager resourceManager;
-        private readonly Lazy<IEnumerable<SheetCommon.Row>> lzGutterUtilitySetSource;
+        private readonly Lazy<IEnumerable<SheetCommon.Row>> lzMountSystemSetSource;
         //private readonly Lazy<IEnumerable<SheetCommon.Row>> lzDbGcMountSystemSet;
         private readonly Lazy<IEnumerable<SheetCommon.Row>> lzScsGutterUtilitySet;
         private readonly Lazy<IEnumerable<SheetCommon.Row>> lzGcMountSystemSet;
@@ -397,7 +400,7 @@ namespace Bs.Nano.Electric.Builder {
         public UtilitySetMakerResources(ResourceManager resourceManager, IElectricBuilderConfiguration configuration) {
             this.configuration = configuration;
             this.resourceManager = resourceManager;
-            lzGutterUtilitySetSource = new Lazy<IEnumerable<SheetCommon.Row>>(GetGutterUtilitySetSource(resourceManager, configuration));
+            lzMountSystemSetSource = new Lazy<IEnumerable<SheetCommon.Row>>(GetDbGcMountSystemSet(resourceManager, configuration));
             //lzDbGcMountSystemSet = new Lazy<IEnumerable<SheetCommon.Row>>(GetDbGcMountSystemSet(resourceManager, configuration));
             lzScsGutterUtilitySet = new(GetScsGutterUtilitySet(resourceManager, configuration));
             lzGcMountSystemSet = new(GetGcMountSystemSet(resourceManager, configuration));
@@ -415,10 +418,10 @@ namespace Bs.Nano.Electric.Builder {
         /// </summary>
         public abstract IEnumerable<string> KnownMaterials { get; }
         /// <summary>
-        /// Крепления лотков. Комплектации узлов крепления.
+        /// Крепления лотков. Комплектации узлов крепления и трасс лотков.
         /// </summary>
         /// <exception cref="SectionNotFoundException">В конфигурации не определена секция или один из необходимых ключей секции.</exception>
-        public IEnumerable<SheetCommon.Row> GutterUtilitySetSource => lzGutterUtilitySetSource.Value;
+        public IEnumerable<SheetCommon.Row> MountSystemSetSource => lzMountSystemSetSource.Value;
         /// <summary>
         /// Конфигурации КНС. Конфигурации трасс лотков
         /// </summary>
@@ -591,11 +594,11 @@ namespace Bs.Nano.Electric.Builder {
             return () => {
                 var section = configuration.GetSection("KitStructureSource:MountSystemSetSource");
                 if (!section.Exists()) {
-                    throw new SectionNotFoundException("В конфигурации не определена секция \"KitStructureSource:MountSystemSetSource\" (Конфигурации трасс лотков).");
+                    throw new SectionNotFoundException("В конфигурации не определена секция \"KitStructureSource:MountSystemSetSource\" (Конфигурации трасс лотков и узлов крепления. Комплектации узлов крепления и трасс лотков).");
                 }
                 var kitStructuresPath = configuration.GetSection("KitStructureSource:Path").Value ?? "Resources\\Конфигурации";
                 string xlsxResource = section["FileName"] ??
-                      throw new SectionNotFoundException("В конфигурации в секции \"KitStructureSource:MountSystemSetSource\" (Конфигурации трасс лотков) не определено имя файла \"FileName\".");
+                      throw new SectionNotFoundException("В конфигурации в секции \"KitStructureSource:MountSystemSetSource\" (Конфигурации трасс лотков и узлов крепления. Комплектации узлов крепления и трасс лотков) не определено имя файла \"FileName\".");
                 string xlsxSheet = section["SheetName"] ?? "Лист1";
                 string fullFileName = Path.GetFullPath(Path.Combine(configuration.CurrentDirectory, kitStructuresPath, xlsxResource));
                 SheetRef shref = new(fullFileName, xlsxSheet);
