@@ -20,6 +20,8 @@ using static Bs.Nano.Electric.Builder.UtilitySetMakerResources;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Caching.Memory;
+using System.Xml.Linq;
+
 
 
 
@@ -97,6 +99,13 @@ namespace Bs.Nano.Electric.Builder {
                 return GetEnumerator();
             }
         }
+        private record struct SeriaConfigurationCacheEntry(
+            string? Seria,
+            string? DbName,
+            string? DbDescription,
+            string? Description,
+            string? DbCatalog,
+            DbScsGcSeriaConfigiration seriaConfiguration);
         private readonly ILogger logger;
         private readonly IElectricBuilderConfiguration configuration;
         private readonly UtilitySetMakerResources resources;
@@ -859,7 +868,7 @@ namespace Bs.Nano.Electric.Builder {
             string imagesPart = configuration.GetSection("KitStructureSource:ImagesPath").Value ??
                 throw new InvalidOperationException($"В конфигурации не установлен путь для загрузки эскизов типовых решений (секция KitStructureSource:ImagesPath).");
             string fullImageFileName = Path.Combine(imagesPart, imgFileName);
-            var image = GetOrCreate(context, fullImageFileName, target: (imgFileName, job.Attribute.DbDescription, "Конфигурации трасс лотков"));
+            var image = GetOrCreateDbImage(context, fullImageFileName, target: (imgFileName, job.Attribute.DbDescription, "Конфигурации трасс лотков"));
             mountSystemSet.DbImageRef = image.Id;
             //image.Category = "Конфигурации КНС\\Конфигурации трасс лотков";
             // Make KitStructure
@@ -925,7 +934,7 @@ namespace Bs.Nano.Electric.Builder {
                             plain.AddChild(dbUtilityUnit);
                         }
                         else {
-                            logger.LogWarning($"В конфигурации трасс лотков {mountSystemSet.Name} пропущена строка {utilityUnitRow.SetCode}{utilityUnitRow.SetCodeSuffix}.  Элемент с именем {utilityUnitRow.ItemCode} не найден в базе данных.");
+                            logger.LogWarning($"В конфигурации трасс лотков {job.Code}{job.CodeSuffix} пропущена строка c Uid={utilityUnitRow.Uid}. Элемент с именем {utilityUnitRow.ItemCode} не найден в базе данных.");
                         }
                         job.JobParts.Remove(utilityUnitRow);
                     }
@@ -936,14 +945,12 @@ namespace Bs.Nano.Electric.Builder {
                             .AsNoTracking()
                             .FirstOrDefault(sgc => sgc.Code == gutterRow.ItemCode);
                         if (gutterCanal is null) {
-                            logger.LogWarning($"В конфигурации {mountSystemSet.Name} элемент  {gutterRow.ItemCode} не найден в таблице \"{Context.GetDefaultLocalizeValue<ScsGutterCanal>()}\"." +
-                                $"Добавление лотка пропущено.");
+                            logger.LogWarning($"В конфигурации трасс лотков {job.Code}{job.CodeSuffix} пропущена строка c Uid={gutterRow.Uid}. Элемент  {gutterRow.ItemCode} не найден в таблице \"{Context.GetDefaultLocalizeValue<ScsGutterCanal>()}\".");
                             job.JobParts.Remove(gutterRow);
                             continue;
-                            //throw new InvalidDataException($"При продукт {gutterRow.ItemCode} не найден в таблице \"{Context.GetDefaultLocalizeValue<ScsGutterCanal>()}\".");
                         }
                         DbScsGcSeriaConfigiration? config = FindDbScsGcSeriaConfigiration(context, mountSystemSet, gutterRow, gutterCanal);
-             
+
                         var gutter = plain.Gutter = new DbGcSystemGutter {
                             Gutter = gutterCanal,
                             ComplectType = gutterRow.ComplectType ?? DbGcStrightSegmentComplectType.SEGMENT,
@@ -961,7 +968,7 @@ namespace Bs.Nano.Electric.Builder {
                                 plain.AddChild(dbUtilityUnit);
                             }
                             else {
-                                logger.LogWarning($"В конфигурации трасс лотков {mountSystemSet.Name} пропущена строка {gutterAccessoryRow.SetCode}{gutterAccessoryRow.SetCodeSuffix}.  Элемент с именем {gutterAccessoryRow.ItemCode} не найден в базе данных.");
+                                logger.LogWarning($"В конфигурации трасс лотков {job.Code}{job.CodeSuffix} пропущена строка c Uid={gutterRow.Uid}.");
                             }
                             job.JobParts.Remove(gutterAccessoryRow);
                         }
@@ -989,29 +996,119 @@ namespace Bs.Nano.Electric.Builder {
             }
 
             foreach (var utilityUnitRow in jobParts) {
-                logger.LogWarning($"В конфигурации трасс лотков {mountSystemSet.Name} пропущена строка {utilityUnitRow.SetCode}{utilityUnitRow.SetCodeSuffix}. В структуре подчиненности элемент должен быть дочерним элементом полки или лотка.");
+                logger.LogWarning($"В конфигурации трасс лотков {job.Code}{job.CodeSuffix} пропущена строка c Uid={utilityUnitRow.Uid}. В структуре подчиненности элемент должен быть дочерним элементом полки или лотка.");
             }
         }
 
         private DbScsGcSeriaConfigiration? FindDbScsGcSeriaConfigiration(Context context, DbGcMountSystem mountSystemSet, MountSystemSetJobPart gutterRow, ScsGutterCanal gutterCanal) {
+            if (contextCache.NotNull().TryGetValue("DbScsGcSeriaConfigirations", out DbScsGcSeriaConfigiration[]? seriaConfigurations) != true) {
+                seriaConfigurations = context.DbScsGcSeriaConfigirations.AsNoTracking().ToArray();
+                contextCache.Set("DbScsGcSeriaConfigirations", seriaConfigurations);
+            }
             DbScsGcSeriaConfigiration? config = null;
             var confCode = gutterRow.DbScsGcSeriaConfigiration;
             if (string.IsNullOrEmpty(confCode)) {
                 confCode = GetDbScsGcSeriesConfiguration_Key(gutterCanal.GutterType, gutterCanal.Series ?? string.Empty);
             }
-            config = context.DbScsGcSeriaConfigirations
-                .AsNoTracking()
+            config = seriaConfigurations.NotNull()
                 .FirstOrDefault(item => item.DbName == confCode);
             if (config is null) {
                 // Поиск подходящей конфигурации по типу и серии лотка, шаблону для поиска.
-                
-                logger.LogWarning($"Не найдена конфигурация соединительных элементов {confCode}.");
-                logger.LogWarning($"В конфигурации {mountSystemSet.Name} для лотка {gutterCanal.Code} не сопоставлена конфигурация соединительных элементов.");
+                List<string> patterns = new List<string>();
+                if (!string.IsNullOrEmpty(gutterCanal.Series)) {
+                    patterns.Add(gutterCanal.Series!);
+                }
+                patterns.Add(gutterCanal.GutterType.GetDescription());
+                if (!string.IsNullOrEmpty(gutterRow.DbScsGcSeriaConfigiration)) {
+                    var confPattern = gutterRow.DbScsGcSeriaConfigiration!.Split(';');
+                    foreach (var pattern in confPattern) {
+                        patterns.Add(pattern.Trim(' ', '"'));
+                    }
+                }
+                // Поиск config по паттерну поиска
+                config = LookupSeriaConfigiration(seriaConfigurations, patterns.ToArray());
+                if (config is null) {
+                    logger.LogWarning($"В конфигурации {mountSystemSet.Name} для лотка {gutterCanal.Code} не сопоставлена конфигурация соединительных элементов.");
+                }
             }
 
             return config;
         }
+        // Последовательно проверяет элементы seriaConfigurations на соответствие шаблону patterns
+        // Элемент seriaConfiguration соответствует шаблону, если для всех элементов string[] patterns выполняется условие:
+        // элемент шаблона является частью одной из строк элементов массива entries
+        // Если имеется частичное совпадение, возвращается элемент с частичным совпадением.
+        // При этом, элементы шаблона, идущие первыми, имеют более высокий приоритет.
+        private DbScsGcSeriaConfigiration? LookupSeriaConfigiration(DbScsGcSeriaConfigiration[] seriaConfigurations, string[] patterns) {
+            SeriaConfigurationCacheEntry[] entries;
+            if (!contextCache.NotNull().TryGetValue("LookupSeriaConfigiration.seriaConfigurations", out entries)) {
+                // Load entries
+                entries = seriaConfigurations
+                    .Select(sc => new SeriaConfigurationCacheEntry(
+                        Seria: GetGutterSeria(sc),
+                        DbName: sc.DbName,
+                        DbDescription: sc.DbDescription,
+                        Description: sc.Description,
+                        DbCatalog: sc.DbCatalog,
+                        seriaConfiguration: sc
+                    ))
+                    .ToArray();
 
+                contextCache.Set("LookupSeriaConfigiration.seriaConfigurations", entries);
+            }
+            // Приоритет по порядку шаблонов
+            //foreach (var pattern in patterns) {
+            //    if (string.IsNullOrWhiteSpace(pattern))
+            //        continue;
+
+            //    var match = entries.NotNull().FirstOrDefault(e =>
+            //        new[] { e.Seria, e.DbName, e.DbDescription, e.Description, e.DbCatalog }
+            //            .Any(field => !string.IsNullOrEmpty(field) &&
+            //                          field!.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) >= 0));
+
+            //    if (match.seriaConfiguration != null)
+            //        return match.seriaConfiguration;
+            //}
+
+            return Filter(new LinkedList<SeriaConfigurationCacheEntry>(entries), null, new Queue<string>(patterns))?
+                .seriaConfiguration;
+
+        }
+        private static SeriaConfigurationCacheEntry? Filter(LinkedList<SeriaConfigurationCacheEntry> seriaConfigurationCacheEntries, SeriaConfigurationCacheEntry? sc, Queue<string> patterns) {
+            var entry = seriaConfigurationCacheEntries.First;
+            if (entry is null | patterns.Count == 0)
+                return sc;
+            var pattern = patterns.Dequeue();
+            while (entry is not null) {
+                var e = entry.Value;
+                if (new[] { e.Seria, e.DbName, e.DbDescription, e.Description, e.DbCatalog }
+                        .Any(field => !string.IsNullOrEmpty(field) &&
+                                      field!.IndexOf(pattern, StringComparison.OrdinalIgnoreCase) >= 0)) {
+                    sc = e;
+                    entry = entry.Next;
+                }
+                else {
+                    var toRemove= entry;
+                    entry= entry.Next;
+                    seriaConfigurationCacheEntries.Remove(toRemove);
+                }
+            }
+            return Filter(seriaConfigurationCacheEntries, sc, patterns);
+        }
+        private static string? GetGutterSeria(DbScsGcSeriaConfigiration dbScsGcSeriaConfigiration) {
+            if (string.IsNullOrWhiteSpace(dbScsGcSeriaConfigiration.KitStructure))
+                return null;
+            try {
+                var xdoc = XDocument.Parse(dbScsGcSeriaConfigiration.KitStructure);
+                // ищем элемент <GutterSeria>
+                var gutterSeria = xdoc.Descendants("GutterSeria").FirstOrDefault();
+                return gutterSeria?.Value;
+            }
+            catch {
+                // если XML битый или ошибка парсинга
+                return null;
+            }
+        }
         private void MakeDbGcHBend(Context context, DbGcHBend segment, IEnumerable<SeriesConfigurationPartItem>? parts, [CallerArgumentExpression("segment")] string? sectionName = null) {
             Queue<SeriesConfigurationPartItem> sectionParts = new Queue<SeriesConfigurationPartItem>(parts);
             while (sectionParts.Count > 0) {
@@ -1474,11 +1571,15 @@ namespace Bs.Nano.Electric.Builder {
                 sguSet.InstallType = job.Attribute.InstallType;
                 sguSet.StructureType = job.Attribute.StructureType;
                 string imgFileName = job.Attribute.DbImageRef;
-                string imagesPart = configuration.GetSection("KitStructureSource:ImagesPath").Value ??
-                    throw new InvalidOperationException($"В конфигурации не установлен путь для загрузки эскизов типовых решений (секция KitStructureSource:ImagesPath).");
-                string fullImageFileName = Path.Combine(imagesPart, imgFileName);
-                var image = GetOrCreate(context, fullImageFileName, target: (imgFileName, job.Attribute.Description, "Конфигурации трасс лотков"));
-                sguSet.DbImageRef = image.Id;
+                string imagesPart = configuration.GetSection("KitStructureSource:ImagesPath").Value;
+                if (imagesPart is null) {
+                    logger.LogWarning($"В настройках не установлен путь для загрузки эскизов типовых решений (секция KitStructureSource:ImagesPath). Загрузка эскиза пропущена.");
+                }
+                else {
+                    string fullImageFileName = Path.Combine(imagesPart, imgFileName);
+                    var image = GetOrCreateDbImage(context, fullImageFileName, target: (imgFileName, job.Attribute.Description, "Конфигурации трасс лотков"));
+                    sguSet.DbImageRef = image.Id;
+                }
 
                 DbGcKnotStand ks = sguSet.Stand = new DbGcKnotStand {
                     IsEnabled = true,
@@ -1602,7 +1703,7 @@ namespace Bs.Nano.Electric.Builder {
                         dbShelf = context.ScsGutterBoltings.FirstOrDefault(p => p.Code == gutterBoltingCode);
                         if (dbShelf is null) {
                             logger.LogWarning($"Элемент с артикулом {gutterBoltingCode} не найден в таблице {Context.GetDefaultLocalizeValue<ScsGutterBolting>()}");
-                            logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {gutterBoltingCode} пропущен.");
+                            logger.LogWarning($"В конфигурации узлов крепления {job.Attribute.Code} пропущена строка c Uid={item.Uid}.");
                             dbShelf = null;
                             sguSet.LevelType = DbGcKnotLevelType.NO;
                             //throw new InvalidDataException($"Элемент с артикулом {gutterBoltingCode} не найден в таблице {Context.GetDefaultLocalizeValue<ScsGutterBolting>()}");
@@ -1643,7 +1744,7 @@ namespace Bs.Nano.Electric.Builder {
                                     sb.Append($"{ScsGutterBoltingTypeEnum.CROSSBAR.GetDescription()}, {ScsGutterBoltingTypeEnum.CONSOLE.GetDescription()}, ");
                                     sb.Append($"или {ScsGutterBoltingTypeEnum.CRAMP.GetDescription()}.");
                                     logger.LogError(sb.ToString());
-                                    logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {gutterBoltingCode} пропущен.");
+                                    logger.LogWarning($"В конфигурации узлов крепления {job.Attribute.Code} пропущена строка c Uid={item.Uid}.");
                                     break;
                                     //throw new InvalidDataException(sb.ToString());
                             }
@@ -1679,7 +1780,7 @@ namespace Bs.Nano.Electric.Builder {
                         if (childItem.KitStructureItem == KitStructureType.DbUtilityUnit) {
                             var unitCode = childItem.ItemCode;
                             if (!TryFindDbUtilityUnit(logger, context, unitCode, out var dbUtilityUnit)) {
-                                logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {unitCode} пропущен.");
+                                logger.LogWarning($"В конфигурации узлов крепления {job.Attribute.Code} пропущена строка c Uid={childItem.Uid}.");
                                 continue;
                                 //throw new InvalidDataException($"При извлечении продукта \"{unitCode}\" как элемента \"Комплектующие\" произошла ошибка: Элемент среди допустимых комплектующих не найден.");
                             }
@@ -1691,7 +1792,7 @@ namespace Bs.Nano.Electric.Builder {
                         }
                         else {
                             logger.LogWarning($"Для элемента конфигурации \"Полка\" в качестве подчиненного можно указать только элемент \"Лоток\" или \"Комплектующие\". ");
-                            logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {childItem.ItemCode} пропущен.");
+                            logger.LogWarning($"В конфигурации узлов крепления {job.Attribute.Code} пропущена строка c Uid={childItem.Uid}.");
                             //throw new InvalidDataException($"При построении элемента {childItem} произошла ошибка. Для элемента конфигурации \"Полка\" в качестве подчиненного можно указать только элемент\"Лоток\" или \"Комплектующие\". ");
                         }
                     }
@@ -1736,7 +1837,7 @@ namespace Bs.Nano.Electric.Builder {
             return mssJobParts;
         }
 
-        internal static DbImage GetOrCreate(Context context, string fullSourceFileName, (string? ImageName, string? Description, string Category) target) {
+        internal static DbImage GetOrCreateDbImage(Context context, string fullSourceFileName, (string? ImageName, string? Description, string Category) target) {
             if (string.IsNullOrEmpty(target.ImageName)) {
                 throw new InvalidDataException("Не задано имя файла изображения.");
             }
@@ -2019,13 +2120,13 @@ namespace Bs.Nano.Electric.Builder {
             int? parentUid = int.TryParse(row["ParentUid"], out int parent) ? parent : null;
             int? totalLayersHeight = int.TryParse(row["TotalLayersHeight"], out int totalHeight) ? totalHeight : null;
             int? layerHeight = int.TryParse(row["LayerHeight"], out int lHeight) ? lHeight : null;
-            if (exceptions.Count > 0) {
-                throw new AggregateException($"Ошибка преобразования на строке {row.Index + 2}.", exceptions);
-            }
             DbGcStrightSegmentComplectType? complectType =
                 EnumConverter<DbGcStrightSegmentComplectType>.TryConvert(row["ComplectType"], out var cType)
                     ? cType : null;
-            string dbScsGcSeriaConfigiration = row["DbScsGcSeriaConfigiration"];
+            row.TryGetValue($"SeriaConfigiration ({coatingTypeName})", out string dbScsGcSeriaConfigiration);
+            if (exceptions.Count > 0) {
+                throw new AggregateException($"Ошибка преобразования на строке {row.Index + 2}.", exceptions);
+            }
             MountSystemSetJobPart value = new MountSystemSetJobPart(
             SetCode: setCode,
             SetCodeSuffix: setCodeSuffix,
