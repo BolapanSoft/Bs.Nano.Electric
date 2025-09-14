@@ -460,8 +460,8 @@ namespace Bs.Nano.Electric.Builder {
             var kit = context.DbCcMountSystems.FirstOrDefault(gsc => gsc.DbName == confJob.DbName);
             if (kit is null) {
                 kit = new DbCcMountSystem();
-                int id = Maker.GetMaxId(context.DbCcMountSystems) + 1;
-                kit.Id = id;
+                //int id = Maker.GetMaxId(context.DbCcMountSystems) + 1;
+                kit.Id = context.GetNextId<DbCcMountSystem>();
                 kit.DbName = confJob.DbName;
                 context.DbCcMountSystems.Add(kit);
             }
@@ -501,8 +501,8 @@ namespace Bs.Nano.Electric.Builder {
             var kit = context.DbTbMountSystems.FirstOrDefault(gsc => gsc.DbName == confJob.DbName);
             if (kit is null) {
                 kit = new DbTbMountSystem();
-                int id = Maker.GetMaxId(context.DbTbMountSystems) + 1;
-                kit.Id = id;
+                //int id = Maker.GetMaxId(context.DbTbMountSystems) + 1;
+                kit.Id = context.GetNextId<DbTbMountSystem>();
                 kit.DbName = confJob.DbName;
                 context.DbTbMountSystems.Add(kit);
             }
@@ -544,8 +544,8 @@ namespace Bs.Nano.Electric.Builder {
             var kit = context.DbScsTubeSeriesConfigurations.FirstOrDefault(gsc => gsc.DbName == confJob.DbName);
             if (kit is null) {
                 kit = new DbScsTubeSeriesConfiguration();
-                int id = Maker.GetMaxId(context.DbScsTubeSeriesConfigurations) + 1;
-                kit.Id = id;
+                //int id = Maker.GetMaxId(context.DbScsTubeSeriesConfigurations) + 1;
+                kit.Id = context.GetNextId<DbScsTubeSeriesConfiguration>();
                 kit.DbName = confJob.DbName;
                 context.DbScsTubeSeriesConfigurations.Add(kit);
             }
@@ -621,7 +621,7 @@ namespace Bs.Nano.Electric.Builder {
                     if (context.DbScsGcSeriaConfigirations.Any()) {
                         id = context.DbScsGcSeriaConfigirations.Max(sc => sc.Id) + 1;
                     }
-                    kit.Id = id;
+                    kit.Id = context.GetNextId<DbScsGcSeriaConfigiration>();
                     kit.DbName = kitJob.Code;
                     context.DbScsGcSeriaConfigirations.Add(kit);
                 }
@@ -841,11 +841,7 @@ namespace Bs.Nano.Electric.Builder {
             DbGcMountSystem? mountSystemSet = query.FirstOrDefault();
             if (mountSystemSet is null) {
                 mountSystemSet = context.DbGcMountSystems.CreateEntity();
-                int id;
-                if (context.DbGcMountSystems.Any())
-                    id = context.DbGcMountSystems.Select(s => s.Id).Max() + 1;
-                else
-                    id = 1;
+                int id = context.GetNextId<DbGcMountSystem>();
                 mountSystemSet.Id = id;
                 context.DbGcMountSystems.Add(mountSystemSet);
                 //context.SaveChanges();
@@ -900,6 +896,9 @@ namespace Bs.Nano.Electric.Builder {
             // Save KitStructure
             mountSystemSet.KitStructure = GetKitStructureAsXML(mountSystemSet);
         }
+
+       
+
         // Конфигурации трасс лотков
         private void MakeKitStructure(Context context, DbGcMountSystem mountSystemSet, DbScsGutterUtilitySet sguSet, MountSystemSetJob job) {
             string dbName = job.Attribute.DbName;
@@ -1088,8 +1087,8 @@ namespace Bs.Nano.Electric.Builder {
                     entry = entry.Next;
                 }
                 else {
-                    var toRemove= entry;
-                    entry= entry.Next;
+                    var toRemove = entry;
+                    entry = entry.Next;
                     seriaConfigurationCacheEntries.Remove(toRemove);
                 }
             }
@@ -1555,11 +1554,12 @@ namespace Bs.Nano.Electric.Builder {
                     sguSet = context.DbScsGutterUtilitySets.Find(gus.Id)!;
                 }
                 else {
-                    if (context.DbScsGutterUtilitySets.Any()) {
-                        id = context.DbScsGutterUtilitySets.Select(s => s.Id).Max() + 1;
-                    }
-                    if (context.DbScsGutterUtilitySets.Local.Any())
-                        id = Math.Max(id, context.DbScsGutterUtilitySets.Local.Select(s => s.Id).Max() + 1);
+                    //if (context.DbScsGutterUtilitySets.Any()) {
+                    //    id = context.DbScsGutterUtilitySets.Select(s => s.Id).Max() + 1;
+                    //}
+                    //if (context.DbScsGutterUtilitySets.Local.Any())
+                    //    id = Math.Max(id, context.DbScsGutterUtilitySets.Local.Select(s => s.Id).Max() + 1);
+                    id = context.GetNextId<DbScsGutterUtilitySet>();
                     sguSet = new DbScsGutterUtilitySet { Id = id };
                     sguSet.DbName = dbName;
                     context.DbScsGutterUtilitySets.Add(sguSet);
@@ -1912,6 +1912,10 @@ namespace Bs.Nano.Electric.Builder {
             return gcPart;
         }
         private static bool TryFindDbUtilityUnit(ILogger logger, Context context, string code, [NotNullWhen(true)] out DbUtilityUnit? dbUtilityUnit) {
+            if (string.IsNullOrEmpty(code)) {
+                dbUtilityUnit = null;
+                return false; 
+            }
             if (TryFindDbUtilityUnit(context, code, out var element)) {
                 dbUtilityUnit = element;
             }

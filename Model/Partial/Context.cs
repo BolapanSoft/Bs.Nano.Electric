@@ -164,19 +164,32 @@ namespace Nano.Electric {
                 Image = image
             };
             //this.DbImages.Add(dbImg);
-            int id = 1;
-            if (this.DbImages.Local.Any()) {
-                id = Math.Max(id, this.DbImages.Local.Max(img => img.Id) + 1);
-            }
-            if (this.DbImages.Any()) {
-                id = Math.Max(this.DbImages.Max(img => img.Id) + 1, id);
-            }
-            dbImg.Id = id;
+            //int id = 1;
+            //if (this.DbImages.Local.Any()) {
+            //    id = Math.Max(id, this.DbImages.Local.Max(img => img.Id) + 1);
+            //}
+            //if (this.DbImages.Any()) {
+            //    id = Math.Max(this.DbImages.Max(img => img.Id) + 1, id);
+            //}
+            dbImg.Id = GetNextId<DbImage>();
             //dbImg.Text = imgName ?? string.Empty;
             //dbImg.Category = category;
             //dbImg.Image = image;
             this.DbImages.Add(dbImg);
             return dbImg;
+        }
+        public int GetNextId<Tentity>() where Tentity : class, IHaveId {
+            int id;
+            var addedMaxId = this.ChangeTracker.Entries<Tentity>()
+                       .Where(e => e.State == EntityState.Added)
+                       .Select(e => (int?)e.Entity.Id)
+                       .Max()
+                       ?? 0;
+            int dbMaxId = this.Set<Tentity>()
+                   .Select(s => (int?)s.Id)   // делаем nullable, чтобы Max над пустой выборкой вернул null
+                   .Max() ?? 0;
+            id = Math.Max(addedMaxId, dbMaxId) + 1;
+            return id;
         }
 #if NETFRAMEWORK
         public Context(DbConnection existingConnection, bool contextOwnsConnection) : base(existingConnection, contextOwnsConnection) {

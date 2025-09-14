@@ -68,18 +68,18 @@ namespace Bs.Nano.Electric.Builder {
         //        return Path.Combine(configuration.OutputPath, $"{dbName} v{vers.Major}.{vers.Minor}.{vers.Build}-n8.5.sdf");
         //    }
         //}
-        internal static int GetMaxId<TEntity>(DbSet<TEntity> set) where TEntity : class, IHaveId {
-            // Берем максимум среди локальных данных, если они есть
-            int localMax = set.Local.Count > 0
-                ? set.Local.Max(p => p.Id)
-                : 0;
+        //internal static int GetMaxId<TEntity>(DbSet<TEntity> set) where TEntity : class, IHaveId {
+        //    // Берем максимум среди локальных данных, если они есть
+        //    int localMax = set.Local.Count > 0
+        //        ? set.Local.Max(p => p.Id)
+        //        : 0;
 
-            // Берем максимум в базе, если там есть записи
-            int dbMax = set.AsNoTracking().Select(p => p.Id).DefaultIfEmpty(0).Max();
+        //    // Берем максимум в базе, если там есть записи
+        //    int dbMax = set.AsNoTracking().Select(p => p.Id).DefaultIfEmpty(0).Max();
 
-            // Возвращаем наибольшее значение
-            return Math.Max(localMax, dbMax);
-        }
+        //    // Возвращаем наибольшее значение
+        //    return Math.Max(localMax, dbMax);
+        //}
         internal static DbImage LoadImage(Context context, string imgName, string category, FileInfo fi) {
             //imgName = string.IsNullOrEmpty(imgName) ? fi.Name : imgName;
             imgName = Path.ChangeExtension(imgName, ".png");

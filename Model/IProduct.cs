@@ -26,7 +26,7 @@ namespace Nano.Electric {
         string? Manufacturer { get; set; }
         string? SpecDescription { get; set; }
     }
-    public interface ICommonProduct : IProduct { 
+    public interface ICommonProduct : IProduct {
         string? Series { get; set; }
         string? Description { get; set; }
         string? Url { get; set; }
@@ -37,11 +37,13 @@ namespace Nano.Electric {
     public partial class DbLtKiTable : IHaveId { }
     public partial class ExplodeSafeLevel : IHaveId { }
     public partial class ScsPortType : IHaveId { }
+    public partial class DbImage : IHaveId { }
+    public partial class DbScsGcSeriaConfigiration : IHaveId { }
     public partial class ElWire : IProduct, IHaveCableSystemTypeRef, IHaveImageRef { }
     public partial class ElWireConductMaterial : IHaveId { }
-    public partial class ElWireIsolationMaterial : IHaveId{}
+    public partial class ElWireIsolationMaterial : IHaveId { }
     public partial class ScsCableSystemType : IHaveId { }
-    public partial class DbCaeMaterialUtilitySet : IHaveId, IHaveImageRef  { }
+    public partial class DbCaeMaterialUtilitySet : IHaveId, IHaveImageRef { }
     public partial class ScsGutterCanal : ICommonProduct, IHaveImageRef { }
     public partial class ScsCabelCanal : ICommonProduct, IHaveImageRef { }
     public partial class ScsCableFitting : ICommonProduct, IHaveImageRef { }
@@ -55,8 +57,8 @@ namespace Nano.Electric {
     public partial class DbScsGcAccessoryUnit : ICommonProduct, IHaveImageRef { }
     public partial class ScsGutterBolting : ICommonProduct, IHaveImageRef { }
     public partial class DbScsGcBoltingAccessoryUnit : ICommonProduct, IHaveImageRef { }
-    public partial class DcCableCanalCover : ICommonProduct, IHaveImageRef   { }
-    public partial class DbCableCanalPartition : ICommonProduct, IHaveImageRef   { }
+    public partial class DcCableCanalCover : ICommonProduct, IHaveImageRef { }
+    public partial class DbCableCanalPartition : ICommonProduct, IHaveImageRef { }
     public partial class CaeMaterialUtility : ICommonProduct, IHaveImageRef { }
     public partial class ElBoard : ICommonProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElBox : ICommonProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate { }
@@ -102,8 +104,8 @@ namespace Nano.Electric {
     public partial class ScsShellDistr : ICommonProduct, IHaveImageRef, IHaveDbGraphicRef { }
     public partial class ScsUtpSocket : ICommonProduct, IHaveCableSystemTypeRef, IHaveImageRef { }
     public partial class ScsCommutatorPanel : ICommonProduct, IHaveImageRef, IHaveDbGraphicRef { }
-    public partial class ScsHatchUtilityUnit : ICommonProduct, IHaveImageRef{ }
-    public partial class ScsServiceColumnUtilityUnit : ICommonProduct, IHaveImageRef{ }
+    public partial class ScsHatchUtilityUnit : ICommonProduct, IHaveImageRef { }
+    public partial class ScsServiceColumnUtilityUnit : ICommonProduct, IHaveImageRef { }
     public partial class ScsHatch : ICommonProduct, IHaveImageRef, IHaveDbGraphicRef { }
     public partial class ScsServiceColumn : ICommonProduct, IHaveImageRef, IHaveDbGraphicRef { }
     public partial class ScsCord : IHaveId, IHaveCableSystemTypeRef, IHaveImageRef { }
