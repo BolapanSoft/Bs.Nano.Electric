@@ -45,7 +45,9 @@ namespace Nano.Electric {
                     Children[0] = value;
             }
         }
-
+        public void Clear() {
+            Children.Clear();
+        }
         //string IProduct.Code => DbName;
 
         //int? IProduct.DbImageRef { get => DbImageRef; set => DbImageRef = value; }

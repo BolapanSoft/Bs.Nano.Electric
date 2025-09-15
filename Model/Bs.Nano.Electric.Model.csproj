@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>1.25.8</VersionPrefix>
+		<VersionPrefix>1.25.9</VersionPrefix>
 		<TargetFrameworks>net48;net8.0</TargetFrameworks>
 		<LangVersion>9.0</LangVersion>
 		<Nullable>enable</Nullable>

@@ -24,13 +24,13 @@ namespace Nano.Electric {
             get {
                 return GetChildren<DbGcSystemPlain>();
             }
-
         }
 
         public void Add(DbGcSystemPlain plain) {
             Throw.IfNull(plain);
             Children.Add(plain);
         }
+        public void Clear() { Children.Clear(); }
         protected override void WriteProperties(XmlWriter writer) {
             ;
         }

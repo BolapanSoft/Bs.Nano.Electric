@@ -212,6 +212,7 @@ namespace Bs.Nano.Electric.Builder {
                         using (var trans = context.Database.BeginTransaction()) {
                             try {
                                 MakeDbScsGutterUtilitySet(context);
+                                context.SaveChanges();
                                 trans.Commit();
                             }
                             catch (Exception) {
@@ -295,7 +296,7 @@ namespace Bs.Nano.Electric.Builder {
             List<DbScsGutterUtilitySetJob> jobs = scsGutterUtilitySetSource
                 .Select(row => new DbScsGutterUtilitySetJob(
                     Attribute: row,
-                    JobParts: mssJobParts.Where(jp => jp.SetCode == row.Code & jp.Material == row.Material)))
+                    JobParts: mssJobParts.Where(jp => jp.SetCode == row.Code & jp.Material == row.Material & !string.IsNullOrEmpty(jp.ItemCode))))
                 .ToList();
             foreach (var job in jobs) {
                 MakeDbScsGutterUtilitySet(context, job);
@@ -835,7 +836,7 @@ namespace Bs.Nano.Electric.Builder {
         // Конфигурации трасс лотков
         private void MakeMountSystemSet(Context context, MountSystemSetJob job) {
             //var gutterUtilitySet = MakeDbScsGutterUtilitySet(context, job);
-            var query = context.DbGcMountSystems.Where(s => s.DbName == job.Attribute.DbName);
+            var query = context.DbGcMountSystems.Where(s => s.DbName == job.Attribute.DbName & s.DbCatalog == job.Attribute.DbCatalog);
             //DbGcMountSystem? mountSystemSet = context.DbGcMountSystems
             //            .FirstOrDefault(s => s.DbName == job.Attribute.DbName);
             DbGcMountSystem? mountSystemSet = query.FirstOrDefault();
@@ -846,6 +847,10 @@ namespace Bs.Nano.Electric.Builder {
                 context.DbGcMountSystems.Add(mountSystemSet);
                 //context.SaveChanges();
             }
+            else { 
+                mountSystemSet.Clear(); 
+            }
+
             mountSystemSet.DbName = job.Attribute.DbName;
             mountSystemSet.Name = job.Attribute.DbDescription; // set to DbNaming
             //mountSystemSet.DbNaming=job.Attribute.DbNaming;
@@ -897,7 +902,7 @@ namespace Bs.Nano.Electric.Builder {
             mountSystemSet.KitStructure = GetKitStructureAsXML(mountSystemSet);
         }
 
-       
+
 
         // Конфигурации трасс лотков
         private void MakeKitStructure(Context context, DbGcMountSystem mountSystemSet, DbScsGutterUtilitySet sguSet, MountSystemSetJob job) {
@@ -1552,6 +1557,7 @@ namespace Bs.Nano.Electric.Builder {
                 DbScsGutterUtilitySet sguSet;
                 if (gus is not null) {
                     sguSet = context.DbScsGutterUtilitySets.Find(gus.Id)!;
+                    sguSet.Clear();
                 }
                 else {
                     //if (context.DbScsGutterUtilitySets.Any()) {
@@ -1914,7 +1920,7 @@ namespace Bs.Nano.Electric.Builder {
         private static bool TryFindDbUtilityUnit(ILogger logger, Context context, string code, [NotNullWhen(true)] out DbUtilityUnit? dbUtilityUnit) {
             if (string.IsNullOrEmpty(code)) {
                 dbUtilityUnit = null;
-                return false; 
+                return false;
             }
             if (TryFindDbUtilityUnit(context, code, out var element)) {
                 dbUtilityUnit = element;
@@ -2099,7 +2105,8 @@ namespace Bs.Nano.Electric.Builder {
                 JobParts: new LinkedList<MountSystemSetJobPart>(mssJobParts.Where(
                     item => item.SetCode == row["Code"] &
                     (item.SetCodeSuffix == row["CodeSuffix"] | string.IsNullOrEmpty(item.SetCodeSuffix)) &
-                    item.Material == row["Material"]))
+                    item.Material == row["Material"] &
+                    !string.IsNullOrEmpty(item.ItemCode)))
                 );
         }
 
