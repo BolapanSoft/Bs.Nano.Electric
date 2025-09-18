@@ -15,9 +15,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using static Bs.XML.SpreadSheet.SheetCommon;
-using OpenXMLROW = DocumentFormat.OpenXml.Spreadsheet.Row;
-using Bs.Nano.Electric.Builder.Internals;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -80,6 +77,56 @@ namespace Bs.Nano.Electric.Builder {
         //    // Возвращаем наибольшее значение
         //    return Math.Max(localMax, dbMax);
         //}
+        public static DbImage GetOrCreateDbImage(Context context, string fullSourceFileName, (string? ImageName, string? Description, string Category) target) {
+            if (string.IsNullOrEmpty(target.ImageName)) {
+                throw new InvalidDataException("Не задано имя файла изображения.");
+            }
+            string imageName = Path.ChangeExtension(target.ImageName, ".png"); // in nanoCad Electro image always in PNG format
+            DbImage? image = context.DbImages.Local.FirstOrDefault(p => p.Text == imageName) ??
+                context.DbImages.FirstOrDefault(p => p.Text == imageName);
+            if (image is null) {
+                ////string imgFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fullSourceFileName);
+                //if (!File.Exists(fullSourceFileName)) {
+                //    throw new FileNotFoundException(fullSourceFileName);
+                //}
+                //FileInfo fi = new FileInfo(fullSourceFileName);
+
+                //image = LoadImage(context, target.ImageName, target.Category, fi);
+                ////var image = context.DbImages.Find(idImg);
+                //image.Description = image.Description;
+                ////image.Category = target.Category;
+                string? foundFile = null;
+
+                if (File.Exists(fullSourceFileName)) {
+                    foundFile = fullSourceFileName;
+                }
+                else {
+                    // список допустимых расширений
+                    string[] allowedExtensions = { ".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tif", ".tiff", ".webp" };
+
+                    string dir = Path.GetDirectoryName(fullSourceFileName)!;
+                    string baseName = Path.GetFileNameWithoutExtension(fullSourceFileName);
+
+                    foreach (var ext in allowedExtensions) {
+                        string candidate = Path.Combine(dir, baseName + ext);
+                        if (File.Exists(candidate)) {
+                            foundFile = candidate;
+                            break;
+                        }
+                    }
+                }
+
+                if (foundFile is null) {
+                    throw new FileNotFoundException($"Не удалось найти файл изображения: {fullSourceFileName}");
+                }
+
+                FileInfo fi = new FileInfo(foundFile);
+
+                image = LoadImage(context, target.ImageName, target.Category, fi);
+                image.Description = image.Description;
+            }
+            return image;
+        }
         internal static DbImage LoadImage(Context context, string imgName, string category, FileInfo fi) {
             //imgName = string.IsNullOrEmpty(imgName) ? fi.Name : imgName;
             imgName = Path.ChangeExtension(imgName, ".png");

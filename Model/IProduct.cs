@@ -92,7 +92,7 @@ namespace Nano.Electric {
     public partial class DbElSocket : ICommonProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElDbCase : ICommonProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class ElSocketUtility : ICommonProduct, IHaveImageRef, IHaveSafeDegree, IHaveDbClimate { }
-    public partial class ElSocketUtility : IProduct, IHaveImageRef, IHaveSafeDegree, IHaveDbClimate { }
+    //public partial class ElSocketUtility : IProduct, IHaveImageRef, IHaveSafeDegree, IHaveDbClimate { }
     public partial class ElWireMark : IHaveId { }
     public partial class DbGraphic : IHaveId, IDbGraphic { }
 
