@@ -10,18 +10,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using static Bs.Nano.Electric.Builder.ResourceManager;
 using static Bs.Nano.Electric.Builder.UtilitySetMakerResources;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Caching.Memory;
 using System.Xml.Linq;
-
+#if NETCOREAPP
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 
 
@@ -296,7 +296,7 @@ namespace Bs.Nano.Electric.Builder {
             List<DbScsGutterUtilitySetJob> jobs = scsGutterUtilitySetSource
                 .Select(row => new DbScsGutterUtilitySetJob(
                     Attribute: row,
-                    JobParts: mssJobParts.Where(jp => jp.SetCode == row.Code & jp.Material == row.Material & !string.IsNullOrEmpty(jp.ItemCode))))
+                    JobParts: mssJobParts.Where(jp => jp.SetCode == row.Code & jp.Material == row.Material)))
                 .ToList();
             foreach (var job in jobs) {
                 MakeDbScsGutterUtilitySet(context, job);
@@ -847,8 +847,8 @@ namespace Bs.Nano.Electric.Builder {
                 context.DbGcMountSystems.Add(mountSystemSet);
                 //context.SaveChanges();
             }
-            else { 
-                mountSystemSet.Clear(); 
+            else {
+                mountSystemSet.Clear();
             }
 
             mountSystemSet.DbName = job.Attribute.DbName;
@@ -1577,7 +1577,7 @@ namespace Bs.Nano.Electric.Builder {
                 sguSet.InstallType = job.Attribute.InstallType;
                 sguSet.StructureType = job.Attribute.StructureType;
                 string imgFileName = job.Attribute.DbImageRef;
-                string imagesPart = configuration.GetSection("KitStructureSource:ImagesPath").Value;
+                string? imagesPart = configuration.GetSection("KitStructureSource:ImagesPath").Value;
                 if (imagesPart is null) {
                     logger.LogWarning($"В настройках не установлен путь для загрузки эскизов типовых решений (секция KitStructureSource:ImagesPath). Загрузка эскиза пропущена.");
                 }
@@ -1643,17 +1643,20 @@ namespace Bs.Nano.Electric.Builder {
                     }
                     var btRowId = btRow.Uid;
                     foreach (var childItem in jobParts.Where(item => item.ParentUid == btRowId).ToArray()) {
+
                         if (childItem.KitStructureItem == KitStructureType.DbUtilityUnit) {
                             var unitCode = childItem.ItemCode;
-                            if (TryFindDbUtilityUnit(logger, context, unitCode, out var dbUtilityUnit)) {
+                            if (string.IsNullOrEmpty(unitCode)) {
+                            }
+                            else if (TryFindDbUtilityUnit(logger, context, unitCode, out var dbUtilityUnit)) {
                                 dbUtilityUnit.SpecCount = childItem.ItemQuantity;
                                 ks.AddChild(dbUtilityUnit);
                             }
                             else {
                                 logger.LogWarning($"В конфигурации узлов крепления {dbName} элемент {unitCode} пропущен.");
-                                continue;
                             }
                             jobParts.Remove(childItem);
+                            continue;
                         }
                         else if (childItem.KitStructureItem == KitStructureType.DbShelf) {
                         }
@@ -1776,7 +1779,7 @@ namespace Bs.Nano.Electric.Builder {
                         IsUse = true,
                         Number = plainCounter.Current.Number,
                         ProfileCount = 1,
-                        Seria = itemItemQuantity > 0 ? dbShelf.Series : string.Empty,
+                        Seria = ((dbShelf is not null) & itemItemQuantity > 0) ? dbShelf.Series : string.Empty,
                         Profile = dbShelf,
                         //Profile = (itemItemQuantity > 0) ? dbShelf : new ScsGutterBolting { Id = -1, CanalBoltingType = lastCanalBoltingType },
                     };
@@ -1785,13 +1788,17 @@ namespace Bs.Nano.Electric.Builder {
                     foreach (var childItem in jobParts.Where(item => item.ParentUid == itemUid).ToArray()) {
                         if (childItem.KitStructureItem == KitStructureType.DbUtilityUnit) {
                             var unitCode = childItem.ItemCode;
-                            if (!TryFindDbUtilityUnit(logger, context, unitCode, out var dbUtilityUnit)) {
+                            if (string.IsNullOrEmpty(unitCode)) {
+                            }
+                            else if (!TryFindDbUtilityUnit(logger, context, unitCode, out var dbUtilityUnit)) {
                                 logger.LogWarning($"В конфигурации узлов крепления {job.Attribute.Code} пропущена строка c Uid={childItem.Uid}.");
-                                continue;
                                 //throw new InvalidDataException($"При извлечении продукта \"{unitCode}\" как элемента \"Комплектующие\" произошла ошибка: Элемент среди допустимых комплектующих не найден.");
                             }
-                            dbUtilityUnit.SpecCount = childItem.ItemQuantity;
-                            dbGcKnotPlain.AddChild(dbUtilityUnit);
+                            else {
+                                dbUtilityUnit.SpecCount = childItem.ItemQuantity;
+                                dbGcKnotPlain.AddChild(dbUtilityUnit); 
+                            }
+                            jobParts.Remove(childItem);
                         }
                         else if (childItem.KitStructureItem == KitStructureType.Gutter) {
 
@@ -1802,10 +1809,19 @@ namespace Bs.Nano.Electric.Builder {
                             //throw new InvalidDataException($"При построении элемента {childItem} произошла ошибка. Для элемента конфигурации \"Полка\" в качестве подчиненного можно указать только элемент\"Лоток\" или \"Комплектующие\". ");
                         }
                     }
+                    jobParts.Remove(item);
                 }
                 sguSet.LevelCount = levelCount;
                 sguSet.KitStructure = GetKitStructureAsXML(sguSet);
-                logger.LogInformation("Конфигурация узлов крепления \"{}\" построена успешно.", job.Attribute.DbName);
+                if (jobParts.Count==0) {
+                    logger.LogInformation("Конфигурация узлов крепления \"{}\" построена успешно.", job.Attribute.DbName); 
+                }
+                else {  
+                    logger.LogWarning($"В конфигурации узлов крепления {job.Attribute.DbName} остались необработанные элементы:");
+                    foreach (var item in jobParts) {
+                        logger.LogWarning($"Id элемента={item.Uid}, Артикул={item.ItemCode}, Элемент конфигурации={item.KitStructureItem.GetDescription()}");
+                    }
+                }
                 return sguSet;
             }
             catch (Exception ex) {
@@ -2105,8 +2121,7 @@ namespace Bs.Nano.Electric.Builder {
                 JobParts: new LinkedList<MountSystemSetJobPart>(mssJobParts.Where(
                     item => item.SetCode == row["Code"] &
                     (item.SetCodeSuffix == row["CodeSuffix"] | string.IsNullOrEmpty(item.SetCodeSuffix)) &
-                    item.Material == row["Material"] &
-                    !string.IsNullOrEmpty(item.ItemCode)))
+                    item.Material == row["Material"]))
                 );
         }
 
