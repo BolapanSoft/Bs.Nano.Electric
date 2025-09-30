@@ -13,6 +13,11 @@
         public int? CableSystemType { get; set; }
         public string? BlockName { get; set; }
         public int? PortType { get; set; }
+#else
+        [Column("CableSystemType")]
+        public int? CableSystemTypeId { get; set; }
+        [Column("PortType")]
+        public int? PortTypeId { get; set; }
 #endif
 
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

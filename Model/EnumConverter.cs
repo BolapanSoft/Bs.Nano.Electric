@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using NetConvert = System.Convert;
 
 namespace Nano.Electric {
     public static class EnumConverter<TEnum> where TEnum : struct, Enum {
@@ -15,15 +16,16 @@ namespace Nano.Electric {
         private static readonly TEnum[] _enumValues;
 
         static EnumConverter() {
-            _isFlagsEnum = typeof(TEnum).GetCustomAttribute<FlagsAttribute>() is not null;
+            var enumType = typeof(TEnum);
+            _isFlagsEnum = enumType.GetCustomAttribute<FlagsAttribute>() != null;
 
-            _enumValues = Enum.GetValues(typeof(TEnum)).Cast<TEnum>().OrderBy(e => e).ToArray();
-            _enumNames = _enumValues.Select(v => v.ToString()!).ToArray();
+            _enumValues = Enum.GetValues(enumType).Cast<TEnum>().OrderBy(e => NetConvert.ToUInt32(e)).ToArray();
+            _enumNames = _enumValues.Select(v => v.ToString()).ToArray();
             _descriptions = _enumValues
                 .Select(v => {
-                    var member = typeof(TEnum).GetMember(v.ToString()!).FirstOrDefault();
+                    var member = enumType.GetMember(v.ToString()).FirstOrDefault();
                     var attr = member?.GetCustomAttribute<DescriptionAttribute>();
-                    return attr?.Description ?? string.Empty;
+                    return attr?.Description ?? v.ToString();
                 })
                 .ToArray();
 
@@ -48,7 +50,7 @@ namespace Nano.Electric {
         public static bool IsDefinedValue(TEnum value) =>
             _isFlagsEnum
                 ? (ToUint(value) & ~_allFlags) == 0
-                : Array.BinarySearch(_enumValues, value) >= 0;
+                : _enumValues.Contains(value);
 
         public static bool IsDefinedName(string value) =>
             _enumNames.Contains(value);
@@ -60,7 +62,7 @@ namespace Nano.Electric {
 
         public static bool TryConvert(string description, out TEnum value) {
             for (int i = 0; i < _descriptions.Length; i++) {
-                if (_descriptions[i] == description) {
+                if (string.Equals(_descriptions[i], description, StringComparison.OrdinalIgnoreCase)) {
                     value = _enumValues[i];
                     return true;
                 }
@@ -71,10 +73,10 @@ namespace Nano.Electric {
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static uint ToUint(TEnum val) =>
-            Unsafe.As<TEnum, uint>(ref val);
+            NetConvert.ToUInt32(val);
 
         private static string GetDescriptionSingleValue(TEnum value) {
-            int idx = Array.BinarySearch(_enumValues, value);
+            int idx = Array.IndexOf(_enumValues, value);
             return idx >= 0 ? _descriptions[idx] : string.Empty;
         }
     }

@@ -1,43 +1,49 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	  <VersionPrefix>1.0.3</VersionPrefix>
-	  <TargetFramework>net48</TargetFramework>
-	  <ImplicitUsings>disable</ImplicitUsings>
-	  <Nullable>enable</Nullable>
-	  <LangVersion>9.0</LangVersion>
-	  <BaseOutputPath>..\bin\</BaseOutputPath>
-  </PropertyGroup>
+	<PropertyGroup>
+		<VersionPrefix>1.0.3</VersionPrefix>
+		<TargetFrameworks>net48; net8.0</TargetFrameworks>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>9.0</LangVersion>
+		<BaseOutputPath>..\bin\</BaseOutputPath>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Model\Bs.Nano.Electric.Model.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Model\Bs.Nano.Electric.Model.csproj" />
+	</ItemGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+		<DefineConstants>NET48</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="Cadwise.Graphic">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 23.1\Cadwise.Graphic.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Cadwise.Graphic.Db">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 23.1\Cadwise.Graphic.Db.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Cadwise.Kit">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 23.1\Cadwise.Kit.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Cadwise.OpenCascade.Interop">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 23.1\Cadwise.OpenCascade.Interop.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Cadwise.Studio.DataBase">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 23.1\Cadwise.Studio.DataBase.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Cadwise.Studio.DataBase.Model">
-      <HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 23.1\Cadwise.Studio.DataBase.Model.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<DefineConstants>NET8_0</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<Reference Include="Cadwise.Graphic">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 24.1\Cadwise.Graphic.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Cadwise.Graphic.Db">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 24.1\Cadwise.Graphic.Db.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Cadwise.Kit">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 24.1\Cadwise.Kit.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Cadwise.OpenCascade.Interop">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 24.1\Cadwise.OpenCascade.Interop.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Cadwise.Studio.DataBase">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 24.1\Cadwise.Studio.DataBase.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Cadwise.Studio.DataBase.Model">
+			<HintPath>C:\Program Files (x86)\Nanosoft\nanoCAD BIM Электро. Редактор БД 24.1\Cadwise.Studio.DataBase.Model.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
 
 </Project>

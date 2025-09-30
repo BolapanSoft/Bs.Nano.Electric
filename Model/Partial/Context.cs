@@ -20,6 +20,7 @@ using System.Data.SqlServerCe;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.Logging;
 #endif
 
 namespace Nano.Electric {
@@ -235,7 +236,19 @@ namespace Nano.Electric {
                 .HasOptional(p => p.CableSystemType)
                 .WithMany()
                 .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ScsSwitchSocketPanel>()
+                .HasOptional(p => p.PortType)
+                .WithMany()
+                .Map(m => m.MapKey("PortType"));
             modelBuilder.Entity<ScsUtpSocket>()
+                .HasOptional(p => p.CableSystemType)
+                .WithMany()
+                .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ScsUtpSocket>()
+                .HasOptional(p => p.PortType)
+                .WithMany()
+                .Map(m => m.MapKey("PortType"));
+            modelBuilder.Entity<ScsPatchCord>()
                 .HasOptional(p => p.CableSystemType)
                 .WithMany()
                 .Map(m => m.MapKey("CableSystemType"));
@@ -276,10 +289,8 @@ namespace Nano.Electric {
                 .IsRequired(false);
 
             modelBuilder.Entity<ElWire>()
-                .HasOne(p => p.CableSystemType)
-                .WithMany()
-                .HasForeignKey("CableSystemTypeId")
-                .IsRequired(false);
+                .Property<int?>("CableSystemTypeId")
+                .HasColumnName("CableSystemType");
             modelBuilder.Entity<ElWire>()
                 .Property<int?>("CableSystemTypeId")
                 .HasColumnName("CableSystemType");
@@ -293,12 +304,28 @@ namespace Nano.Electric {
                 .Property<int?>("wireMarkId")
                 .HasColumnName("wireMark");
 
-            modelBuilder.Entity<ScsSwitchSocketPanel>()
-                .HasOne(p => p.CableSystemType)
-                .WithMany()
-                .HasForeignKey("CableSystemTypeId")
-                .IsRequired(false);
+            //modelBuilder.Entity<ScsSwitchSocketPanel>()
+            //    .Property<int?>("CableSystemTypeId")
+            //    .HasColumnName("CableSystemType");
+            //modelBuilder.Entity<ScsSwitchSocketPanel>()
+            //    .Property<int?>("PortTypeId")
+            //    .HasColumnName("PortType");
+            //modelBuilder.Entity<ScsSwitchUtpPanel>()
+            //    .Property<int?>("CableSystemTypeId")
+            //    .HasColumnName("CableSystemType");
+            //modelBuilder.Entity<ScsSwitchUtpPanel>()
+            //    .Property<int?>("PortTypeId")
+            //    .HasColumnName("PortType");
+            modelBuilder.Entity<ScsUtpSocket>()
+                .Property<int?>("CableSystemTypeId")
+                .HasColumnName("CableSystemType");
+            modelBuilder.Entity<ScsUtpSocket>()
+                .Property<int?>("PortTypeId")
+                .HasColumnName("PortType");
             modelBuilder.Entity<ElWire>()
+                .Property<int?>("CableSystemTypeId")
+                .HasColumnName("CableSystemType");
+            modelBuilder.Entity<ScsPatchCord>()
                 .Property<int?>("CableSystemTypeId")
                 .HasColumnName("CableSystemType");
             
@@ -310,6 +337,12 @@ namespace Nano.Electric {
             modelBuilder.Entity<ElLighting>()
                 .Property<int?>("LampId")
                 .HasColumnName("Lamp");
+            modelBuilder.Entity<ScsCommutatorPanel>()
+                .Property<int?>("PortTypeInId")
+                .HasColumnName("PortTypeIn");
+            modelBuilder.Entity<ScsCommutatorPanel>()
+                .Property<int?>("PortTypeOutId")
+                .HasColumnName("PortTypeOut");
             
 #endif
 #endif

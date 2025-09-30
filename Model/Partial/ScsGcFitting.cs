@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 namespace Nano.Electric {
     public partial class ScsGcFitting : DbUtilityUnit, IXmlSerializable {
         public override string UtilityTypeId => "ScsGcFitting";
+        [NotMapped]
         public override string TableName => "ScsGcFitting";
 
 #if InitDbContextEnums
