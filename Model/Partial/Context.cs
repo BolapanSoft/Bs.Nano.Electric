@@ -22,15 +22,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.Logging;
 #endif
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Nano.Electric {
     public partial class Context {
         private class TableColumn {
             public string Name { get; set; }
         }
-
-        private static Dictionary<string, string[]> propertiesCache = new Dictionary<string, string[]>();
-        private static readonly Dictionary<Type, string> knownLocalizeValues = new Dictionary<Type, string>();
+        private static readonly MemoryCache _cache = new(new MemoryCacheOptions());
+        //private static Dictionary<string, string[]> propertiesCache = new Dictionary<string, string[]>();
+        //private static readonly Dictionary<Type, string> knownLocalizeValues = new Dictionary<Type, string>();
         /// <summary>
         /// Выполняет заполнение свойств сущности из сериализованного в строку источника.
         /// </summary>
@@ -64,6 +65,32 @@ namespace Nano.Electric {
                 }
                 catch (Exception ex) {
                     results.Add((propName, new InvalidOperationException($"Операция не выполнена. Значение \"{sourceValue}\" столбца {propName} не удается привести к типу {propertyInfo.PropertyType}.", ex)));
+                }
+            }
+            return results;
+        }
+        public IList<(string, Exception)> LoadProperties<Tdest>(Tdest product, IEnumerable<string> propNames, IDictionary<string, string> dest) where Tdest : class {
+            var results = new List<(string, Exception)>();
+            foreach (var propName in propNames) {
+                var propertyInfo = typeof(Tdest).GetProperty(propName);
+                if (propertyInfo == null || !propertyInfo.CanRead) {
+                    continue;
+                }
+                try {
+                    var value = propertyInfo.GetValue(product, BindingFlags.Public, FieldBinder.Instance, null, CultureInfo.GetCultureInfo("Ru-ru"));
+                    if (value is null) {
+                        dest[propName] = string.Empty;
+                        continue;
+                    }
+                    if (propertyInfo.PropertyType == typeof(Enum)) {
+                        string description = ReflectionHelper.GetEnumDescription(propertyInfo.PropertyType, value);
+                    }
+                    else {
+                        dest[propName] = value?.ToString() ?? string.Empty;
+                    }
+                }
+                catch (Exception ex) {
+                    results.Add((propName, new InvalidOperationException($"Не удалось выполнить чтение свойства {propName}.", ex)));
                 }
             }
             return results;
@@ -123,24 +150,52 @@ namespace Nano.Electric {
         public static string[] GetProductProperties<Tdest>() where Tdest : class {
             var type = typeof(Tdest);
             var typeName = type.Name;
-            if (propertiesCache.TryGetValue(typeName, out var properties)) {
-                return properties;
+            //if (propertiesCache.TryGetValue(typeName, out var properties)) {
+            //    return properties;
+            //}
+            if (_cache.TryGetValue(typeName, out string[]? props) && props is not null) {
+                return props;
             }
-            var contextType = typeof(Context);
-            if (type.Assembly != contextType.Assembly) {
-                throw new InvalidOperationException($"Тип {typeName} не принадлежит сборке, в которой определен класс Nano.Electric.Context.");
-            }
-            var attr = typeof(Tdest).GetCustomAttribute<System.ComponentModel.DataAnnotations.Schema.TableAttribute>();
-            if (attr is null) {
-                throw new InvalidOperationException($"Тип {typeName} не имеет атрибута TableAttribute.");
-            }
-            // out public propertis, exept properties width attribute [NotMapped]
-            properties = type.GetProperties()
-                .Where(p => /*p.GetCustomAttribute<System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute>() == null &&*/ p.CanWrite)
-                .Select(p => p.Name)
-                .ToArray();
-            propertiesCache[typeName] = properties;
-            return properties;
+            // Use GetOrCreate for thread-safe lazy initialization
+            return _cache.GetOrCreate(typeName, entry => {
+                //entry.SlidingExpiration = TimeSpan.FromMinutes(30); // optional, adjust to your needs
+                entry.Priority = CacheItemPriority.Normal;
+
+                var contextType = typeof(Context);
+                if (type.Assembly != contextType.Assembly) {
+                    throw new InvalidOperationException(
+                        $"Тип {typeName} не принадлежит сборке, в которой определен класс {contextType.FullName}.");
+                }
+
+                var attr = type.GetCustomAttribute<TableAttribute>();
+                if (attr is null) {
+                    throw new InvalidOperationException(
+                        $"Тип {typeName} не имеет атрибута {nameof(TableAttribute)}.");
+                }
+
+                // Collect public properties, excluding [NotMapped] and read-only
+                return type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(p =>
+                        p.CanWrite &&
+                        p.GetCustomAttribute<NotMappedAttribute>() == null)
+                    .Select(p => p.Name)
+                    .ToArray();
+            })!;
+            //var contextType = typeof(Context);
+            //if (type.Assembly != contextType.Assembly) {
+            //    throw new InvalidOperationException($"Тип {typeName} не принадлежит сборке, в которой определен класс Nano.Electric.Context.");
+            //}
+            //var attr = typeof(Tdest).GetCustomAttribute<System.ComponentModel.DataAnnotations.Schema.TableAttribute>();
+            //if (attr is null) {
+            //    throw new InvalidOperationException($"Тип {typeName} не имеет атрибута TableAttribute.");
+            //}
+            //// out public propertis, exept properties width attribute [NotMapped]
+            //properties = type.GetProperties()
+            //    .Where(p => /*p.GetCustomAttribute<System.ComponentModel.DataAnnotations.Schema.NotMappedAttribute>() == null &&*/ p.CanWrite)
+            //    .Select(p => p.Name)
+            //    .ToArray();
+            //propertiesCache[typeName] = properties;
+            //return properties;
         }
         public static string GetDefaultLocalizeValue<T>() where T : class {
             Type productType = typeof(T);
@@ -150,11 +205,29 @@ namespace Nano.Electric {
             var table = productType.GetCustomAttribute<TableAttribute>()?.Name ?? productType.Name;
             return table;
         }
+        //public static string GetDefaultLocalizeValue(Type productType) {
+        //    if (knownLocalizeValues.ContainsKey(productType))
+        //        return knownLocalizeValues[productType];
+        //    var value = productType.GetCustomAttribute<DefaultLocalizeValueAttribute>()?.DefaultLocalizeValue ?? string.Empty;
+        //    knownLocalizeValues.Add(productType, value);
+        //    return value;
+        //}
         public static string GetDefaultLocalizeValue(Type productType) {
-            if (knownLocalizeValues.ContainsKey(productType))
-                return knownLocalizeValues[productType];
-            var value = productType.GetCustomAttribute<DefaultLocalizeValueAttribute>()?.DefaultLocalizeValue ?? string.Empty;
-            knownLocalizeValues.Add(productType, value);
+            var cacheKey = $"DefaultLocalizeValue_{productType.FullName}";
+            if (_cache.TryGetValue(cacheKey, out string? value))
+                return value ?? string.Empty;
+
+            value = productType.GetCustomAttribute<DefaultLocalizeValueAttribute>()?.DefaultLocalizeValue ?? string.Empty;
+
+            // сохраняем в кэш с политикой
+            _cache.Set(
+                cacheKey,
+                value,
+                new MemoryCacheEntryOptions {
+                    //SlidingExpiration = TimeSpan.FromHours(1), // очистка при неиспользовании
+                    Priority = CacheItemPriority.Normal
+                });
+
             return value;
         }
         public DbImage CreateImage(string? imgName, string category, byte[] image) {
@@ -195,7 +268,7 @@ namespace Nano.Electric {
 #if NETFRAMEWORK
         public Context(DbConnection existingConnection, bool contextOwnsConnection) : base(existingConnection, contextOwnsConnection) {
         }
-        partial void InitializeModel(DbModelBuilder modelBuilder) { 
+        partial void InitializeModel(DbModelBuilder modelBuilder) {
 #else
         public Context(DbConnection existingConnection, bool contextOwnsConnection)
            : base(new DbContextOptionsBuilder<Context>().UseSqlite(existingConnection).Options) {
@@ -263,19 +336,19 @@ namespace Nano.Electric {
 #endif
 #else
             modelBuilder.Entity<DbGcMountSystem>()
-                .HasOne(p => p.StandGutterUtilitySet)  
+                .HasOne(p => p.StandGutterUtilitySet)
                 .WithMany()
-                .HasForeignKey(ms => ms.Stand)  
+                .HasForeignKey(ms => ms.Stand)
                 .IsRequired(false);
 #if InitDbContextEnums
             modelBuilder.Entity<DbLtKiTable>()
                 .HasKey(e => e.Id);
 
             modelBuilder.Entity<ElLighting>()
-                .HasOne(p => p.DbLtKiTable)        
+                .HasOne(p => p.DbLtKiTable)
                 .WithMany()
-                .HasForeignKey("KiTable")          
-                .IsRequired(false);                
+                .HasForeignKey("KiTable")
+                .IsRequired(false);
             modelBuilder.Entity<ElWireMark>()
                 .HasOne(p => p.IsolationMaterial)
                 .WithMany()
@@ -328,7 +401,7 @@ namespace Nano.Electric {
             modelBuilder.Entity<ScsPatchCord>()
                 .Property<int?>("CableSystemTypeId")
                 .HasColumnName("CableSystemType");
-            
+
             modelBuilder.Entity<ElLighting>()
                 .HasOne(l => l.Lamp)
                 .WithMany()
@@ -343,7 +416,7 @@ namespace Nano.Electric {
             modelBuilder.Entity<ScsCommutatorPanel>()
                 .Property<int?>("PortTypeOutId")
                 .HasColumnName("PortTypeOut");
-            
+
 #endif
 #endif
             modelBuilder.Entity<CaeMaterialUtility>()
@@ -361,8 +434,8 @@ namespace Nano.Electric {
             var connection = Database.GetDbConnection(); // Используем GetDbConnection() в EF Core
             if (connection is Microsoft.Data.Sqlite.SqliteConnection) {
 #else
-    var connection = Database.Connection;
-    if (connection is System.Data.SQLite.SQLiteConnection) {
+            var connection = Database.Connection;
+            if (connection is System.Data.SQLite.SQLiteConnection) {
 #endif
                 try {
                     var tableSchema = Database.SqlQuery<TableColumn>($"PRAGMA table_info({tableName});").ToList();
@@ -375,17 +448,17 @@ namespace Nano.Electric {
             }
 
 #if NETFRAMEWORK
-    if (connection is System.Data.SqlServerCe.SqlCeConnection) {
-        try {
-            string query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @tableName";
-            var columnNames = Database.SqlQuery<string>(query, new System.Data.SqlClient.SqlParameter("@tableName", tableName))
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            return columns.All(column => columnNames.Contains(column));
-        }
-        catch (Exception) {
-            return false;
-        }
-    }
+            if (connection is System.Data.SqlServerCe.SqlCeConnection) {
+                try {
+                    string query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @tableName";
+                    var columnNames = Database.SqlQuery<string>(query, new System.Data.SqlClient.SqlParameter("@tableName", tableName))
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    return columns.All(column => columnNames.Contains(column));
+                }
+                catch (Exception) {
+                    return false;
+                }
+            }
 #endif
 
             throw new NotImplementedException($"Не реализовано для типа подключения {connection.GetType().Name}");

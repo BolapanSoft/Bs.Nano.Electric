@@ -246,29 +246,29 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Приборы контроля и учета\\Вольтметры")]
     public partial class ElVoltmeter { }
 
-    [DefaultLocalizeValue("Монтажные шкафы и панели. Коммутационные панели")]
+    [DefaultLocalizeValue("Монтажные шкафы и панели\\Коммутационные панели")]
     public partial class ScsSwitchUtpPanel { }
-    [DefaultLocalizeValue("Монтажные шкафы и панели. Кабельные организаторы")]
+    [DefaultLocalizeValue("Монтажные шкафы и панели\\Кабельные организаторы")]
     public partial class ScsOrganaizerPanel { }
-    [DefaultLocalizeValue("Монтажные шкафы и панели. Блоки розеток")]
+    [DefaultLocalizeValue("Монтажные шкафы и панели\\Блоки розеток")]
     public partial class ScsSwitchSocketPanel { }
-    [DefaultLocalizeValue("Монтажные шкафы и панели. Аксессуары шкафов")]
+    [DefaultLocalizeValue("Монтажные шкафы и панели\\Аксессуары шкафов")]
     public partial class ScsShellUtility { }
-    [DefaultLocalizeValue("Монтажные шкафы и панели. Аксессуары панелей")]
+    [DefaultLocalizeValue("Монтажные шкафы и панели\\Аксессуары панелей")]
     public partial class ScsPanelUtilityUnit { }
-   [DefaultLocalizeValue("Монтажные шкафы и панели. Активное оборудование")]
+   [DefaultLocalizeValue("Монтажные шкафы и панели\\Активное оборудование")]
     public partial class ScsCommutatorPanel { }
-    [DefaultLocalizeValue("Монтажные шкафы и панели. Монтажные шкафы 19″")]
+    [DefaultLocalizeValue("Монтажные шкафы и панели\\Монтажные шкафы 19″")]
     public partial class ScsShellDistr { }
-    [DefaultLocalizeValue("Приборы. Сервисные колонны")]
+    [DefaultLocalizeValue("Приборы\\Сервисные колонны")]
     public partial class ScsServiceColumn { }
-    [DefaultLocalizeValue("Приборы. Аксессуары сервисных колонн")]
+    [DefaultLocalizeValue("Приборы\\Аксессуары сервисных колонн")]
     public partial class ScsServiceColumnUtilityUnit { }
-    [DefaultLocalizeValue("Приборы. Лючки")]
+    [DefaultLocalizeValue("Приборы\\Лючки")]
     public partial class ScsHatch { }
-     [DefaultLocalizeValue("Приборы. Аксессуары лючков")]
+     [DefaultLocalizeValue("Приборы\\Аксессуары лючков")]
     public partial class ScsHatchUtilityUnit { }
-    [DefaultLocalizeValue("Приборы. Розетки телекоммуникационные")]
+    [DefaultLocalizeValue("Приборы\\Розетки телекоммуникационные")]
     public partial class ScsUtpSocket { }
     /* 
 

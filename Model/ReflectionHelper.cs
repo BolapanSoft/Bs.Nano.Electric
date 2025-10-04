@@ -66,6 +66,24 @@ namespace Nano.Electric {
         public static string GetDescription<TEnum>(this TEnum enumValue) where TEnum :struct, Enum {
             return EnumConverter<TEnum>.GetDescription(enumValue);
         }
+        public static string GetEnumDescription(Type type, object value) {
+            if (!type.IsEnum)
+                throw new ArgumentException($"Type {type.FullName} is not an Enum");
+
+            if (!Enum.IsDefined(type, value))
+                throw new ArgumentException($"Value '{value}' is not defined in enum {type.FullName}");
+
+            var name = Enum.GetName(type, value);
+            if (name == null)
+                return value.ToString() ?? string.Empty;
+
+            var field = type.GetField(name);
+            if (field == null)
+                return value.ToString() ?? string.Empty;
+
+            var attr = field.GetCustomAttribute<DescriptionAttribute>();
+            return attr?.Description ?? name;
+        }
         /// <summary>
         /// Возвращает список геттеров экземпляра класса для свойств простого типа (string, double, int, bool).
         /// </summary>
