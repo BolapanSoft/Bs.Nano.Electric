@@ -82,11 +82,17 @@ namespace Nano.Electric {
                         dest[propName] = string.Empty;
                         continue;
                     }
-                    if (propertyInfo.PropertyType == typeof(Enum)) {
-                        string description = ReflectionHelper.GetEnumDescription(propertyInfo.PropertyType, value);
+                    var type = propertyInfo.PropertyType;
+                    var underlyingType = Nullable.GetUnderlyingType(type) ?? type; // если Nullable<T>, достаем T
+
+                    if (underlyingType.IsEnum) {
+                        string description = ReflectionHelper.GetEnumDescription(underlyingType, value);
+                        dest[propName] = description;
+                        continue;
                     }
                     else {
                         dest[propName] = value?.ToString() ?? string.Empty;
+                        continue;
                     }
                 }
                 catch (Exception ex) {

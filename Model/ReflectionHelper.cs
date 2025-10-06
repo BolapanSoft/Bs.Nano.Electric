@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -13,6 +14,7 @@ using System.Text;
 namespace Nano.Electric {
     internal static class ReflectionHelper {
         private static readonly MemoryCache memoryCache = new MemoryCache(new MemoryCacheOptions());
+        private static readonly ConcurrentDictionary<Type, MethodInfo> _getDescriptionMethods = new();
         /// <summary>
         /// Формирует перечень публичных свойств типа <typeparamref name="Tret"/> для типа <typeparamref name="T"/>
         /// </summary>
@@ -66,24 +68,48 @@ namespace Nano.Electric {
         public static string GetDescription<TEnum>(this TEnum enumValue) where TEnum :struct, Enum {
             return EnumConverter<TEnum>.GetDescription(enumValue);
         }
-        public static string GetEnumDescription(Type type, object value) {
-            if (!type.IsEnum)
-                throw new ArgumentException($"Type {type.FullName} is not an Enum");
+        public static string GetEnumDescription(Type enumType, object value) {
+            if (enumType == null)
+                throw new ArgumentNullException(nameof(enumType));
+            if (!enumType.IsEnum)
+                throw new ArgumentException($"Тип {enumType.FullName} не является enum.", nameof(enumType));
+            if (value == null)
+                return string.Empty;
 
-            if (!Enum.IsDefined(type, value))
-                throw new ArgumentException($"Value '{value}' is not defined in enum {type.FullName}");
+            //// Нормализуем входное значение к экземпляру enumType (boxed)
+            //object enumValue = NormalizeToEnumValue(enumType, value);
 
-            var name = Enum.GetName(type, value);
-            if (name == null)
-                return value.ToString() ?? string.Empty;
+            // Получаем MethodInfo для EnumConverter<TEnum>.GetDescription
+            var method = _getDescriptionMethods.GetOrAdd(enumType, t => {
+                var converterType = typeof(EnumConverter<>).MakeGenericType(t);
+                var mi = converterType.GetMethod("GetDescription", BindingFlags.Public | BindingFlags.Static);
+                if (mi == null)
+                    throw new InvalidOperationException($"Не найден статический метод GetDescription в {converterType.FullName}.");
+                return mi;
+            });
 
-            var field = type.GetField(name);
-            if (field == null)
-                return value.ToString() ?? string.Empty;
-
-            var attr = field.GetCustomAttribute<DescriptionAttribute>();
-            return attr?.Description ?? name;
+            // Вызываем и возвращаем строку
+            var result = method.Invoke(null, new object[] { value });
+            return result?.ToString() ?? string.Empty;
         }
+        //public static string GetEnumDescription(Type type, object value) {
+        //    if (!type.IsEnum)
+        //        throw new ArgumentException($"Type {type.FullName} is not an Enum");
+
+        //    if (!Enum.IsDefined(type, value))
+        //        throw new ArgumentException($"Value '{value}' is not defined in enum {type.FullName}");
+
+        //    var name = Enum.GetName(type, value);
+        //    if (name == null)
+        //        return value.ToString() ?? string.Empty;
+
+        //    var field = type.GetField(name);
+        //    if (field == null)
+        //        return value.ToString() ?? string.Empty;
+
+        //    var attr = field.GetCustomAttribute<DescriptionAttribute>();
+        //    return attr?.Description ?? name;
+        //}
         /// <summary>
         /// Возвращает список геттеров экземпляра класса для свойств простого типа (string, double, int, bool).
         /// </summary>

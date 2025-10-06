@@ -535,13 +535,13 @@ namespace Nano.Electric {
                 values = new Dictionary<string, object>();
                 foreach (var enumValue in enumValues) {
                     string enumName = enumValue.ToString();
-                    values[enumName] = enumValue;
                     MemberInfo[] memberInfo = typeEnum.GetMember(enumName);
                     DescriptionAttribute? descriptionAttribute = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault() as DescriptionAttribute;
                     if (descriptionAttribute is null) {
                         throw new ArgumentException($"Для одного или нескольких членов перечисления {typeEnum.Name} не определен атрибут [Description].");
                     }
                     values[descriptionAttribute.Description] = enumValue;
+                    values[enumName] = enumValue;
                 }
                 cacheEnumValues.Add(typeEnum, values);
             }
