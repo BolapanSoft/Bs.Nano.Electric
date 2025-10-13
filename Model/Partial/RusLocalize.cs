@@ -131,6 +131,9 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Кабельно-проводниковая продукция\\Патч-корды")]
     public partial class ScsPatchCord { }
 
+    [DefaultLocalizeValue("Трансформатоы, реакторы и УКРМ\\Реакторы")]
+    public partial class ElResistReactor { }
+
     [DefaultLocalizeValue("Распределительные устройства\\Шкафы")]
     public partial class ElBoard { }
 
@@ -206,7 +209,7 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Общая информация")]
     public partial class DSInformation { }
 
-  
+
     [DefaultLocalizeValue("Электроустановочные изделия\\Выключатели")]
     public partial class DbElSwitch { }
 
@@ -229,7 +232,7 @@ namespace Nano.Electric {
     [DefaultLocalizeValue("Комплектации КА")]
     public partial class DbElFiderUtilitySet { }
 
- 
+
     [DefaultLocalizeValue("Комплектации РУ")]
     public partial class DbElBoardUtilitySet { }
 
@@ -256,7 +259,7 @@ namespace Nano.Electric {
     public partial class ScsShellUtility { }
     [DefaultLocalizeValue("Монтажные шкафы и панели\\Аксессуары панелей")]
     public partial class ScsPanelUtilityUnit { }
-   [DefaultLocalizeValue("Монтажные шкафы и панели\\Активное оборудование")]
+    [DefaultLocalizeValue("Монтажные шкафы и панели\\Активное оборудование")]
     public partial class ScsCommutatorPanel { }
     [DefaultLocalizeValue("Монтажные шкафы и панели\\Монтажные шкафы 19″")]
     public partial class ScsShellDistr { }
@@ -266,7 +269,7 @@ namespace Nano.Electric {
     public partial class ScsServiceColumnUtilityUnit { }
     [DefaultLocalizeValue("Приборы\\Лючки")]
     public partial class ScsHatch { }
-     [DefaultLocalizeValue("Приборы\\Аксессуары лючков")]
+    [DefaultLocalizeValue("Приборы\\Аксессуары лючков")]
     public partial class ScsHatchUtilityUnit { }
     [DefaultLocalizeValue("Приборы\\Розетки телекоммуникационные")]
     public partial class ScsUtpSocket { }

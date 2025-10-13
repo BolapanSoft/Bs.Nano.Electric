@@ -16,4 +16,14 @@ namespace Nano.Electric {
 
 #endif
     }
+    public partial class ElResistReactor {
+       
+#if InitDbContextEnums
+        [Column("DbSafeDegree")]
+        public int? SafeDegree { get; set; }
+        [Column("DbClimate")]
+        public int? Climate { get; set; }
+
+#endif
+    }
 }

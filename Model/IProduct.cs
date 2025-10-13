@@ -110,8 +110,8 @@ namespace Nano.Electric {
     public partial class ScsServiceColumn : ICommonProduct, IHaveImageRef, IHaveDbGraphicRef { }
     public partial class ScsCord : IHaveId, IHaveCableSystemTypeRef, IHaveImageRef { }
     public partial class DbScsTubeSeriesConfiguration : IHaveId { }
+    public partial class ElResistReactor : IProduct, IHaveImageRef, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     /*
-    public partial class __ : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class __ : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class __ : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }
     public partial class __ : IProduct, IHaveImageRef, IHaveExplodeLevel, IHaveSafeDegree, IHaveDbClimate, IHaveDbGraphicRef { }

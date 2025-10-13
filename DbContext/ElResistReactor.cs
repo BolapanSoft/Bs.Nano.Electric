@@ -1,17 +1,19 @@
-﻿namespace Nano.Electric
-{
+﻿namespace Nano.Electric {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    
+
 
     [Table("ElResistReactor")]
-    public partial class ElResistReactor
-    {
+    public partial class ElResistReactor {
+#if !InitDbContextEnums
+        public int? DbSafeDegree { get; set; }
+        public int? DbClimate { get; set; }
+
+#endif
         public string? Code { get; set; }
 
-        public int? DbClimate { get; set; }
 
         public double? DbDepth { get; set; }
 
@@ -25,7 +27,6 @@
 
         public double? DbMaxSectionConductor { get; set; }
 
-        public int? DbSafeDegree { get; set; }
 
         public double? DbThermalCurrentStability { get; set; }
 
