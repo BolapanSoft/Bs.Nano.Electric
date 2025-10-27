@@ -130,12 +130,17 @@ namespace Bs.Nano.Electric.Builder {
         internal static DbImage LoadImage(Context context, string imgName, string category, FileInfo fi) {
             //imgName = string.IsNullOrEmpty(imgName) ? fi.Name : imgName;
             imgName = Path.ChangeExtension(imgName, ".png");
-            DbImage? img;
-            if (string.IsNullOrEmpty(category)) {
-                img = context.DbImages.FirstOrDefault(img => img.Text == imgName);
-            }
-            else {
-                img = context.DbImages.FirstOrDefault(img => img.Text == imgName & img.Category == category);
+            //DbImage? img;
+            //if (string.IsNullOrEmpty(category)) {
+            //    img = context.DbImages.FirstOrDefault(img => img.Text == imgName);
+            //}
+            //else {
+            //    img = context.DbImages.FirstOrDefault(img => img.Text == imgName & img.Category == category);
+            //}
+            var imgId = context.FindImageId(imgName, category);
+            DbImage? img = null;
+            if (imgId.HasValue) {
+                img = context.DbImages.Find(imgId.Value);
             }
             var data = GetData(fi);
             /*using (var stream = new MemoryStream(1024 * 8))*/ {

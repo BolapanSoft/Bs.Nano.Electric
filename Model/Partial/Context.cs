@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
 #if NETFRAMEWORK
 using System.Data.Entity;
 using System.Data.SQLite;
@@ -236,6 +237,44 @@ namespace Nano.Electric {
 
             return value;
         }
+#if NETFRAMEWORK
+        public int? FindImageId(string? imgName, string? category = null) {
+            if (string.IsNullOrEmpty(imgName))
+                return null;
+            var tracked = this.ChangeTracker
+                             .Entries<DbImage>()
+                             .Where(e => e.State != EntityState.Deleted)
+                             .Select(e => e.Entity)
+                             .Where(img => img.Text == imgName);
+            var query = this.Set<DbImage>().AsNoTracking().Where(img => DbFunctions.Like(img.Text, imgName));
+            if (!string.IsNullOrEmpty(category)) {
+                tracked=tracked.Where(img=>img.Category == category);
+                query = query.Where(img => DbFunctions.Like(img.Category, category));
+            }
+                var id = tracked.Select(img => (int?)img.Id).FirstOrDefault()??
+                    query.Select(img => (int?)img.Id).FirstOrDefault();
+                return id;
+        } 
+#else
+        public int? FindImageId(string? imgName, string? category = null) {
+            if (string.IsNullOrEmpty(imgName))
+                return null;
+            var tracked = this.ChangeTracker
+                             .Entries<DbImage>()
+                             .Where(e => e.State != EntityState.Deleted)
+                             .Select(e => e.Entity)
+                             .Where(img => img.Text == imgName);
+            var query = this.Set<DbImage>().AsNoTracking().Where(img => EF.Functions.Like(img.Text, imgName));
+            if (category is not null) {
+                tracked = tracked.Where(img => img.Category == category);
+                query = query.Where(img => EF.Functions.Like(img.Category, category));
+            }
+            var id = tracked.Select(img => (int?)img.Id).FirstOrDefault() ??
+                query.Select(img => (int?)img.Id).FirstOrDefault();
+            return id;
+        }
+
+#endif
         public DbImage CreateImage(string? imgName, string category, byte[] image) {
             //DbImage dbImg = this.DbImages.Create();
             var dbImg = new DbImage {
@@ -243,18 +282,7 @@ namespace Nano.Electric {
                 Category = category,
                 Image = image
             };
-            //this.DbImages.Add(dbImg);
-            //int id = 1;
-            //if (this.DbImages.Local.Any()) {
-            //    id = Math.Max(id, this.DbImages.Local.Max(img => img.Id) + 1);
-            //}
-            //if (this.DbImages.Any()) {
-            //    id = Math.Max(this.DbImages.Max(img => img.Id) + 1, id);
-            //}
             dbImg.Id = GetNextId<DbImage>();
-            //dbImg.Text = imgName ?? string.Empty;
-            //dbImg.Category = category;
-            //dbImg.Image = image;
             this.DbImages.Add(dbImg);
             return dbImg;
         }
