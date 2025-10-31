@@ -127,10 +127,46 @@ namespace Nano.Electric.Enums {
 #if DBNE23_1
             ,
         [Description("GX70")]
-        SOCLE_GX70 = 62,
+        SOCLE_GX70 = 62
+#endif
+#if DBNE25
+            ,
+	    [Description("AR111")]
+		SOCLE_AR111 = 63,
+	    [Description("B22")]
+		SOCLE_B22 = 64,
+        [Description("E10")]
+        SOCLE_E10 = 65,
+        [Description("E12")]
+        SOCLE_E12 = 66,
+        [Description("G13r")]
+        SOCLE_G13r = 67,
+        [Description("G24d")]
+        SOCLE_G24d = 68,
+        [Description("G45")]
+        SOCLE_G45 = 69,
+        [Description("G5,3")]
+        SOCLE_G5_3 = 70,
+        [Description("G6,35")]
+        SOCLE_G6_35 = 71,
+        [Description("GX5,3")]
+        SOCLE_GX5_3 = 72,
         [Description("GX53")]
-        SOCLE_GX53 = 63
-#endif  
+        SOCLE_GX53 = 73,
+        [Description("GY5,3")]
+        SOCLE_GY5_3 = 74,
+        [Description("K12s")]
+        SOCLE_K12s = 75,
+        [Description("K27s")]
+        SOCLE_K27s = 76,
+        [Description("MR16")]
+        SOCLE_MR16 = 77,
+        [Description("P13,5s")]
+        SOCLE_P13_5s = 78,
+        [Description("E14s")]
+        SOCLE_E14s = 79
+
+#endif    
     }
     public enum EnvLightingTypeEnum {
         [DefaultLocalizeValue("лампа накаливания")]

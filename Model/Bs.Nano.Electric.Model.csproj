@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>1.25.16</VersionPrefix>
+		<VersionPrefix>1.25.17</VersionPrefix>
 		<TargetFrameworks>net48;net8.0</TargetFrameworks>
-		<LangVersion>9.0</LangVersion>
+		<LangVersion>10.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>Nano.Electric</RootNamespace>
 		<BaseOutputPath>..\bin\</BaseOutputPath>
-		<VersionSuffix>059</VersionSuffix>
+		<VersionSuffix>060</VersionSuffix>
 		<Version>$(VersionPrefix).$(VersionSuffix)</Version>
 		<Copyright>Bolapansoft</Copyright>
 		<!--<Nullable>enable</Nullable>-->
 	</PropertyGroup>
 	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);DBNE85;DBNE201;DBNE23_1;InitDbContextEnums</DefineConstants>
+		<DefineConstants>$(DefineConstants);DBNE85;DBNE201;DBNE23_1;DBNE25;InitDbContextEnums</DefineConstants>
 	</PropertyGroup>
 	<!--<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
@@ -165,6 +165,7 @@
 	<ItemGroup>
 		<Folder Include="Cadwise\" />
 		<Folder Include="RefPartial\" />
+		<Folder Include="Serialize\" />
 	</ItemGroup>
 
 
