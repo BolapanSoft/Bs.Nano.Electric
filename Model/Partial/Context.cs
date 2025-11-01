@@ -304,9 +304,6 @@ namespace Nano.Electric {
         }
         partial void InitializeModel(DbModelBuilder modelBuilder) {
 #else
-        public Context(DbConnection existingConnection, bool contextOwnsConnection)
-           : base(new DbContextOptionsBuilder<Context>().UseSqlite(existingConnection).Options) {
-        }
         partial void InitializeModel(ModelBuilder modelBuilder) {
 #endif
             // var connectionString = this.Database.Connection.ConnectionString;
@@ -339,6 +336,10 @@ namespace Nano.Electric {
                 .HasOptional(p => p.CableSystemType)
                 .WithMany()
                 .Map(m => m.MapKey("CableSystemType"));
+            modelBuilder.Entity<ElWire>()
+                .HasOptional(p => p.wireMark)
+                .WithMany()
+                .Map(m => m.MapKey("wireMark"));
             modelBuilder.Entity<ScsSwitchSocketPanel>()
                 .HasOptional(p => p.CableSystemType)
                 .WithMany()
@@ -359,10 +360,6 @@ namespace Nano.Electric {
                 .HasOptional(p => p.CableSystemType)
                 .WithMany()
                 .Map(m => m.MapKey("CableSystemType"));
-            modelBuilder.Entity<ElWire>()
-                .HasOptional(p => p.wireMark)
-                .WithMany()
-                .Map(m => m.MapKey("wireMark"));
             modelBuilder.Entity<ElLighting>()
                 .HasOptional(l => l.Lamp)
                 .WithMany()

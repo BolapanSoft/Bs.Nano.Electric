@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Common;
 using System.Linq;
 
 #if NETFRAMEWORK
@@ -20,17 +21,24 @@ namespace Nano.Electric {
 #else
         private readonly string _connectionString;
 
-        public Context() {
-            _connectionString = "Data Source=database.db";
+        public Context():this("Data Source=database.db", new DbContextOptions<Context>()) {
         }
 
-        public Context(string connectionString) {
+        public Context(string connectionString):this(connectionString, new DbContextOptions<Context>()) {
+        }
+        public Context(DbConnection existingConnection, bool contextOwnsConnection)
+            : this(string.Empty, new DbContextOptionsBuilder<Context>().UseSqlite(existingConnection).Options) {
+        }
+        public Context(string connectionString, DbContextOptions options) : base(options) {
             _connectionString = connectionString;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            optionsBuilder.UseSqlite(_connectionString);
+            if (!string.IsNullOrEmpty(_connectionString)) {
+                optionsBuilder.UseSqlite(_connectionString); 
+            }
         }
+
 #endif
 
         public virtual DbSet<AutomatValuesScale> AutomatValuesScales { get; set; }

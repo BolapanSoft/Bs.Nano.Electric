@@ -31,13 +31,13 @@
 
         public int? OrderNumber { get; set; }
 
-        public string SpecСomment { get; set; }
+        public string? SpecСomment { get; set; }
 
         public double? voltage { get; set; }
 
 
 
-        public string сomment { get; set; }
+        public string? сomment { get; set; }
 
         public int? CwPCode { get; set; }
 

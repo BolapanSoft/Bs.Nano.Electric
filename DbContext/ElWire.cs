@@ -73,7 +73,7 @@
 
         public string? DbSpecDescription { get; set; }
 
-        public int сonductorsPairNumber { get; set; }
+        public int? сonductorsPairNumber { get; set; }
 
         public int? DbImageRef { get; set; }
 
