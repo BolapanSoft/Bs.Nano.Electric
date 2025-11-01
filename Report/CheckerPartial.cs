@@ -8,7 +8,7 @@ using System.Data.SqlClient;
 #if NETFRAMEWORK
 using System.Data.SQLite;
 using System.Data.Entity;
-using System.Data.SqlServerCe; 
+using System.Data.SqlServerCe;
 #else
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -153,63 +153,66 @@ namespace Bs.Nano.Electric.Report {
             if (!typeof(IProduct).IsAssignableFrom(entityType))
                 return new();
             List<(string Code, string ArticleName, string TableName, string TypeDescription)> products = new(1024);
-            try {
-                ///*using (var context = connector.Connect())*/
-                //{
-                //    //var query = dbSet.Cast<object>().ToList();// Convert dbSet to query
-                //    // Load all entity from dbSet query
-                //    foreach (var entity in dbSet.AsNoTracking()) {
-                //        IProduct product = (IProduct)entity;
-                //        products.Add((product.Code, product.Name, tableName, typeDescription));
-                //    }
-                //}
-                //return products;
 #if NETFRAMEWORK
-                using var efConnection = context.Database.Connection;
-                if (efConnection.State != ConnectionState.Open)
-                    efConnection.Open();
+            using var efConnection = context.Database.Connection;
+            if (efConnection.State != ConnectionState.Open)
+                efConnection.Open();
+            // Build SQL command
+            string sql = $"SELECT Code, Name FROM {tableName}"; // Use parameterized if dynamic parts can be unsafe
 
-                
-                // Build SQL command
-                string sql = $"SELECT Code, Name FROM {tableName}"; // Use parameterized if dynamic parts can be unsafe
+            using var command = efConnection.CreateCommand();
+            command.CommandText = sql;
 
-                using var command = efConnection.CreateCommand();
-                command.CommandText = sql;
-                using var reader = command.ExecuteReader(CommandBehavior.SequentialAccess);
-
-                while (reader.Read()) {
-                    string code = reader.IsDBNull(0) ? "" : reader.GetString(0);
-                    string name = reader.IsDBNull(1) ? "" : reader.GetString(1);
-                    products.Add((code, name, tableName, typeDescription));
+            try {
+                efConnection.Open();
+                using (var reader = command.ExecuteReader(CommandBehavior.SequentialAccess)) {
+                    while (reader.Read()) {
+                        string code = reader.IsDBNull(0) ? "" : reader.GetString(0);
+                        string name = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                        products.Add((code, name, tableName, typeDescription));
+                    }
                 }
             }
             catch (Exception ex) {
                 logger.LogWarning(ex.ToString());
+            }
+            finally {
+                if (efConnection.State == ConnectionState.Open) {
+                    efConnection.Close();
+                }
             }
 #else
-                using var efConnection = context.Database.GetDbConnection();
-                if (efConnection.State != ConnectionState.Open)
-                    efConnection.Open();
+            using var efConnection = context.Database.GetDbConnection();
+            if (efConnection.State != ConnectionState.Open)
+                efConnection.Open();
 
-                // Ensure it's SQLite
-                if (efConnection is not SqliteConnection sqliteConn)
-                    sqliteConn = new SqliteConnection(efConnection.ConnectionString);
+            // Ensure it's SQLite
+            if (efConnection is not SqliteConnection sqliteConn)
+                sqliteConn = new SqliteConnection(efConnection.ConnectionString);
 
-                // Build SQL command
-                string sql = $"SELECT Code, Name FROM {tableName}"; // Use parameterized if dynamic parts can be unsafe
+            // Build SQL command
+            string sql = $"SELECT Code, Name FROM {tableName}"; // Use parameterized if dynamic parts can be unsafe
 
-                using var command = sqliteConn.CreateCommand();
-                command.CommandText = sql;
-                using var reader = command.ExecuteReader(CommandBehavior.SequentialAccess);
-
-                while (reader.Read()) {
-                    string code = reader.IsDBNull(0) ? "" : reader.GetString(0);
-                    string name = reader.IsDBNull(1) ? "" : reader.GetString(1);
-                    products.Add((code, name, tableName, typeDescription));
+            using var command = sqliteConn.CreateCommand();
+            command.CommandText = sql;
+            try {
+                sqliteConn.Open();
+                using (var reader = command.ExecuteReader(CommandBehavior.SequentialAccess)) {
+                    ;
+                    while (reader.Read()) {
+                        string code = reader.IsDBNull(0) ? "" : reader.GetString(0);
+                        string name = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                        products.Add((code, name, tableName, typeDescription));
+                    }
                 }
             }
             catch (Exception ex) {
                 logger.LogWarning(ex.ToString());
+            }
+            finally {
+                if (sqliteConn.State == ConnectionState.Open) {
+                    sqliteConn.Close();
+                }
             }
 #endif
             return products;
@@ -403,22 +406,20 @@ namespace Bs.Nano.Electric.Report {
                 string sql = $"SELECT [Code], [Mass] FROM [{tableName}]";
                 values = context.Database.SqlQuery<Material>(sql).ToList();
 #else
-        using var conn = context.Database.GetDbConnection();
-        if (conn.State != ConnectionState.Open)
-            conn.Open();
+                using var conn = context.Database.GetDbConnection();
+                if (conn.State != ConnectionState.Open)
+                    conn.Open();
 
-        using var cmd = conn.CreateCommand();
-        cmd.CommandText = $"SELECT [Code], [Mass] FROM [{tableName}]";
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = $"SELECT [Code], [Mass] FROM [{tableName}]";
 
-        using var reader = cmd.ExecuteReader();
-        while (reader.Read())
-        {
-            values.Add(new Material
-            {
-                Code = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
-                Mass = reader.IsDBNull(1) ? string.Empty : reader.GetString(1)
-            });
-        }
+                using var reader = cmd.ExecuteReader();
+                while (reader.Read()) {
+                    values.Add(new Material {
+                        Code = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
+                        Mass = reader.IsDBNull(1) ? string.Empty : reader.GetString(1)
+                    });
+                }
 #endif
                 allRight = true;
             }
@@ -441,10 +442,10 @@ namespace Bs.Nano.Electric.Report {
         protected static List<IProduct> GetProducts(Context context, string tableName) {
             if (!IsCorrectTableName(tableName))
                 throw new ArgumentException($"Строка \"{tableName}\" не является допустимым именем таблицы.", nameof(tableName));
-    string sql = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer], [Id], [SpecDescription] FROM [{tableName}]";
+            string sql = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer], [Id], [SpecDescription] FROM [{tableName}]";
 
 #if NETFRAMEWORK
-    return context.Database.SqlQuery<NtProduct>(sql).ToList().Cast<IProduct>().ToList();
+            return context.Database.SqlQuery<NtProduct>(sql).ToList().Cast<IProduct>().ToList();
 #else
             var list = new List<IProduct>();
             using var conn = context.Database.GetDbConnection();
@@ -506,17 +507,15 @@ namespace Bs.Nano.Electric.Report {
 
             try {
 #if NETFRAMEWORK
-            string sql = $"SELECT [Code], [Url] FROM [{tableName}]";
-        if (context.Database.Connection is SQLiteConnection && context.IsHaveColumns(tableName, "Code", "Url"))
-        {
-            values = context.Database.SqlQuery<UrlElement>(sql)
-                                     .Select(el => (el.Code, el.Url))
-                                     .ToList();
-        }
-        else
-        {
-            values = context.Database.SqlQuery<(string code, string uri)>(sql).ToList();
-        }
+                string sql = $"SELECT [Code], [Url] FROM [{tableName}]";
+                if (context.Database.Connection is SQLiteConnection && context.IsHaveColumns(tableName, "Code", "Url")) {
+                    values = context.Database.SqlQuery<UrlElement>(sql)
+                                             .Select(el => (el.Code, el.Url))
+                                             .ToList();
+                }
+                else {
+                    values = context.Database.SqlQuery<(string code, string uri)>(sql).ToList();
+                }
 #else
                 using var conn = context.Database.GetDbConnection();
                 if (conn is SqliteConnection && !context.IsHaveColumns(tableName, "Code", "Url"))
