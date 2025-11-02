@@ -189,20 +189,33 @@ namespace Bs.Nano.Electric.Report {
             // Ensure it's SQLite
             if (efConnection is not SqliteConnection sqliteConn)
                 sqliteConn = new SqliteConnection(efConnection.ConnectionString);
+            using (var checkCmd = sqliteConn.CreateCommand()) {
+                checkCmd.CommandText = $"PRAGMA table_info({tableName});";
+                using (var reader = checkCmd.ExecuteReader()) {
+                    var columns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    while (reader.Read()) {
+                        columns.Add(reader.GetString(1)); // 1 — это имя столбца
+                    }
 
+                    if (!columns.Contains("Code") || !columns.Contains("Name")) {
+                        logger.LogTrace($"Таблица '{tableName}' не содержит поля Code и/или Name.");
+                        return new();
+                    }
+                }
+            }
             // Build SQL command
             string sql = $"SELECT Code, Name FROM {tableName}"; // Use parameterized if dynamic parts can be unsafe
 
-            using var command = sqliteConn.CreateCommand();
-            command.CommandText = sql;
             try {
-                sqliteConn.Open();
-                using (var reader = command.ExecuteReader(CommandBehavior.SequentialAccess)) {
-                    ;
-                    while (reader.Read()) {
-                        string code = reader.IsDBNull(0) ? "" : reader.GetString(0);
-                        string name = reader.IsDBNull(1) ? "" : reader.GetString(1);
-                        products.Add((code, name, tableName, typeDescription));
+                using (var command = sqliteConn.CreateCommand()) {
+                    command.CommandText = sql;
+                    using (var reader = command.ExecuteReader(CommandBehavior.SequentialAccess)) {
+                        //sqliteConn.Open();
+                        while (reader.Read()) {
+                            string code = reader.IsDBNull(0) ? "" : reader.GetString(0);
+                            string name = reader.IsDBNull(1) ? "" : reader.GetString(1);
+                            products.Add((code, name, tableName, typeDescription));
+                        }
                     }
                 }
             }
