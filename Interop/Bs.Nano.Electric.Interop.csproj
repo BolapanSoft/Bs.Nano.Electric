@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<VersionPrefix>1.0.3</VersionPrefix>
-		<TargetFrameworks>net48; net8.0</TargetFrameworks>
+		<TargetFrameworks>net48; net6.0; net8.0</TargetFrameworks>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>9.0</LangVersion>

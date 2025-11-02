@@ -5,6 +5,8 @@ using System.Runtime.Serialization;
 #if NETFRAMEWORK
 using System.Data.SQLite;
 using System.Data.SqlServerCe;
+#elif NET6_0
+using Microsoft.Data.Sqlite;
 #elif NET8_0_OR_GREATER
 using Microsoft.Data.Sqlite;
 #endif
@@ -67,7 +69,7 @@ namespace Bs.Nano.Electric.Model {
                 //var name when name.EndsWith(".sdf") => ($"Data Source=\"{fileName}\";Max Database Size=2560", DbProvider.SqlServerCompact),
                 var name when name.EndsWith(".db", StringComparison.OrdinalIgnoreCase) => ($"Data Source=\"{fileName}\"", DbProvider.SQLite),
                 _ => throw new ArgumentOutOfRangeException(nameof(fileName), $"Файл \"{fileName}\" должен иметь расширение .db")
-            }; 
+            };
 #endif
         }
         public static string? GetDbName(DbConnection connection) {
@@ -98,6 +100,8 @@ namespace Bs.Nano.Electric.Model {
         private DbConnection CreateSQLiteConnection() =>
 #if NETFRAMEWORK
             new SQLiteConnection(connectionString);
+#elif NET6_0
+            new SqliteConnection(connectionString);
 #elif NET8_0_OR_GREATER
             new SqliteConnection(connectionString);
 #endif

@@ -18,7 +18,7 @@ namespace Bs.Nano.Electric.Interop {
         private bool disposedValue;
 
         public Service(string cadwisePath) {
-            cadwisePath = "C:\\Program Files (x86)\\Nanosoft\\nanoCAD BIM Электро. Редактор БД 23.1";
+            //cadwisePath = "C:\\Program Files (x86)\\Nanosoft\\nanoCAD BIM Электро. Редактор БД 23.1";
             if (cadwisePath is not null) {
                 string localPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 var _path = System.IO.Path.Combine(localPath, cadwisePath);
@@ -56,7 +56,7 @@ namespace Bs.Nano.Electric.Interop {
                 throw new FormatException($"Неверный тип  файла \"{file}\". Для импорта необходимо указать файл STEP.");
             }
             Cadwise.OpenCascade.Interop.StepImporterService service = lzStepImporterService.Value;
-            string codeBase = typeof(Cadwise.OpenCascade.Interop.StepImporterService).Assembly.CodeBase;
+            //string codeBase = typeof(Cadwise.OpenCascade.Interop.StepImporterService).Assembly.CodeBase;
             Cadwise.Graphic.Interfaces.IGraphicView dbGraphicView = LoadStep(file, service);
             Cadwise.Graphic.Db.DbGraphic dbGraphic = new();
             dbGraphic.GraphicView = dbGraphicView;

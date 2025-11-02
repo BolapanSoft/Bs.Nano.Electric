@@ -28,7 +28,7 @@ namespace Bs.Nano.Electric.StepLoaderHost {
                 return 0;
             }
             catch (Exception ex) {
-                var result = new { Id = (int?)null, Error = ex.Message };
+                var result = new { Id = (int?)null, Error = ex.ToString() };
                 Console.WriteLine(JsonSerializer.Serialize(result));
                 return 1;
             }

@@ -461,7 +461,7 @@ namespace Nano.Electric {
         }
 
         public bool IsHaveColumns(string tableName, params string[] columns) {
-#if NET8_0_OR_GREATER
+#if NET6_0_OR_GREATER
             var connection = Database.GetDbConnection(); // Используем GetDbConnection() в EF Core
             if (connection is Microsoft.Data.Sqlite.SqliteConnection) {
 #else

@@ -19,7 +19,7 @@ namespace Bs.Nano.Electric.StepLoaderHost {
         private readonly DbProvider provider;
         public readonly string dbFileName;
         public ContextConnector(string fullFileName) {
-            if (string.IsNullOrWhiteSpace(fullFileName) ||  fullFileName.ToLower().EndsWith(".db"))
+            if (string.IsNullOrWhiteSpace(fullFileName) ||  !fullFileName.ToLower().EndsWith(".db"))
                 throw new ArgumentOutOfRangeException(nameof(fullFileName), $"Переданная строка \"{fullFileName}\" должна ссылаться на файл .db");
             //string fullFileName = Path.Combine(configuration.CurrentDirectory, fullFileName);
             if (File.Exists(fullFileName)) {
