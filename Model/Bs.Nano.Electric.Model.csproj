@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>1.25.19</VersionPrefix>
+		<VersionPrefix>1.25.21</VersionPrefix>
 		<TargetFrameworks>net48; net6.0; net8.0</TargetFrameworks>
 		<LangVersion>10.0</LangVersion>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<RootNamespace>Nano.Electric</RootNamespace>
 		<!--<BaseOutputPath>..\bin\</BaseOutputPath>-->
-		<VersionSuffix>063</VersionSuffix>
+		<VersionSuffix>065</VersionSuffix>
 		<Version>$(VersionPrefix).$(VersionSuffix)</Version>
 		<Copyright>Bolapansoft</Copyright>
 		<!--<Nullable>enable</Nullable>-->

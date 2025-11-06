@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<VersionPrefix>1.2.18</VersionPrefix>
+		<VersionPrefix>1.2.20</VersionPrefix>
 		<OutputType>Library</OutputType>
 		<TargetFrameworks>net48; net8.0</TargetFrameworks>
 		<ImplicitUsings>disable</ImplicitUsings>

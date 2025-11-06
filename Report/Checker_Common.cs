@@ -20,6 +20,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.ConstrainedExecution;
 using System.Text;
+using Nano.Electric.Extensions;
 
 namespace Bs.Nano.Electric.Report {
     public class NtProduct : IProduct {
@@ -187,7 +188,7 @@ namespace Bs.Nano.Electric.Report {
         public void TotalKnownTablesCount() {
             using (Context context = connector.Connect()) {
                 int totalCount = 0;
-                var tables = context.GetKnownTables();
+                var tables = context.GetKnownTables().Where(t => t.count > 0);
                 foreach (var tableProperty in tables) {
                     (object property, string tableDescription, Type entityType, int count) = tableProperty;
                     if (string.IsNullOrEmpty(tableDescription)) {
@@ -206,7 +207,7 @@ namespace Bs.Nano.Electric.Report {
             using (Context context = connector.Connect()) {
                 var csvFile = $"Состав БДИ {DateTime.Now.ToString("yyyy.MM.dd")}.csv";
                 csvFile = Path.Combine(Directory.GetCurrentDirectory(), csvFile);
-                var tables = context.GetKnownTables();
+                var tables = context.GetKnownTables().Where(t => t.count > 0);
                 using (var csv = new StreamWriter(csvFile, false, new UTF8Encoding(false))) {
                     try {
                         csv.WriteLine($"Code;Name;SpecDescription");
@@ -397,7 +398,7 @@ namespace Bs.Nano.Electric.Report {
             //var allCodes = LoadAllCodes();
             List<(string Code, string ArticleName, string TableName, string TypeDescription)> allCodes = new();
             using (Context context = connector.Connect()) {
-                var tables = context.GetKnownTables();
+                var tables = context.GetKnownTables().Where(t => t.count > 0);
                 foreach (var tableDef in tables) {
                     IQueryable dbSet = (IQueryable)tableDef.property;
                     var tableName = Context.GetDatabaseTableName(tableDef.EntityType);
@@ -449,7 +450,7 @@ namespace Bs.Nano.Electric.Report {
         public void Rule_00_003() {
             Queue<(string TableName, string Code, string ArticleName)> errors = new();
             using (Context context = connector.Connect()) {
-                foreach (var tableDef in context.GetKnownTables()) {
+                foreach (var tableDef in context.GetKnownTables().Where(t => t.count > 0)) {
                     (object property, string tableDescription, Type entityType, int count) = tableDef;
                     var dbSet = (IQueryable)property;
                     if (typeof(IHaveImageRef).IsAssignableFrom(entityType) & typeof(IProduct).IsAssignableFrom(entityType)) {
@@ -498,7 +499,7 @@ namespace Bs.Nano.Electric.Report {
             Queue<(string tableDescription, string Code)> errorsIsNull = new();
             Queue<(string tableDescription, string Code, string message)> errorsFormat = new();
             using (Context context = connector.Connect()) {
-                foreach (var tableDef in context.GetKnownTables()) {
+                foreach (var tableDef in context.GetKnownTables().Where(t => t.count > 0)) {
                     (object property, string tableDescription, Type entityType, int count) = tableDef;
                     if (count > 0) {
                         //var typeDescription = Context.GetDefaultLocalizeValue(entityType);
@@ -571,7 +572,7 @@ namespace Bs.Nano.Electric.Report {
             var tasks = new List<(string Code, string Uri)>(1024 * 8);
 
             using (var context = connector.Connect()) {
-                foreach (var tableDef in context.GetKnownTables()) {
+                foreach (var tableDef in context.GetKnownTables().Where(t => t.count > 0)) {
                     string tableName = Context.GetDatabaseTableName(tableDef.EntityType);
                     tasks.AddRange(GetUriValues(context, tableName));
                 }

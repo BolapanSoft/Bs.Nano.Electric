@@ -290,26 +290,26 @@ namespace Bs.Nano.Electric.Report {
 
             return 0;
         }
-        public static IEnumerable<(object property, string tableDescription, Type EntityType, int count)> GetKnownTables(this DbContext source) {
-            var dbSetProperties = source.GetType().GetProperties()
-                .Where(p => p.PropertyType.IsGenericType &&
-                    p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>) &&
-                    p.PropertyType.GetGenericArguments().Length > 0);
+        //public static IEnumerable<(object property, string tableDescription, Type EntityType, int count)> GetKnownTables(this DbContext source) {
+        //    var dbSetProperties = source.GetType().GetProperties()
+        //        .Where(p => p.PropertyType.IsGenericType &&
+        //            p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>) &&
+        //            p.PropertyType.GetGenericArguments().Length > 0);
 
-            foreach (PropertyInfo propInfo in dbSetProperties) {
-                Type propType = propInfo.PropertyType.GetGenericArguments()[0];
-                string tableDescription = Context.GetDefaultLocalizeValue(propType);
-                object? dbSetInstance = propInfo.GetValue(source); // Get the instance of the DbSet<T> property
-                if (dbSetInstance is null) { continue; }
-                int count = 0;
-                try {
-                    count = GetCount((IQueryable)dbSetInstance);
-                }
-                catch {
-                    continue;
-                }
-                yield return (dbSetInstance, tableDescription, propType, count);
-            }
-        }
+        //    foreach (PropertyInfo propInfo in dbSetProperties) {
+        //        Type propType = propInfo.PropertyType.GetGenericArguments()[0];
+        //        string tableDescription = Context.GetDefaultLocalizeValue(propType);
+        //        object? dbSetInstance = propInfo.GetValue(source); // Get the instance of the DbSet<T> property
+        //        if (dbSetInstance is null) { continue; }
+        //        int count = 0;
+        //        try {
+        //            count = GetCount((IQueryable)dbSetInstance);
+        //        }
+        //        catch {
+        //            continue;
+        //        }
+        //        yield return (dbSetInstance, tableDescription, propType, count);
+        //    }
+        //}
     }
 }

@@ -443,22 +443,145 @@ namespace Bs.Nano.Electric.Report {
             return (allRight, values);
         }
 
-        //protected static IEnumerable<IProduct> GetProducts(Context context, string tableName) {
-        //    if (!(IsCorrectTableName(tableName))) {
-        //        throw new ArgumentException($"Строка \"{tableName}\" нея является допустимым именем таблицы.", nameof(tableName));
-        //    }
-        //    string strQuery = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer], [Id], [SpecDescription] FROM [{tableName}]";
-        //    var query = context.Database.SqlQuery<NtProduct>(strQuery);
-        //    var l = query.ToList();
-        //    return l;
-        //}
+        protected static IEnumerable<IProduct> GetProducts(Context context, Type tEntity) {
+            if (tEntity == null)
+                throw new ArgumentNullException(nameof(tEntity));
+
+            // Находим метод GetProducts<TEntity>(Context)
+            var method = typeof(Checker) // ← замените на реальное имя класса, где определён метод
+                .GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+                .Where(m => string.Equals(m.Name, "GetProducts", StringComparison.Ordinal))
+                .FirstOrDefault(m =>
+                    m.IsGenericMethodDefinition &&
+                    m.GetGenericArguments().Length == 1 &&
+                    m.GetParameters().Length == 1 &&
+                    m.GetParameters()[0].ParameterType == typeof(Context) &&
+                    // Проверяем ограничение "class" на generic-параметр
+                    (m.GetGenericArguments()[0].GenericParameterAttributes & GenericParameterAttributes.ReferenceTypeConstraint) != 0
+                );
+
+            if (method == null)
+                throw new MissingMethodException("Метод GetProducts<TEntity> не найден.");
+
+            // Создаём generic-версию метода с конкретным типом TEntity
+            var genericMethod = method.MakeGenericMethod(tEntity);
+
+            // Вызываем её (так как метод static, первый аргумент null)
+            var result = genericMethod.Invoke(null, new object[] { context });
+
+            // Возвращаем приведённый результат
+            return (List<IProduct>)result!;
+        }
+        protected static List<IProduct> GetProducts<TEntity>(Context context) where TEntity:class{
+            if (!typeof(IProduct).IsAssignableFrom(typeof(TEntity)))
+                throw new InvalidOperationException($"Тип \"{typeof(TEntity).FullName}\" не может быть приведен к интерфейсу \"{typeof(IProduct).FullName}\"");
+
+            // Получаем корректно schema и table
+            var (schema, table) = context.GetTableSchemaAndName(typeof(TEntity));
+            var sqlTable = string.IsNullOrEmpty(schema) ? $"[{table}]" : $"[{schema}].[{table}]";
+
+            string sql = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer], [Id], [SpecDescription] FROM {sqlTable}";
+
+            // Открываем connection - ветви для EF6/EF Core
+#if NETFRAMEWORK
+            using var conn = context.Database.Connection; // EF6
+#else
+    using var conn = context.Database.GetDbConnection(); // EF Core
+#endif
+
+            if (conn.State != ConnectionState.Open)
+                conn.Open();
+
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = sql;
+
+            try {
+                using (var reader = cmd.ExecuteReader()) {
+                    var list = new List<IProduct>();
+                    while (reader.Read()) {
+                        // Code
+                        string code = reader.IsDBNull(0) ? string.Empty : reader.GetValue(0)?.ToString() ?? string.Empty;
+
+                        // DbImageRef - nullable int; underlying provider may return Int64 for integers (SQLite)
+                        int? dbImageRef = null;
+                        if (!reader.IsDBNull(1)) {
+                            var val = reader.GetValue(1);
+                            dbImageRef = ConvertDbIntegerToIntNullable(val);
+                        }
+
+                        string name = reader.IsDBNull(2) ? string.Empty : reader.GetValue(2)?.ToString() ?? string.Empty;
+                        string manufacturer = reader.IsDBNull(3) ? string.Empty : reader.GetValue(3)?.ToString() ?? string.Empty;
+
+                        // Id - primary key, ожидаем не-null
+                        int id;
+                        if (!reader.IsDBNull(4)) {
+                            id = System.Convert.ToInt32(reader.GetValue(4), CultureInfo.InvariantCulture);
+                        }
+                        else {
+                            // решение: если PK == null - пропускаем запись или бросаем
+                            continue;
+                        }
+
+                        string specDescription = reader.IsDBNull(5) ? string.Empty : reader.GetValue(5)?.ToString() ?? string.Empty;
+
+                        list.Add(new NtProduct {
+                            Code = code,
+                            DbImageRef = dbImageRef,
+                            Name = name,
+                            Manufacturer = manufacturer,
+                            Id = id,
+                            SpecDescription = specDescription
+                        });
+                    }
+                    return list;
+                }
+            }
+            catch (Exception ex) {
+                // Логирование исключения важно — не подавляйте ошибки silently
+                // Logger?.LogError(ex, "Direct SQL read failed, falling back to EF loading.");
+                // Запасной план — полная загрузка сущностей через EF (AsNoTracking для уменьшения нагрузки)
+                var set = context.Set<TEntity>();
+                // Для EF6: System.Data.Entity namespace содержит AsNoTracking() extension
+                var entities = set.AsNoTracking().ToList(); // List<TEntity>
+
+                var outList = new List<IProduct>(entities.Count);
+                foreach (var e in entities)
+                    outList.Add((IProduct)e);
+
+                return outList;
+            }
+        }
+        private static int? ConvertDbIntegerToIntNullable(object? val) {
+            if (val == null || val == DBNull.Value)
+                return null;
+            try {
+                // Если уже int
+                if (val is int i)
+                    return i;
+                if (val is long l)
+                    return (int)l;
+                if (val is short s)
+                    return (int)s;
+                if (val is byte b)
+                    return b;
+                if (val is decimal dec)
+                    return (int)dec;
+                // Попробуем через Convert
+                return System.Convert.ToInt32(val, CultureInfo.InvariantCulture);
+            }
+            catch {
+                return null;
+            }
+        }
         protected static List<IProduct> GetProducts(Context context, string tableName) {
-            if (!IsCorrectTableName(tableName))
+            if (IsCorrectTableName(tableName)) {
                 throw new ArgumentException($"Строка \"{tableName}\" не является допустимым именем таблицы.", nameof(tableName));
+            }
             string sql = $"SELECT [Code], [DbImageRef], [Name], [Manufacturer], [Id], [SpecDescription] FROM [{tableName}]";
 
 #if NETFRAMEWORK
             return context.Database.SqlQuery<NtProduct>(sql).ToList().Cast<IProduct>().ToList();
+
 #else
             var list = new List<IProduct>();
             using var conn = context.Database.GetDbConnection();
@@ -468,20 +591,23 @@ namespace Bs.Nano.Electric.Report {
             using var cmd = conn.CreateCommand();
             cmd.CommandText = sql;
 
-            using var reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                list.Add(new NtProduct {
-                    Code = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
-                    DbImageRef = reader.IsDBNull(1) ? null : reader.GetInt32(1),
-                    Name = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
-                    Manufacturer = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                    Id = reader.GetInt32(4),
-                    SpecDescription = reader.IsDBNull(5) ? string.Empty : reader.GetString(5)
-                });
+            using (var reader = cmd.ExecuteReader()) {
+                while (reader.Read()) {
+                    list.Add(new NtProduct {
+                        Code = reader.IsDBNull(0) ? string.Empty : reader.GetString(0),
+                        DbImageRef = reader.IsDBNull(1) ? null : reader.GetInt32(1),
+                        Name = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                        Manufacturer = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                        Id = reader.GetInt32(4),
+                        SpecDescription = reader.IsDBNull(5) ? string.Empty : reader.GetString(5)
+                    });
+                }
+                return list;
             }
-            return list;
 #endif
         }
+
+
         //private static IEnumerable<(string code, string uri)> GetUriValues(Context context, string tableName) {
         //    List<(string code, string uri)> values = new();
         //    if (!(IsCorrectTableName(tableName))) {

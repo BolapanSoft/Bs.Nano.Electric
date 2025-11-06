@@ -12,11 +12,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+
+
+
 #if NETFRAMEWORK
 using System.Data.Entity;
 using System.Data.SQLite;
 using System.Data.SqlClient;
 using System.Data.SqlServerCe;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Core.Metadata.Edm;
 #else
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -458,6 +463,83 @@ namespace Nano.Electric {
             modelBuilder.Ignore<DbGcKnotLevel>();
             modelBuilder.Ignore<DbGcSystemPlain>();
 
+        }
+#if NETFRAMEWORK
+        public string GetTableName(Type entityType) {
+            if (entityType == null)
+                throw new ArgumentNullException(nameof(entityType));
+
+            var metadata = ((IObjectContextAdapter)this).ObjectContext.MetadataWorkspace;
+            var entityName = entityType.Name;
+
+            var entitySet = metadata
+                .GetItems<EntityContainer>(DataSpace.SSpace)
+                .SelectMany(c => c.BaseEntitySets)
+                .FirstOrDefault(s => s.ElementType.Name == entityName || s.Name == entityName);
+
+            if (entitySet == null)
+                throw new InvalidOperationException($"Не удалось найти таблицу для типа {entityType.FullName} в модели EF.");
+
+            var schema = (string)entitySet.MetadataProperties["Schema"].Value ?? "dbo";
+            var table = (string)entitySet.MetadataProperties["Table"].Value ?? entitySet.Name;
+
+            return $"{schema}.{table}";
+        }
+#else
+        public string GetTableName(Type entityType) {
+            if (entityType == null)
+                throw new ArgumentNullException(nameof(entityType));
+            var et = this.Model.FindEntityType(entityType);
+            if (et == null)
+                throw new InvalidOperationException($"Тип {entityType.FullName} не найден в модели DbContext.");
+
+            // Получаем имя таблицы и схему (если задана)
+            //var tableName = et.GetTableName();
+            //var schema = et.GetSchema();
+            (string? schema, string tableName) = GetTableSchemaAndName(entityType);
+            if (string.IsNullOrWhiteSpace(tableName))
+                throw new InvalidOperationException($"Для типа {entityType.FullName} не определено имя таблицы.");
+
+            // Возвращаем в виде schema.table (если схема указана)
+            return string.IsNullOrWhiteSpace(schema)
+                ? tableName
+                : $"{schema}.{tableName}";
+        }
+#endif
+        public (string? schema, string table) GetTableSchemaAndName(Type entityType) {
+#if NETFRAMEWORK
+            // EF6 implementation using MetadataWorkspace
+            var objectContext = ((System.Data.Entity.Infrastructure.IObjectContextAdapter)this).ObjectContext;
+            var metadata = objectContext.MetadataWorkspace;
+
+            string entityName = entityType.Name;
+
+            // Ищем EntitySet в пространстве хранения (SSpace)
+            var entitySets = metadata.GetItems<EntityContainer>(DataSpace.SSpace)
+                                     .SelectMany(c => c.BaseEntitySets);
+
+            var set = entitySets.FirstOrDefault(s =>
+                string.Equals(s.ElementType.Name, entityName, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(s.Name, entityName, StringComparison.OrdinalIgnoreCase));
+
+            if (set == null)
+                throw new InvalidOperationException($"Не найден EntitySet для {entityType.FullName}.");
+
+            var table = (string)(set.MetadataProperties.Contains("Table") && set.MetadataProperties["Table"].Value != null
+                ? set.MetadataProperties["Table"].Value
+                : set.Name);
+
+            var schema = (string?)(set.MetadataProperties.Contains("Schema") ? set.MetadataProperties["Schema"].Value : null);
+            return (schema, table);
+#else
+            // EF Core implementation
+            var et = this.Model.FindEntityType(entityType);
+            if (et == null)
+                throw new InvalidOperationException($"EntityType for {entityType.FullName} not found in model.");
+            var tableName = et.GetTableName();
+            var schema = et.GetSchema();
+            return (schema, tableName ?? throw new InvalidOperationException("Table name is null"));
+#endif
         }
 
         public bool IsHaveColumns(string tableName, params string[] columns) {
