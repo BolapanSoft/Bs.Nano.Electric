@@ -111,7 +111,7 @@ namespace Nano.Electric {
             [XmlElement("ActivityFactor")]
             public string ActivityFactorXml {
                 get => ActivityFactor.ToString(CultureInfo.InvariantCulture);
-                set => ActivityFactor = ParseIntAndValidate(value, nameof(ActivityFactor), 1, 500);
+                set => ActivityFactor = ParseIntAndValidate(value, nameof(ActivityFactor), -1, 500);
             }
 
             // --- Вспомогательные методы ---

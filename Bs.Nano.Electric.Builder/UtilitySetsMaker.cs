@@ -300,11 +300,6 @@ namespace Bs.Nano.Electric.Builder {
                 .ToList();
             foreach (var job in jobs) {
                 MakeDbScsGutterUtilitySet(context, job);
-                //logger.LogInformation("Построение конфигурации узлов крепления \"{}\".", job.Attribute.DbName);
-                //using (Context context = connector.Connect())
-                //using (var trans = context.Database.BeginTransaction()) {
-
-                //}
             }
         }
 
@@ -1599,7 +1594,7 @@ namespace Bs.Nano.Electric.Builder {
                 }
                 else {
                     string btRowCode = btRow.ItemCode;
-                    {
+                    if (!string.IsNullOrEmpty(btRowCode)) {
                         var btLength = btRow.TotalLayersHeight;
                         var bt = context.ScsGutterBoltings
                             .Select(bt => new { bt.Id, bt.Code, bt.Length, bt.ProfileLength, bt.Heigth, bt.CanalBoltingType })
@@ -1640,6 +1635,9 @@ namespace Bs.Nano.Electric.Builder {
                             }
                         }
                         ks.Length = btLength.HasValue ? btLength.Value : 500;
+                    }
+                    else {
+                        sguSet.StandType = DbGcKnotStandType.NO;
                     }
                     var btRowId = btRow.Uid;
                     foreach (var childItem in jobParts.Where(item => item.ParentUid == btRowId).ToArray()) {
@@ -1796,7 +1794,7 @@ namespace Bs.Nano.Electric.Builder {
                             }
                             else {
                                 dbUtilityUnit.SpecCount = childItem.ItemQuantity;
-                                dbGcKnotPlain.AddChild(dbUtilityUnit); 
+                                dbGcKnotPlain.AddChild(dbUtilityUnit);
                             }
                             jobParts.Remove(childItem);
                         }
@@ -1813,10 +1811,10 @@ namespace Bs.Nano.Electric.Builder {
                 }
                 sguSet.LevelCount = levelCount;
                 sguSet.KitStructure = GetKitStructureAsXML(sguSet);
-                if (jobParts.Count==0) {
-                    logger.LogInformation("Конфигурация узлов крепления \"{}\" построена успешно.", job.Attribute.DbName); 
+                if (jobParts.Count == 0) {
+                    logger.LogInformation("Конфигурация узлов крепления \"{}\" построена успешно.", job.Attribute.DbName);
                 }
-                else {  
+                else {
                     logger.LogWarning($"В конфигурации узлов крепления {job.Attribute.DbName} остались необработанные элементы:");
                     foreach (var item in jobParts) {
                         logger.LogWarning($"Id элемента={item.Uid}, Артикул={item.ItemCode}, Элемент конфигурации={item.KitStructureItem.GetDescription()}");
