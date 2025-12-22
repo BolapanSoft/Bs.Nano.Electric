@@ -445,11 +445,13 @@ namespace Bs.Nano.Electric.Builder {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal string GetDbScsGcSeriesConfiguration_Key(ScsGutterType gutterType, string gutterSerie) {
-            var key = $"{EnumConverter<ScsGutterType>.GetDescription(gutterType)}\\{gutterSerie}";
-            if (resources.SeriaConfigurationMapping.TryGetValue(key, out var keySeriaConfiguration) && !string.IsNullOrWhiteSpace(keySeriaConfiguration)) {
-                return keySeriaConfiguration;
-            }
+        internal string GetDbScsGcSeriesConfiguration_Key(ScsGutterType gutterType, string? gutterSerie) {
+            string gtc = EnumConverter<ScsGutterType>.GetDescription(gutterType);
+            var key = string.IsNullOrEmpty(gutterSerie) ? gtc :
+                $"{gtc}\\{gutterSerie}";
+            //if (resources.SeriaConfigurationMapping.TryGetValue(key, out var keySeriaConfiguration) && !string.IsNullOrWhiteSpace(keySeriaConfiguration)) {
+            //    return keySeriaConfiguration;
+            //}
             return key;
         }
         private DbCcMountSystem MakeDbCcMountSystem(Context context, CcMountSystemSetJob confJob) {
@@ -652,8 +654,8 @@ namespace Bs.Nano.Electric.Builder {
                                                                           //kit.DbCatalog = gcPart.Series;
                                                                           //kit.Description = gcPart.Description;
                                                     segment.SetGutterSeria(gcPart);
-                                                    //var confCode = GetDbScsGcSeriesConfiguration_Key(gcPart.GutterType, gcPart.Series);
-                                                    //kit.DbName = confCode;
+                                                    var confCode = GetDbScsGcSeriesConfiguration_Key(gcPart.GutterType, gcPart.Series);
+                                                    kit.DbCatalog = confCode;
                                                     segment.ComplectType = configPartItem.ComplectType;
                                                     continue;
                                                 }
@@ -949,7 +951,9 @@ namespace Bs.Nano.Electric.Builder {
                             continue;
                         }
                         DbScsGcSeriaConfigiration? config = FindDbScsGcSeriaConfigiration(context, mountSystemSet, gutterRow, gutterCanal);
-
+                        if (config is null) {
+                            logger.LogWarning($"Ошибка создания конфигурации трасс лотков {job.Code}{job.CodeSuffix}, строка c Uid={gutterRow.Uid}. Не найдена конфигурация соединительных элементов для лотка {gutterCanal.Code}.");
+                        }
                         var gutter = plain.Gutter = new DbGcSystemGutter {
                             Gutter = gutterCanal,
                             ComplectType = gutterRow.ComplectType ?? DbGcStrightSegmentComplectType.SEGMENT,
@@ -1000,32 +1004,36 @@ namespace Bs.Nano.Electric.Builder {
         }
 
         private DbScsGcSeriaConfigiration? FindDbScsGcSeriaConfigiration(Context context, DbGcMountSystem mountSystemSet, MountSystemSetJobPart gutterRow, ScsGutterCanal gutterCanal) {
-            if (contextCache.NotNull().TryGetValue("DbScsGcSeriaConfigirations", out DbScsGcSeriaConfigiration[]? seriaConfigurations) != true) {
+            if (contextCache!.TryGetValue("DbScsGcSeriaConfigirations", out DbScsGcSeriaConfigiration[]? seriaConfigurations) != true || seriaConfigurations is null) {
                 seriaConfigurations = context.DbScsGcSeriaConfigirations.AsNoTracking().ToArray();
-                contextCache.Set("DbScsGcSeriaConfigirations", seriaConfigurations);
+                contextCache!.Set("DbScsGcSeriaConfigirations", seriaConfigurations);
             }
             DbScsGcSeriaConfigiration? config = null;
-            var confCode = gutterRow.DbScsGcSeriaConfigiration;
-            if (string.IsNullOrEmpty(confCode)) {
-                confCode = GetDbScsGcSeriesConfiguration_Key(gutterCanal.GutterType, gutterCanal.Series ?? string.Empty);
-            }
-            config = seriaConfigurations.NotNull()
-                .FirstOrDefault(item => item.DbName == confCode);
+            //var confCode = gutterRow.DbScsGcSeriaConfigiration;
+            //if (string.IsNullOrEmpty(confCode)) {
+            //    confCode = GetDbScsGcSeriesConfiguration_Key(gutterCanal.GutterType, gutterCanal.Series ?? string.Empty);
+            //}
+            //config = seriaConfigurations
+            //    .FirstOrDefault(item => item.DbName == confCode);
             if (config is null) {
                 // Поиск подходящей конфигурации по типу и серии лотка, шаблону для поиска.
                 List<string> patterns = new List<string>();
-                if (!string.IsNullOrEmpty(gutterCanal.Series)) {
-                    patterns.Add(gutterCanal.Series!);
-                }
-                patterns.Add(gutterCanal.GutterType.GetDescription());
-                if (!string.IsNullOrEmpty(gutterRow.DbScsGcSeriaConfigiration)) {
-                    var confPattern = gutterRow.DbScsGcSeriaConfigiration!.Split(';');
-                    foreach (var pattern in confPattern) {
-                        patterns.Add(pattern.Trim(' ', '"'));
+                var gutterSeria = gutterCanal.Series;
+                if (!string.IsNullOrEmpty(gutterSeria)) { // Требование nanoCAD - серия лотка обязана совпадать с серией лотка в конфигурации соединительных элементов.
+                    // patterns.Add(gutterCanal.Series!);
+                    patterns.Add(gutterCanal.GutterType.GetDescription());
+                    if (!string.IsNullOrEmpty(gutterRow.DbScsGcSeriaConfigiration)) {
+                        var confPattern = gutterRow.DbScsGcSeriaConfigiration!.Split(';');
+                        foreach (var pattern in confPattern) {
+                            patterns.Add(pattern.Trim(' ', '"'));
+                        }
                     }
+                    // Поиск config по паттерну поиска
+                    config = LookupSeriaConfigiration(seriaConfigurations, gutterSeria!, patterns.ToArray());
                 }
-                // Поиск config по паттерну поиска
-                config = LookupSeriaConfigiration(seriaConfigurations, patterns.ToArray());
+                else {
+                    return null;
+                }
                 if (config is null) {
                     logger.LogWarning($"В конфигурации {mountSystemSet.Name} для лотка {gutterCanal.Code} не сопоставлена конфигурация соединительных элементов.");
                 }
@@ -1038,9 +1046,8 @@ namespace Bs.Nano.Electric.Builder {
         // элемент шаблона является частью одной из строк элементов массива entries
         // Если имеется частичное совпадение, возвращается элемент с частичным совпадением.
         // При этом, элементы шаблона, идущие первыми, имеют более высокий приоритет.
-        private DbScsGcSeriaConfigiration? LookupSeriaConfigiration(DbScsGcSeriaConfigiration[] seriaConfigurations, string[] patterns) {
-            SeriaConfigurationCacheEntry[] entries;
-            if (!contextCache.NotNull().TryGetValue("LookupSeriaConfigiration.seriaConfigurations", out entries)) {
+        private DbScsGcSeriaConfigiration? LookupSeriaConfigiration(DbScsGcSeriaConfigiration[] seriaConfigurations, string gutterSeria, string[] patterns) {
+            if (!contextCache.NotNull().TryGetValue("LookupSeriaConfigiration.seriaConfigurations", out SeriaConfigurationCacheEntry[]? entries) || entries is null) {
                 // Load entries
                 entries = seriaConfigurations
                     .Select(sc => new SeriaConfigurationCacheEntry(
@@ -1069,7 +1076,7 @@ namespace Bs.Nano.Electric.Builder {
             //        return match.seriaConfiguration;
             //}
 
-            return Filter(new LinkedList<SeriaConfigurationCacheEntry>(entries), null, new Queue<string>(patterns))?
+            return Filter(new LinkedList<SeriaConfigurationCacheEntry>(entries.Where(el => el.Seria == gutterSeria)), null, new Queue<string>(patterns))?
                 .seriaConfiguration;
 
         }

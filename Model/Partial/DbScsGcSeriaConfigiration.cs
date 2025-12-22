@@ -1,7 +1,8 @@
 ﻿using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-
+using System.IO;
+using System;
 
 
 namespace Nano.Electric {
@@ -15,6 +16,17 @@ namespace Nano.Electric {
             }
             string xml = stringBuilder.ToString();
             KitStructure = xml;
+        }
+        public static SeriaConfigirationKit ParseKitStructure(string strKitStructure)
+        {
+            if (string.IsNullOrWhiteSpace(strKitStructure))
+                throw new ArgumentException("Input XML string is null or empty.", nameof(strKitStructure));
+
+            var serializer = new XmlSerializer(typeof(SeriaConfigirationKit));
+            using (var stringReader = new StringReader(strKitStructure))
+            {
+                return (SeriaConfigirationKit)serializer.Deserialize(stringReader)!;
+            }
         }
     }
 }

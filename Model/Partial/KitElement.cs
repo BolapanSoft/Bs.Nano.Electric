@@ -14,8 +14,49 @@ namespace Nano.Electric {
         }
 
         public virtual void ReadXml(XmlReader reader) {
-            throw new NotImplementedException();
+            if (reader.IsEmptyElement) {
+                reader.ReadStartElement();
+                return;
+            }
+
+            reader.ReadStartElement();
+
+            // Read properties
+            if (reader.NodeType == XmlNodeType.Element && reader.Name == "Properties") {
+                ReadProperties(reader);
+                reader.ReadEndElement();
+            }
+
+            // Read children
+            if (reader.NodeType == XmlNodeType.Element && reader.Name == "Children") {
+                reader.ReadStartElement();
+                while (reader.NodeType == XmlNodeType.Element && reader.Name == "Child") {
+                    string typeName = reader.GetAttribute("TypeName");
+                    reader.ReadStartElement("Child");
+
+                    // Dynamically create instance by type name
+                    var type = Type.GetType(typeName, throwOnError: false);
+                    if (type != null && typeof(IXmlSerializable).IsAssignableFrom(type)) {
+                        var serializer = new XmlSerializer(type);
+                        var child = (IXmlSerializable)serializer.Deserialize(reader);
+                        Children.Add(child);
+                    }
+                    else {
+                        // Skip unknown child
+                        reader.Skip();
+                    }
+                    reader.ReadEndElement(); // Child
+                }
+                reader.ReadEndElement(); // Children
+            }
+
+            // Move past end element of root
+            if (reader.NodeType == XmlNodeType.EndElement)
+                reader.ReadEndElement();
         }
+
+        // You must implement this in derived classes
+        protected abstract void ReadProperties(XmlReader reader);
 
         public virtual void WriteXml(XmlWriter writer) {
             writer.WriteStartElement("Properties");
