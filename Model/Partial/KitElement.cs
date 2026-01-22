@@ -56,7 +56,9 @@ namespace Nano.Electric {
         }
 
         // You must implement this in derived classes
-        protected abstract void ReadProperties(XmlReader reader);
+        protected virtual void ReadProperties(XmlReader reader) {
+            throw new NotImplementedException();
+        }
 
         public virtual void WriteXml(XmlWriter writer) {
             writer.WriteStartElement("Properties");
