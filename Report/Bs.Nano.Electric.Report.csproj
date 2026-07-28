@@ -14,7 +14,10 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="9.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.2" />
-		<PackageReference Include="Bs.XML.SpreadSheet" Version="2.0.16" />
+		<!-- В решениях, где рядом лежат исходники Bs.XML.SpreadSheet, этот пакет
+		     подменяется на ProjectReference из Directory.Build.targets родительского
+		     решения. См. Bs.ModelStudioCs/Doc/PackageReferenceOverride.md -->
+		<PackageReference Include="Bs.XML.SpreadSheet" Version="3.2.5" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="9.0.2" />
