@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Gc Scs Etm
-
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System;
     using System.Collections.Generic;

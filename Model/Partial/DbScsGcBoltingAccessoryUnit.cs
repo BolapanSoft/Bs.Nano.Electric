@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Scs Gc
-
-using System.Xml.Serialization;
+﻿using System.Xml.Serialization;
 
 namespace Nano.Electric {
     public partial class DbScsGcBoltingAccessoryUnit : DbUtilityUnit, IXmlSerializable {

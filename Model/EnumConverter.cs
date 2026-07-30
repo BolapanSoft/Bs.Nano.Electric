@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Tdest Tsource Tprop dest Tret
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;

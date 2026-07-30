@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Scs Gc Nano
-
-using Bs.XML.SpreadSheet;
+﻿using Bs.XML.SpreadSheet;
 using Microsoft.Extensions.Configuration;
 using Nano.Electric;
 using System.Diagnostics.CodeAnalysis;

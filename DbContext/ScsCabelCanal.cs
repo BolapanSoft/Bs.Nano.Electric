@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Scs Cabel Etm
+﻿// Ignore Spelling: Cabel
 
 namespace Nano.Electric
 {

@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Cae Meashure Etm
+﻿// Ignore Spelling: Cae Meashure
 
 namespace Nano.Electric
 {

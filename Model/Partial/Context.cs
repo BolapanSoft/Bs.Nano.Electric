@@ -1,7 +1,5 @@
 ﻿//using DocumentFormat.OpenXml.Bibliography;
 
-// Ignore Spelling: Tdest
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

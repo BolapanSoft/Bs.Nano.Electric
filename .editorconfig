@@ -4,3 +4,10 @@
 
 # CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 dotnet_diagnostic.CS8618.severity = none
+
+# Настройки проверки орфографии (расширение Visual Studio Spell Checker, EWSoftware).
+# Отдельная секция и отдельный словарь: root = true в этом файле обрывает наследование,
+# поэтому словарь из каталога выше сюда не распространяется.
+[*]
+vsspell_section_id = 925b94232efa4b8db52e4ae165cc1297
+vsspell_ignored_words_925b94232efa4b8db52e4ae165cc1297 = File:IgnoredWords.dic

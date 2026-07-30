@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Scs Cabel
+﻿// Ignore Spelling: Cabel
 using Nano.Electric.Enums;
 
 namespace Nano.Electric {

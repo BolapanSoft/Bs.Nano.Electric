@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Scs Gc
-
-namespace Nano.Electric
+﻿namespace Nano.Electric
 {
     using System.ComponentModel.DataAnnotations.Schema;
     

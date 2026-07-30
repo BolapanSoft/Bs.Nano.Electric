@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Expl
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Xml;
 using System.Xml.Serialization;
 

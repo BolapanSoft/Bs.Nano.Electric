@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Expl
-
-using Nano.Electric.Enums;
+﻿using Nano.Electric.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.PerformanceData;
 using System.Xml;

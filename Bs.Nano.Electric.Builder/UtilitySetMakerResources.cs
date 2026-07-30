@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Gc
-
-using Bs.XML.SpreadSheet;
+﻿using Bs.XML.SpreadSheet;
 using Microsoft.Extensions.Configuration;
 using Nano.Electric;
 using Nano.Electric.Enums;

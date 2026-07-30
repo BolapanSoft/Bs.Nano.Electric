@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Automat
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace Nano.Electric.Enums {
     public enum AutomatContactType {

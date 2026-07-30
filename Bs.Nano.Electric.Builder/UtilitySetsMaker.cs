@@ -1,6 +1,4 @@
-﻿// Ignore Spelling: Gc
-
-using Bs.Nano.Electric.Model;
+﻿using Bs.Nano.Electric.Model;
 using Bs.XML.SpreadSheet;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

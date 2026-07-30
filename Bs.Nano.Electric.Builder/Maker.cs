@@ -1,4 +1,4 @@
-﻿// Ignore Spelling: Iek Tprod
+﻿// Ignore Spelling: Tprod
 
 using Microsoft.Extensions.Logging;
 using Nano.Electric;
